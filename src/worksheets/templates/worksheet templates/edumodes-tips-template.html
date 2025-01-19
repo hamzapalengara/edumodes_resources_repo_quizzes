@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="description" content="EduModes Worksheet Tips">
+    <meta name="theme-color" content="#f59e0b">
+    <title>[[WORKSHEET_TITLE]] - Tips</title>
+    
+    <!-- Include Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <style>
+        /* Base Styles */
+        :root {
+            --primary-color: #f59e0b;
+            --spacing-unit: clamp(0.5rem, 2vw, 1rem);
+            --font-base: clamp(16px, 2vw, 18px);
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-size: var(--font-base);
+            -webkit-text-size-adjust: 100%;
+        }
+
+        /* Print styles */
+        @media print {
+            .no-print { display: none; }
+            .tips-content { margin: 0; padding: 20px; }
+            .page-break { page-break-before: always; }
+            @page { size: A4; margin: 2cm; }
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="border-b print:border-0 bg-white">
+        <div class="container mx-auto">
+            <div class="px-2 sm:px-4 pt-0 pb-1">
+                <div class="flex items-center justify-between">
+                    <div class="flex flex-col min-w-0">
+                        <!-- Logo -->
+                        <div class="flex items-baseline leading-none">
+                            <span class="text-lg sm:text-xl font-black text-[#EC4899]">E</span>
+                            <span class="text-base sm:text-lg font-black text-sky-500 -ml-0.5">d</span>
+                            <span class="text-base sm:text-lg font-black text-indigo-500">u</span>
+                            <span class="text-lg sm:text-xl font-black text-[#EAB308] ml-0.5">M</span>
+                            <span class="text-base sm:text-lg font-black text-emerald-500 -ml-0.5">o</span>
+                            <span class="text-base sm:text-lg font-black text-teal-500">d</span>
+                            <span class="text-base sm:text-lg font-black text-green-500">e</span>
+                            <span class="text-base sm:text-lg font-black text-teal-500">s</span>
+                        </div>
+                        <a href="https://www.edumodes.com" target="_blank" class="text-[9px] sm:text-[10px] text-gray-500 hover:text-gray-800 leading-tight truncate">www.edumodes.com</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content Container -->
+    <div class="max-w-7xl mx-auto px-2 sm:px-4 py-3 sm:py-6">
+        <!-- Title Section -->
+        <div class="bg-white rounded-lg shadow-md p-3 sm:p-6 mb-4">
+            <h1 class="text-lg sm:text-xl md:text-2xl font-bold text-gray-800 text-center">
+                [[WORKSHEET_TITLE]] - Tips
+            </h1>
+        </div>
+
+        <!-- Overview Section -->
+        <div class="bg-white rounded-lg shadow-md p-3 sm:p-6 mb-4">
+            <h2 class="text-lg font-bold text-gray-800 mb-3">Getting Started</h2>
+            <div class="bg-amber-50 rounded-lg p-4">
+                <p class="text-gray-700">[[OVERVIEW]]</p>
+            </div>
+        </div>
+
+        <!-- Tips Container -->
+        <div class="space-y-4">
+            <!-- Key Concepts -->
+            <div class="bg-white rounded-lg shadow-md p-3 sm:p-6">
+                <h2 class="text-base font-medium text-gray-800 mb-3">Key Concepts to Remember</h2>
+                <div class="pl-4 border-l-4 border-amber-500">
+                    <ul class="list-disc list-inside space-y-2 text-gray-700">
+                        <li>[[CONCEPT_1]]</li>
+                        <li>[[CONCEPT_2]]</li>
+                        <li>[[CONCEPT_3]]</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Solving Strategies -->
+            <div class="bg-white rounded-lg shadow-md p-3 sm:p-6">
+                <h2 class="text-base font-medium text-gray-800 mb-3">Solving Strategies</h2>
+                <div class="pl-4 border-l-4 border-amber-500">
+                    <div class="space-y-4">
+                        <div>
+                            <h3 class="font-medium text-amber-600">Before You Start</h3>
+                            <p class="text-gray-700">[[PREPARATION_TIPS]]</p>
+                        </div>
+                        <div>
+                            <h3 class="font-medium text-amber-600">Step-by-Step Approach</h3>
+                            <p class="text-gray-700">[[SOLVING_STEPS]]</p>
+                        </div>
+                        <div>
+                            <h3 class="font-medium text-amber-600">Practice Tips</h3>
+                            <p class="text-gray-700">[[PRACTICE_TIPS]]</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Helpful Hints -->
+            <div class="bg-white rounded-lg shadow-md p-3 sm:p-6">
+                <h2 class="text-base font-medium text-gray-800 mb-3">Helpful Hints</h2>
+                <div class="pl-4 border-l-4 border-amber-500">
+                    <div class="space-y-3">
+                        <div>
+                            <p class="font-medium text-amber-600">Quick Tips:</p>
+                            <ul class="list-disc list-inside space-y-2 text-gray-700">
+                                <li>[[QUICK_TIP_1]]</li>
+                                <li>[[QUICK_TIP_2]]</li>
+                                <li>[[QUICK_TIP_3]]</li>
+                            </ul>
+                        </div>
+                        <div class="mt-4">
+                            <p class="font-medium text-amber-600">Common Mistakes to Avoid:</p>
+                            <ul class="list-disc list-inside space-y-2 text-gray-700">
+                                <li>[[MISTAKE_1]]</li>
+                                <li>[[MISTAKE_2]]</li>
+                                <li>[[MISTAKE_3]]</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="mt-8 py-4 border-t bg-white print:hidden">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <div class="text-xs text-gray-500">
+                © 2024 EduModes. All rights reserved.
+            </div>
+        </div>
+    </footer>
+</body>
+</html> 

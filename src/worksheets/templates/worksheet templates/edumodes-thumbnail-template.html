@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduModes Worksheet - Thumbnail</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Comic+Neue:wght@700&family=Orbitron:wght@700&display=swap');
+        
+        .comic-font {
+            font-family: 'Comic Neue', cursive;
+        }
+        
+        .orbitron-font {
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        .dynamic-bg {
+            background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+        }
+
+        .card-shine {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(
+                45deg,
+                rgba(255,255,255,0.2) 0%,
+                rgba(255,255,255,0.1) 50%,
+                rgba(255,255,255,0) 100%
+            );
+        }
+
+        .glow {
+            filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.5));
+        }
+
+        .neon-border {
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.3),
+                       inset 0 0 10px rgba(255, 255, 255, 0.3);
+        }
+
+        .card-bg {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+        }
+
+        .sparkle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: white;
+            border-radius: 50%;
+            box-shadow: 0 0 4px rgba(255, 255, 255, 0.8);
+        }
+    </style>
+</head>
+<body class="w-[500px] h-[375px] overflow-hidden dynamic-bg flex items-center justify-center">
+    <!-- Main Container - reverted width, reduced height -->
+    <div class="w-[420px] h-[240px] bg-gradient-to-br from-[var(--color-primary-dark)] to-[var(--color-secondary-dark)] rounded-2xl shadow-xl overflow-hidden border border-white/30 neon-border relative p-3">
+        <!-- Static Sparkles -->
+        <div class="absolute inset-0">
+            <div class="sparkle" style="top: 15%; left: 15%;"></div>
+            <div class="sparkle" style="top: 30%; left: 30%;"></div>
+            <div class="sparkle" style="top: 45%; left: 45%;"></div>
+            <div class="sparkle" style="top: 60%; left: 60%;"></div>
+            <div class="sparkle" style="top: 75%; left: 75%;"></div>
+        </div>
+        
+        <!-- Shine Effect -->
+        <div class="card-shine"></div>
+        
+        <!-- Content Area - more compact spacing -->
+        <div class="relative h-full flex flex-col justify-between">
+            <!-- Title Section -->
+            <div class="text-center mb-1">
+                <h1 class="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-white to-white/80 mb-1 glow">
+                    Worksheet Title
+                </h1>
+                <p class="text-lg text-white/90 glow">Subtitle</p>
+            </div>
+
+            <!-- Content Preview -->
+            <div class="grid grid-cols-2 gap-3 mb-1">
+                <!-- Left Side Content -->
+                <div class="card-bg rounded-xl p-2 shadow-lg transform -rotate-2 border border-white/30">
+                    <div class="h-10 flex items-center justify-center">
+                        <!-- Preview content here -->
+                    </div>
+                </div>
+
+                <!-- Right Side Content -->
+                <div class="card-bg rounded-xl p-2 shadow-lg transform rotate-2 border border-white/30">
+                    <div class="h-10 flex items-center justify-center">
+                        <!-- Preview content here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Icons -->
+            <div class="flex justify-center items-center gap-4">
+                <div class="w-8 h-8 card-bg rounded-full flex items-center justify-center text-lg border border-white/30">
+                    <!-- Icon 1 -->
+                </div>
+                <div class="w-8 h-8 card-bg rounded-full flex items-center justify-center text-lg border border-white/30">
+                    <!-- Icon 2 -->
+                </div>
+                <div class="w-8 h-8 card-bg rounded-full flex items-center justify-center text-lg border border-white/30">
+                    <!-- Icon 3 -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Set theme colors based on subject
+        const themes = {
+            math: {
+                primary: '#1e3a8a',
+                secondary: '#5b21b6',
+                primaryDark: 'rgba(30, 58, 138, 0.9)',
+                secondaryDark: 'rgba(91, 33, 182, 0.9)'
+            },
+            english: {
+                primary: '#FF6B6B',
+                secondary: '#4ECDC4',
+                primaryDark: 'rgba(255, 107, 107, 0.9)',
+                secondaryDark: 'rgba(78, 205, 196, 0.9)'
+            },
+            science: {
+                primary: '#38A169',
+                secondary: '#2B6CB0',
+                primaryDark: 'rgba(56, 161, 105, 0.9)',
+                secondaryDark: 'rgba(43, 108, 176, 0.9)'
+            }
+        };
+
+        // Set default theme (can be changed based on subject)
+        const theme = themes.math;
+        document.documentElement.style.setProperty('--color-primary', theme.primary);
+        document.documentElement.style.setProperty('--color-secondary', theme.secondary);
+        document.documentElement.style.setProperty('--color-primary-dark', theme.primaryDark);
+        document.documentElement.style.setProperty('--color-secondary-dark', theme.secondaryDark);
+    </script>
+</body>
+</html> 

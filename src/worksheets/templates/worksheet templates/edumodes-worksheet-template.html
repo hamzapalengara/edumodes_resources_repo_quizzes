@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="description" content="EduModes Interactive Worksheet">
+    <meta name="theme-color" content="#EC4899">
+    <title>[[WORKSHEET_TITLE]] - EduModes Interactive Worksheet</title>
+    
+    <!-- Include Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Include Alpine.js for reactivity -->
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <!-- Include SortableJS for drag and drop -->
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+    
+    <style>
+        /* Base Styles */
+        :root {
+            --primary-color: #EC4899;
+            --secondary-color: #EAB308;
+            --success-color: #22c55e;
+            --error-color: #ef4444;
+            --warning-color: #f59e0b;
+            --spacing-unit: clamp(0.5rem, 2vw, 1rem);
+            --touch-target: 44px;
+            --font-base: clamp(16px, 2vw, 18px);
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-size: var(--font-base);
+            -webkit-text-size-adjust: 100%;
+        }
+
+        /* Interactive Elements */
+        .interactive-element {
+            min-height: var(--touch-target);
+            padding: var(--spacing-unit);
+            margin: var(--spacing-unit) 0;
+            border-radius: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        /* Drag and Drop */
+        .draggable {
+            cursor: move;
+            user-select: none;
+            touch-action: none;
+        }
+
+        .dropzone {
+            min-height: var(--touch-target);
+            border: 2px dashed #cbd5e1;
+            border-radius: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .dropzone.active {
+            border-color: var(--primary-color);
+            background-color: rgba(236, 72, 153, 0.1);
+        }
+
+        /* Multiple Choice */
+        .choice-option {
+            min-height: var(--touch-target);
+            padding: 0.75rem;
+            margin: 0.5rem 0;
+            border: 2px solid #e5e7eb;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .choice-option:hover {
+            border-color: var(--primary-color);
+            background-color: rgba(236, 72, 153, 0.1);
+        }
+
+        .choice-option.selected {
+            border-color: var(--primary-color);
+            background-color: rgba(236, 72, 153, 0.2);
+        }
+
+        /* Progress Bar */
+        .progress-bar {
+            height: 0.5rem;
+            background-color: #e5e7eb;
+            border-radius: 9999px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background-color: var(--primary-color);
+            transition: width 0.3s ease;
+        }
+
+        /* Animations */
+        @keyframes celebrate {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .celebrate { animation: celebrate 0.5s ease; }
+        .shake { animation: shake 0.5s ease; }
+
+        /* Accessibility */
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+                scroll-behavior: auto !important;
+            }
+        }
+
+        .high-contrast {
+            --primary-color: #000000;
+            --secondary-color: #ffffff;
+            contrast: high;
+        }
+
+        /* Print styles */
+        @media print {
+            .no-print { display: none; }
+            .worksheet-content { margin: 0; padding: 20px; }
+            .page-break { page-break-before: always; }
+            @page { size: A4; margin: 2cm; }
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="border-b print:border-0 bg-white">
+        <div class="container mx-auto">
+            <div class="px-2 sm:px-4 pt-0 pb-1">
+                <div class="flex items-center justify-between">
+                    <div class="flex flex-col min-w-0">
+                        <!-- Logo -->
+                        <div class="flex items-baseline leading-none">
+                            <span class="text-lg sm:text-xl font-black text-[#EC4899]">E</span>
+                            <span class="text-base sm:text-lg font-black text-sky-500 -ml-0.5">d</span>
+                            <span class="text-base sm:text-lg font-black text-indigo-500">u</span>
+                            <span class="text-lg sm:text-xl font-black text-[#EAB308] ml-0.5">M</span>
+                            <span class="text-base sm:text-lg font-black text-emerald-500 -ml-0.5">o</span>
+                            <span class="text-base sm:text-lg font-black text-teal-500">d</span>
+                            <span class="text-base sm:text-lg font-black text-green-500">e</span>
+                            <span class="text-base sm:text-lg font-black text-teal-500">s</span>
+                        </div>
+                        <a href="https://www.edumodes.com" target="_blank" class="text-[9px] sm:text-[10px] text-gray-500 hover:text-gray-800 leading-tight truncate">www.edumodes.com</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Worksheet Container -->
+    <div x-data="worksheetApp()" class="worksheet-container max-w-7xl mx-auto px-2 sm:px-4 py-3 sm:py-6">
+        <!-- Progress Section -->
+        <div class="bg-white rounded-lg shadow-md p-3 sm:p-6 mb-4">
+            <div class="flex items-center justify-between mb-2">
+                <div class="text-sm font-medium text-gray-600">Progress</div>
+                <div class="text-sm font-medium text-gray-600">
+                    Score: <span x-text="score">0</span>/<span x-text="totalQuestions">0</span>
+                </div>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-bar-fill" x-bind:style="{ width: progressPercentage + '%' }"></div>
+            </div>
+        </div>
+
+        <!-- Title Section -->
+        <div class="bg-white rounded-lg shadow-md p-3 sm:p-6 mb-4">
+            <div class="flex flex-col md:flex-row items-center justify-between gap-2">
+                <div class="text-xs sm:text-sm text-gray-600 w-full md:w-auto">
+                    Student Name: _____________________
+                </div>
+                <h1 class="text-lg sm:text-xl md:text-2xl font-bold text-gray-800 text-center w-full md:flex-1 md:px-4">
+                    [[WORKSHEET_TITLE]]
+                </h1>
+                <div class="text-xs sm:text-sm text-gray-600 w-full md:w-auto text-right">
+                    Date: _____________________
+                </div>
+            </div>
+        </div>
+
+        <!-- Instructions -->
+        <div class="bg-white rounded-lg shadow-md p-3 sm:p-6 mb-4">
+            <h2 class="text-lg font-bold text-gray-800 mb-2">Instructions:</h2>
+            <div class="bg-blue-50 rounded-lg p-4">
+                <p class="text-sm sm:text-base text-gray-600">[[INSTRUCTIONS]]</p>
+            </div>
+        </div>
+
+        <!-- Questions Container -->
+        <div class="space-y-4">
+            <!-- Example Multiple Choice Question -->
+            <div class="bg-white rounded-lg shadow-md p-3 sm:p-6">
+                <div class="question-container" x-data="{ selected: null, isCorrect: null }">
+                    <h3 class="text-base font-medium text-gray-800 mb-3">[[QUESTION_1]]</h3>
+                    <div class="space-y-2">
+                        <template x-for="(option, index) in ['Option A', 'Option B', 'Option C', 'Option D']">
+                            <div class="choice-option"
+                                 :class="{ 'selected': selected === index }"
+                                 @click="selectOption(index)">
+                                <span x-text="option"></span>
+                            </div>
+                        </template>
+                    </div>
+                    <div class="mt-3" x-show="isCorrect !== null">
+                        <p x-show="isCorrect" class="text-success-color">Correct! Well done!</p>
+                        <p x-show="!isCorrect" class="text-error-color">Try again!</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Example Drag and Drop Question -->
+            <div class="bg-white rounded-lg shadow-md p-3 sm:p-6">
+                <div class="question-container">
+                    <h3 class="text-base font-medium text-gray-800 mb-3">[[QUESTION_2]]</h3>
+                    <div class="drag-drop-container">
+                        <div class="draggable-items space-y-2">
+                            <template x-for="item in ['Item 1', 'Item 2', 'Item 3']">
+                                <div class="draggable interactive-element bg-gray-100">
+                                    <span x-text="item"></span>
+                                </div>
+                            </template>
+                        </div>
+                        <div class="dropzones mt-4 space-y-2">
+                            <template x-for="zone in ['Zone 1', 'Zone 2', 'Zone 3']">
+                                <div class="dropzone">
+                                    <span class="text-gray-400" x-text="zone"></span>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Example Fill in the Blanks -->
+            <div class="bg-white rounded-lg shadow-md p-3 sm:p-6">
+                <div class="question-container">
+                    <h3 class="text-base font-medium text-gray-800 mb-3">[[QUESTION_3]]</h3>
+                    <div class="fill-blanks-container">
+                        <p class="text-gray-700">
+                            The <input type="text" class="border-b-2 border-gray-300 focus:border-primary-color outline-none px-2 w-24 text-center" placeholder="(type here)"> is shining brightly in the sky.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="mt-8 py-4 border-t bg-white print:hidden">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <div class="text-xs text-gray-500">
+                © 2024 EduModes. All rights reserved.
+            </div>
+        </div>
+    </footer>
+
+    <!-- Core Worksheet JavaScript -->
+    <script>
+        function worksheetApp() {
+            return {
+                currentQuestion: 0,
+                totalQuestions: 3,
+                score: 0,
+                answers: {},
+                
+                init() {
+                    this.initDragAndDrop();
+                    this.loadProgress();
+                },
+
+                get progressPercentage() {
+                    return (this.currentQuestion + 1) / this.totalQuestions * 100;
+                },
+
+                selectOption(index) {
+                    this.selected = index;
+                    // Add validation logic here
+                },
+
+                initDragAndDrop() {
+                    // Initialize SortableJS for drag and drop functionality
+                    const containers = document.querySelectorAll('.drag-drop-container');
+                    containers.forEach(container => {
+                        new Sortable(container.querySelector('.draggable-items'), {
+                            group: 'shared',
+                            animation: 150
+                        });
+                        new Sortable(container.querySelector('.dropzones'), {
+                            group: 'shared',
+                            animation: 150
+                        });
+                    });
+                },
+
+                saveProgress() {
+                    localStorage.setItem('worksheetProgress', JSON.stringify({
+                        currentQuestion: this.currentQuestion,
+                        score: this.score,
+                        answers: this.answers
+                    }));
+                },
+
+                loadProgress() {
+                    const saved = localStorage.getItem('worksheetProgress');
+                    if (saved) {
+                        const data = JSON.parse(saved);
+                        this.currentQuestion = data.currentQuestion;
+                        this.score = data.score;
+                        this.answers = data.answers;
+                    }
+                }
+            }
+        }
+    </script>
+</body>
+</html> 

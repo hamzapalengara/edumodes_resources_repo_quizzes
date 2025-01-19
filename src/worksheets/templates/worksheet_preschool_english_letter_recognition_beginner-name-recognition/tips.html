@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teaching Tips - Name Recognition Adventure</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @media print {
+            .no-print { display: none; }
+            .tips-content { margin: 0; padding: 20px; }
+            @page { size: A4; margin: 2cm; }
+        }
+
+        .tip-section {
+            @apply mb-6 border-l-4 border-amber-500 pl-4;
+        }
+
+        .tip-list {
+            @apply list-none pl-0 my-3;
+        }
+
+        .tip-list li {
+            @apply mb-2 pl-6 relative;
+        }
+
+        .tip-list li::before {
+            content: "•";
+            @apply text-amber-500 text-xl absolute left-0 top-[-2px];
+        }
+
+        .important-note {
+            @apply bg-amber-50 border border-amber-500 rounded-lg p-4 my-5;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="border-b print:border-0 bg-white">
+        <div class="container mx-auto">
+            <div class="px-2 sm:px-4 pt-0 pb-1">
+                <div class="flex items-center justify-between">
+                    <div class="flex flex-col min-w-0">
+                        <!-- Logo -->
+                        <div class="flex items-baseline leading-none">
+                            <span class="text-lg sm:text-xl font-black text-[#EC4899]">E</span>
+                            <span class="text-base sm:text-lg font-black text-sky-500 -ml-0.5">d</span>
+                            <span class="text-base sm:text-lg font-black text-indigo-500">u</span>
+                            <span class="text-lg sm:text-xl font-black text-[#EAB308] ml-0.5">M</span>
+                            <span class="text-base sm:text-lg font-black text-emerald-500 -ml-0.5">o</span>
+                            <span class="text-base sm:text-lg font-black text-teal-500">d</span>
+                            <span class="text-base sm:text-lg font-black text-green-500">e</span>
+                            <span class="text-base sm:text-lg font-black text-teal-500">s</span>
+                        </div>
+                        <a href="https://www.edumodes.com" target="_blank" class="text-[9px] sm:text-[10px] text-gray-500 hover:text-gray-800 leading-tight truncate">www.edumodes.com</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-4xl mx-auto p-4">
+        <!-- Header with amber gradient -->
+        <div class="bg-gradient-to-r from-amber-500 to-amber-700 text-white rounded-t-lg p-6 text-center">
+            <h1 class="text-2xl font-bold">Teaching Tips: Name Recognition Adventure</h1>
+        </div>
+        
+        <div class="bg-white rounded-b-lg shadow-md p-6">
+            <div class="tip-section">
+                <h2 class="text-lg font-bold text-amber-600 mb-3">Getting Started</h2>
+                <p class="text-gray-700 mb-2">Before beginning the name recognition activity, ensure:</p>
+                <ul class="tip-list">
+                    <li>The child is comfortable and ready to learn</li>
+                    <li>You have their name spelled correctly as you want them to learn it</li>
+                    <li>The device is properly positioned at their eye level</li>
+                    <li>The learning environment is free from distractions</li>
+                </ul>
+            </div>
+
+            <div class="tip-section">
+                <h2 class="text-lg font-bold text-amber-600 mb-3">Activity Guide</h2>
+                <ul class="tip-list">
+                    <li>Activity 1: Help enter the child's name correctly</li>
+                    <li>Activity 2: Guide them in finding letters of their name in the alphabet</li>
+                    <li>Activity 3: Assist with the matching game if needed</li>
+                    <li>Activity 4: Support them in putting letters in the correct order</li>
+                    <li>Activity 5: Watch the letter animations together</li>
+                </ul>
+            </div>
+
+            <div class="important-note">
+                <h3 class="text-lg font-bold text-amber-600 mb-2">Important Reminder</h3>
+                <p>Every child develops at their own pace. Some may need more time with certain activities than others. Always maintain a positive and encouraging environment.</p>
+            </div>
+
+            <div class="tip-section">
+                <h2 class="text-lg font-bold text-amber-600 mb-3">Progress Monitoring</h2>
+                <ul class="tip-list">
+                    <li>Watch how confidently they identify letters</li>
+                    <li>Notice if they can match letters consistently</li>
+                    <li>Observe their understanding of letter order</li>
+                    <li>Monitor their engagement and enjoyment</li>
+                </ul>
+            </div>
+
+            <div class="tip-section">
+                <h2 class="text-lg font-bold text-amber-600 mb-3">Extension Activities</h2>
+                <ul class="tip-list">
+                    <li>Practice finding their name letters in books</li>
+                    <li>Create a name song together</li>
+                    <li>Look for their letters in the environment</li>
+                    <li>Draw their letters in sand or with paint</li>
+                </ul>
+            </div>
+
+            <div class="important-note">
+                <h3 class="text-lg font-bold text-amber-600 mb-2">Learning Goals</h3>
+                <p>By completing this worksheet, you should be able to:</p>
+                <ul class="tip-list">
+                    <li>Recognize your name in print</li>
+                    <li>Identify all the letters in your name</li>
+                    <li>Match identical letters</li>
+                    <li>Put the letters of your name in order</li>
+                    <li>Understand how each letter is written</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</body>
+</html> 

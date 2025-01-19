@@ -1,0 +1,9 @@
+# Description (maximum 100 words)
+{Enter a clear description of the worksheet that includes:
+- What students will learn
+- Key activities or exercises
+- Learning outcomes
+- Target audience
+- Difficulty level
+
+Keep the description engaging and informative while staying under 100 words.} 

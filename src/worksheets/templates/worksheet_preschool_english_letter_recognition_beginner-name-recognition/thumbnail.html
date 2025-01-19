@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Name Recognition Adventure - Thumbnail</title>
+    <style>
+        :root {
+            --primary-color: #EC4899;    /* Pink */
+            --secondary-color: #EAB308;  /* Yellow */
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            width: 500px;            /* Outer width */
+            height: 375px;           /* Outer height */
+            overflow: hidden;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            font-family: system-ui, -apple-system, sans-serif;
+        }
+
+        .thumbnail-container {
+            width: 420px;            /* Inner width */
+            height: 240px;           /* Inner height */
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: var(--primary-color);
+            color: white;
+            padding: 12px 20px;
+            font-size: 18px;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .content {
+            flex: 1;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .preview {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .name-display {
+            display: flex;
+            gap: 8px;
+        }
+
+        .letter-box {
+            width: 36px;
+            height: 36px;
+            background: white;
+            border: 2px solid var(--primary-color);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .stars {
+            display: flex;
+            gap: 4px;
+        }
+
+        .star {
+            color: var(--secondary-color);
+            font-size: 24px;
+        }
+
+        .features {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            color: #475569;
+            font-size: 14px;
+        }
+
+        .feature {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .feature-icon {
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--primary-color);
+            color: white;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="thumbnail-container">
+        <div class="header">
+            Name Recognition Adventure
+        </div>
+        <div class="content">
+            <div class="preview">
+                <div class="name-display">
+                    <div class="letter-box">A</div>
+                    <div class="letter-box">M</div>
+                    <div class="letter-box">Y</div>
+                </div>
+                <div class="stars">
+                    ⭐⭐⭐⭐⭐
+                </div>
+            </div>
+            <div class="features">
+                <div class="feature">
+                    <div class="feature-icon">👀</div>
+                    <span>Find Letters in Your Name</span>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">🎯</div>
+                    <span>Match and Sequence Letters</span>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">✍️</div>
+                    <span>Learn Letter Writing</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html> 

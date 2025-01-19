@@ -1,0 +1,1346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="description" content="EduModes Interactive Worksheet">
+    <meta name="theme-color" content="#EC4899">
+    <title>Name Recognition Adventure - EduModes Interactive Worksheet</title>
+    
+    <!-- Include required libraries -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <!-- Add Vivus.js for SVG animations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vivus/0.4.6/vivus.min.js"></script>
+    
+    <script>
+        // Initialize speech synthesis
+        const speechSynth = window.speechSynthesis;
+        
+        // Function to speak text
+        function speakText(text) {
+            // Cancel any ongoing speech
+            speechSynth.cancel();
+            
+            // Create a new utterance
+            const utterance = new SpeechSynthesisUtterance(text);
+            
+            // Configure the utterance
+            utterance.rate = 0.8;  // Slightly slower speed
+            utterance.pitch = 1;   // Normal pitch
+            utterance.volume = 1;  // Full volume
+            
+            // Use English voice
+            const voices = speechSynth.getVoices();
+            const englishVoice = voices.find(voice => voice.lang.startsWith('en'));
+            if (englishVoice) {
+                utterance.voice = englishVoice;
+            }
+            
+            // Speak the text
+            speechSynth.speak(utterance);
+        }
+
+        // Add celebration functions
+        function playCelebration() {
+            // Trigger confetti only, remove audio
+            const count = 200;
+            const defaults = {
+                origin: { y: 0.7 }
+            };
+
+            function fire(particleRatio, opts) {
+                confetti({
+                    ...defaults,
+                    ...opts,
+                    particleCount: Math.floor(count * particleRatio)
+                });
+            }
+
+            fire(0.25, {
+                spread: 26,
+                startVelocity: 55,
+            });
+            fire(0.2, {
+                spread: 60,
+            });
+            fire(0.35, {
+                spread: 100,
+                decay: 0.91,
+                scalar: 0.8
+            });
+            fire(0.1, {
+                spread: 120,
+                startVelocity: 25,
+                decay: 0.92,
+                scalar: 1.2
+            });
+            fire(0.1, {
+                spread: 120,
+                startVelocity: 45,
+            });
+        }
+
+        function showCelebrationMessage(message) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'celebration-message';
+            messageDiv.textContent = message;
+            document.body.appendChild(messageDiv);
+            
+            setTimeout(() => {
+                messageDiv.remove();
+            }, 3000);
+        }
+    </script>
+
+    <style>
+        :root {
+            --primary-color: #EC4899;
+            --secondary-color: #EAB308;
+            --success-color: #22c55e;
+            --error-color: #ef4444;
+            --warning-color: #f59e0b;
+            --spacing-unit: clamp(0.5rem, 2vw, 1rem);
+            --touch-target: clamp(36px, 8vw, 44px);
+            --font-base: clamp(16px, 2vw, 18px);
+            --letter-size: clamp(24px, 6vw, 32px);
+        }
+
+        @media print {
+            .no-print { display: none; }
+            .worksheet-content { margin: 0; padding: 20px; }
+            .page-break { page-break-before: always; }
+            @page { size: A4; margin: 2cm; }
+        }
+
+        .activity-card {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            width: 100%;
+        }
+
+        .letter-box {
+            min-height: var(--touch-target);
+            min-width: var(--touch-target);
+            max-width: var(--touch-target);
+            border: 2px solid var(--primary-color);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: clamp(1rem, 4vw, 1.5rem);
+            margin: 0.25rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            touch-action: manipulation;
+            position: relative;
+            padding: 0.25rem;
+        }
+
+        .letter-box::after {
+            content: '🔊';
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            font-size: 12px;
+            opacity: 0;
+            transform: scale(0);
+            transition: all 0.2s ease;
+        }
+
+        .letter-box:active::after {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        /* Add animation for sound feedback */
+        @keyframes playSound {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .playing-sound {
+            animation: playSound 0.3s ease;
+        }
+
+        .dropzone {
+            min-height: var(--touch-target);
+            min-width: var(--touch-target);
+            border: 2px dashed #cbd5e1;
+            border-radius: 0.5rem;
+            transition: all 0.3s ease;
+            padding: 1rem;
+            margin: 0.5rem 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .dropzone.active {
+            border-color: var(--primary-color);
+            background-color: rgba(236, 72, 153, 0.1);
+        }
+
+        .practice-area {
+            background: #1a2e35;
+            border-radius: 1rem;
+            padding: 1rem;
+            min-height: 300px;
+            position: relative;
+            touch-action: none;
+        }
+
+        .practice-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            touch-action: none;
+            background: transparent;
+        }
+
+        .control-btn {
+            min-height: var(--touch-target);
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            background: white;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.2s;
+        }
+
+        .control-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .letter-box.highlight {
+            background-color: var(--success-color);
+            color: white;
+            transform: scale(1.1);
+        }
+
+        .name-display {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.75rem;
+            padding: 1rem;
+            width: 100%;
+            background: white;
+            border-radius: 0.75rem;
+            border: 1px solid #e2e8f0;
+        }
+
+        .name-display .letter-box {
+            font-size: var(--letter-size);
+            min-width: clamp(40px, 10vw, 60px);
+            min-height: clamp(40px, 10vw, 60px);
+        }
+
+        .letter-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(var(--touch-target), 1fr));
+            gap: 0.75rem;
+            width: 100%;
+            padding: 1rem;
+            background: #f8fafc;
+            border-radius: 0.75rem;
+            border: 1px solid #e2e8f0;
+        }
+
+        @media (max-width: 480px) {
+            .letter-box {
+                font-size: 1rem;
+            }
+
+            .name-display .letter-box {
+                min-width: clamp(32px, 8vw, 40px);
+                min-height: clamp(32px, 8vw, 40px);
+                font-size: clamp(18px, 5vw, 24px);
+            }
+        }
+
+        @keyframes letterSpeak {
+            0% { 
+                transform: scale(1);
+                background-color: white;
+            }
+            50% { 
+                transform: scale(1.2);
+                background-color: var(--primary-color);
+                color: white;
+                box-shadow: 0 0 15px rgba(236, 72, 153, 0.5);
+            }
+            100% { 
+                transform: scale(1);
+                background-color: white;
+            }
+        }
+
+        .speaking {
+            animation: letterSpeak 1s ease-in-out;
+        }
+
+        /* Add new styles for matching activity */
+        .letter-box.selected {
+            background-color: var(--primary-color);
+            color: white;
+            transform: scale(1.1);
+            box-shadow: 0 0 15px rgba(236, 72, 153, 0.5);
+        }
+
+        .letter-box.matched {
+            background-color: var(--success-color);
+            color: white;
+            transform: scale(1.05);
+        }
+
+        /* Add celebration message styles */
+        .celebration-message {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 255, 255, 0.95);
+            padding: 2rem;
+            border-radius: 1rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            text-align: center;
+            z-index: 1000;
+            animation: messagePopIn 0.5s ease-out;
+        }
+
+        @keyframes messagePopIn {
+            0% { 
+                transform: translate(-50%, -50%) scale(0.8);
+                opacity: 0;
+            }
+            100% { 
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 1;
+            }
+        }
+
+        /* Add new styles for letter discovery game */
+        .letter-pairs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            gap: 1rem;
+            padding: 1rem;
+            width: 100%;
+            background: white;
+            border-radius: 0.75rem;
+            border: 1px solid #e2e8f0;
+        }
+
+        .letter-card {
+            width: 80px;
+            height: 80px;
+            perspective: 1000px;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .letter-card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .letter-card.revealed .letter-card-inner,
+        .letter-card.selected .letter-card-inner {
+            transform: rotateY(180deg);
+        }
+
+        .letter-card-front,
+        .letter-card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: bold;
+            border-radius: 12px;
+            border: 2px solid var(--primary-color);
+        }
+
+        .letter-card-front {
+            background-color: white;
+            color: var(--primary-color);
+        }
+
+        .letter-card-back {
+            background-color: var(--primary-color);
+            color: white;
+            transform: rotateY(180deg);
+        }
+
+        .letter-card.matched .letter-card-back {
+            background-color: var(--success-color);
+        }
+
+        @media (max-width: 480px) {
+            .letter-pairs-grid {
+                grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
+                gap: 0.5rem;
+            }
+
+            .letter-card {
+                width: 60px;
+                height: 60px;
+            }
+
+            .letter-card-front,
+            .letter-card-back {
+                font-size: 1.5rem;
+            }
+        }
+
+        /* Add new styles for sequencing activity */
+        .letter-slot {
+            width: clamp(40px, 10vw, 60px);
+            height: clamp(40px, 10vw, 60px);
+            border: 2px dashed var(--primary-color);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: var(--letter-size);
+            font-weight: bold;
+            background: white;
+            color: #94a3b8;
+        }
+
+        .letter-slot.filled {
+            border-style: solid;
+            background-color: var(--primary-color);
+            color: white;
+            animation: popIn 0.3s ease-out;
+        }
+
+        .letter-choice {
+            width: clamp(40px, 10vw, 60px);
+            height: clamp(40px, 10vw, 60px);
+            border: 2px solid var(--primary-color);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: var(--letter-size);
+            font-weight: bold;
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .letter-choice:not(.used):hover {
+            transform: translateY(-2px);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .letter-choice.used {
+            opacity: 0.5;
+            cursor: not-allowed;
+            background-color: #f1f5f9;
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        /* Add styles for letter animation */
+        .animation-container svg {
+            width: 100%;
+            height: 100%;
+            max-width: 300px;
+            max-height: 300px;
+        }
+
+        .letter-path {
+            fill: none;
+            stroke: var(--primary-color);
+            stroke-width: 4;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            stroke-dasharray: 1000;
+            stroke-dashoffset: 1000;
+        }
+
+        @keyframes drawLetter {
+            to {
+                stroke-dashoffset: 0;
+            }
+        }
+
+        .animate-stroke {
+            animation: drawLetter 2s ease forwards;
+        }
+
+        /* Add School Script font for proper handwriting style */
+        @font-face {
+            font-family: 'School Script';
+            src: url('https://cdn.jsdelivr.net/npm/school-script@1.0.0/SchoolScript.woff2') format('woff2');
+            font-display: swap;
+        }
+
+        .formation-container {
+            border: 2px solid #e2e8f0;
+            border-radius: 0.5rem;
+            background-color: #fff;
+            padding: 1rem;
+            position: relative;
+        }
+
+        /* Writing guidelines */
+        .formation-container::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 70%;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .formation-container::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 50%;
+            border-bottom: 1px dashed #e2e8f0;
+        }
+
+        .start-point {
+            transform: translate(-50%, -50%);
+        }
+
+        .direction-arrow {
+            transform-origin: center;
+        }
+
+        .letter-box.selected {
+            background-color: var(--primary-color);
+            color: white;
+            transform: scale(1.1);
+        }
+
+        @keyframes drawStroke {
+            to {
+                stroke-dashoffset: 0;
+            }
+        }
+
+        .stroke-animation {
+            animation: drawStroke 1.5s ease forwards;
+        }
+
+        .writing-lines {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            justify-content: center;
+            align-items: center;
+            padding: 0.5rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .letter-practice-box {
+            position: relative;
+            width: clamp(80px, 20vw, 120px);
+            height: clamp(80px, 20vw, 120px);
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0.5rem;
+        }
+
+        .letter-trace {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .letter-gap {
+            fill: none;
+            stroke: var(--primary-color);
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            transform: translate(100, 100) scale(0.5);
+            stroke-width: 15;
+            stroke-opacity: 0.15;
+        }
+
+        .letter-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            cursor: crosshair;
+            touch-action: none;
+        }
+
+        @media (max-width: 640px) {
+            .letter-practice-box {
+                width: clamp(60px, 15vw, 80px);
+                height: clamp(60px, 15vw, 80px);
+            }
+
+            .letter-gap {
+                transform: translate(100, 100) scale(0.4);
+                stroke-width: 12;
+            }
+        }
+
+        @media (max-width: 380px) {
+            .letter-practice-box {
+                width: clamp(50px, 12vw, 60px);
+                height: clamp(50px, 12vw, 60px);
+            }
+
+            .letter-gap {
+                transform: translate(100, 100) scale(0.35);
+                stroke-width: 10;
+            }
+        }
+
+        .sequence-area {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            width: 100%;
+        }
+
+        .animation-area {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            width: 100%;
+        }
+
+        .letter-choices {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.75rem;
+            padding: 1rem;
+            width: 100%;
+            background: white;
+            border-radius: 0.75rem;
+            border: 1px solid #e2e8f0;
+        }
+
+        .sequence-slots {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.75rem;
+            padding: 1rem;
+            width: 100%;
+            background: white;
+            border-radius: 0.75rem;
+            border: 1px solid #e2e8f0;
+        }
+
+        @media (max-width: 640px) {
+            .activity-card {
+                padding: 1rem;
+                margin-bottom: 1rem;
+            }
+
+            .letter-grid,
+            .name-display,
+            .letter-pairs-grid,
+            .sequence-area,
+            .animation-area,
+            .letter-choices,
+            .sequence-slots {
+                padding: 0.75rem;
+                gap: 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body class="bg-white">
+    <!-- Navigation -->
+    <nav class="border-b print:border-0 bg-white">
+        <div class="container mx-auto">
+            <div class="px-2 sm:px-4 pt-0 pb-1">
+                <div class="flex items-center justify-between">
+                    <div class="flex flex-col min-w-0">
+                        <!-- Logo -->
+                        <div class="flex items-baseline leading-none">
+                            <span class="text-lg sm:text-xl font-black text-[#EC4899]">E</span>
+                            <span class="text-base sm:text-lg font-black text-sky-500 -ml-0.5">d</span>
+                            <span class="text-base sm:text-lg font-black text-indigo-500">u</span>
+                            <span class="text-lg sm:text-xl font-black text-[#EAB308] ml-0.5">M</span>
+                            <span class="text-base sm:text-lg font-black text-emerald-500 -ml-0.5">o</span>
+                            <span class="text-base sm:text-lg font-black text-teal-500">d</span>
+                            <span class="text-base sm:text-lg font-black text-green-500">e</span>
+                            <span class="text-base sm:text-lg font-black text-teal-500">s</span>
+                        </div>
+                        <a href="https://www.edumodes.com" target="_blank" class="text-[9px] sm:text-[10px] text-gray-500 hover:text-gray-800 leading-tight truncate">www.edumodes.com</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Worksheet Container -->
+    <div x-data="worksheetApp()" class="worksheet-container max-w-7xl mx-auto px-0 sm:px-4 py-6">
+        <!-- Progress Section -->
+        <div class="bg-white rounded-lg shadow-md p-4 mb-6">
+            <div class="flex items-center justify-between mb-2">
+                <div class="text-sm font-medium text-gray-600">Progress</div>
+                <div class="text-sm font-medium text-gray-600">
+                    Stars: <span x-text="stars">0</span>/5 ⭐
+                </div>
+            </div>
+            <div class="h-2 bg-gray-200 rounded-full overflow-hidden">
+                <div class="h-full bg-[#EC4899] transition-all duration-300"
+                     :style="{ width: progress + '%' }"></div>
+            </div>
+        </div>
+
+        <!-- Activity 1: Name Input -->
+        <div class="activity-card" x-show="currentStep === 'input'">
+            <h2 class="text-xl font-bold text-gray-800 mb-4">1. Parents, Let's Get Started! 👋</h2>
+            <div class="space-y-4">
+                <div class="bg-blue-50 border-l-4 border-blue-500 p-4 mb-4">
+                    <p class="text-blue-700">Dear Parents, please help your child by entering their name below. This will personalize the learning activities for them.</p>
+                </div>
+                <div>
+                    <label for="studentName" class="block text-gray-700 mb-2">Enter Your Child's Name:</label>
+                    <div class="flex flex-col sm:flex-row gap-3">
+                        <input 
+                            type="text" 
+                            id="studentName" 
+                            x-model="studentName"
+                            placeholder="Type your child's name here"
+                            class="w-full p-3 border-2 border-dashed rounded-lg focus:border-primary-color focus:outline-none text-center text-xl"
+                            maxlength="20"
+                        >
+                        <button 
+                            class="w-full sm:w-auto px-6 py-3 bg-[#EC4899] text-white rounded-lg hover:bg-opacity-90 transition flex items-center justify-center gap-2 whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed"
+                            x-bind:disabled="!studentName.trim()"
+                            @click="startActivity"
+                        >
+                            <span>Let's Begin!</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+                            </svg>
+                        </button>
+                    </div>
+                    <p class="text-sm text-gray-600 mt-2">Tip: Enter the name exactly as you want your child to learn to write it.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Activity 2: Name Introduction and Letter Identification -->
+        <div class="activity-card mt-8" x-show="currentStep === 'recognition'">
+            <h2 class="text-xl font-bold text-gray-800 mb-4">2. Look at Your Name! 👀</h2>
+            
+            <!-- Display child's name in large, clear letters -->
+            <div class="mb-6 p-4 bg-yellow-50 rounded-lg">
+                <p class="text-gray-600 mb-2">This is your name:</p>
+                <div class="name-display">
+                    <template x-for="(letter, index) in nameLetters">
+                        <div class="letter-box bg-white" :key="index" x-text="letter"></div>
+                    </template>
+                </div>
+                <div class="mt-4 flex justify-center">
+                    <button 
+                        class="control-btn"
+                        @click="readName"
+                    >
+                        🔊 Hear Your Name
+                    </button>
+                </div>
+            </div>
+
+            <!-- Letter identification activity -->
+            <div class="mt-6">
+                <p class="text-gray-600 mb-4">Can you find these letters in the alphabet below? Click on them! 🎯</p>
+                <div class="letter-grid flex flex-wrap justify-center gap-2">
+                    <template x-for="(letter, index) in alphabetLetters">
+                        <div class="letter-box"
+                             :key="index"
+                             :class="{ 'highlight': highlightedLetters.includes(letter) }"
+                             @click="toggleLetter(letter, $event)"
+                             x-text="letter"></div>
+                    </template>
+                </div>
+            </div>
+        </div>
+
+        <!-- Activity 3: Letter Discovery -->
+        <div class="activity-card mt-8">
+            <h2 class="text-xl font-bold text-gray-800 mb-4">3. Find the Matching Letters! 🔍</h2>
+            <div class="letter-discovery space-y-4">
+                <div class="mb-4 p-4 bg-yellow-50 rounded-lg">
+                    <p class="text-gray-600 mb-2">Find pairs of matching letters in your name!</p>
+                    
+                    <!-- Letter pairs container -->
+                    <div class="letter-pairs-grid">
+                        <template x-for="(letter, index) in [...nameLetters, ...nameLetters]">
+                            <div class="letter-card" 
+                                 :class="{
+                                     'revealed': revealedCards.includes(index),
+                                     'selected': selectedCard === index,
+                                     'matched': matchedPairs.includes(index)
+                                 }"
+                                 @click="selectCard(index, letter)">
+                                <div class="letter-card-inner">
+                                    <div class="letter-card-front">
+                                        <span>?</span>
+                                    </div>
+                                    <div class="letter-card-back">
+                                        <span x-text="letter"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add new Activity 4: Letter Sequencing -->
+        <div class="activity-card mt-8">
+            <h2 class="text-xl font-bold text-gray-800 mb-4">4. Put Your Name in Order! </h2>
+            <div class="letter-sequencing space-y-4">
+                <!-- Reference name display -->
+                <div class="mb-4 p-4 bg-yellow-50 rounded-lg">
+                    <p class="text-gray-600 mb-2">Make your name look like this:</p>
+                    <div class="name-display">
+                        <template x-for="(letter, index) in nameLetters">
+                            <div class="letter-box bg-white" :key="index" x-text="letter"></div>
+                        </template>
+                    </div>
+                </div>
+
+                <!-- Sequence building area -->
+                <div class="sequence-area p-4 bg-white rounded-lg">
+                    <div class="sequence-slots flex justify-center gap-2 mb-4">
+                        <template x-for="(letter, index) in nameLetters">
+                            <div class="letter-slot"
+                                 :class="{ 'filled': sequencedLetters[index] }"
+                                 x-text="sequencedLetters[index] || '_'"></div>
+                        </template>
+                    </div>
+
+                    <!-- Letter choices -->
+                    <div class="letter-choices flex flex-wrap justify-center gap-2 mt-4">
+                        <template x-for="(letter, index) in shuffledNameLetters">
+                            <div class="letter-choice"
+                                 :class="{ 'used': usedLetters.includes(index) }"
+                                 @click="selectLetterForSequence(letter, index)"
+                                 x-text="letter"></div>
+                        </template>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Replace Activity 5 with simpler letter animation -->
+        <div class="activity-card mt-8">
+            <h2 class="text-xl font-bold text-gray-800 mb-4">5. Watch How to Write Each Letter! ✍️</h2>
+            <div class="letter-animation space-y-4">
+                <!-- Name display with clickable letters -->
+                <div class="mb-4 p-4 bg-yellow-50 rounded-lg">
+                    <p class="text-gray-600 mb-2">Click each letter to see how to write it:</p>
+                    <div class="name-display">
+                        <template x-for="(letter, index) in nameLetters">
+                            <div class="letter-box bg-white cursor-pointer hover:shadow-lg transition-all" 
+                                 :key="index" 
+                                 x-text="letter"
+                                 @click="showLetterAnimation(letter)"></div>
+                        </template>
+                    </div>
+                </div>
+
+                <!-- Animation display area -->
+                <div class="animation-area bg-white rounded-lg p-4">
+                    <div class="animation-container relative w-full aspect-square max-w-md mx-auto flex items-center justify-center">
+                        <!-- SVG animation will be inserted here -->
+                        <div x-ref="animationContainer" class="w-full h-full flex items-center justify-center">
+                            <p x-show="!currentAnimatingLetter" class="text-gray-400">Click a letter above to see how to write it!</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            document.addEventListener('alpine:init', () => {
+                Alpine.data('worksheetApp', () => ({
+                    studentName: '',
+                    currentStep: 'input',
+                    stars: 0,
+                    progress: 0,
+                    alphabetLetters: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split(''),
+                    nameLetters: [],
+                    shuffledNameLetters: [],
+                    letterMatches: {},
+                    selectedLetter: null,
+                    matchedLetters: [],
+                    matchedPositions: [],
+                    selectedCard: null,
+                    revealedCards: [],
+                    matchedPairs: [],
+                    canFlip: true,
+                    sequencedLetters: [],
+                    usedLetters: [],
+                    currentSequenceIndex: 0,
+                    currentAnimatingLetter: null,
+                    letterPaths: {
+                        // Start from top, go down-left, lift pen, back to top, go down-right, lift pen, cross line left to right
+                        'A': 'M100,50 L50,150 M100,50 L150,150 M60,100 L140,100',
+                        
+                        // First vertical line, then top curve from left to right, then bottom curve from left to right
+                        'B': 'M50,50 V150 M50,50 C75,50 150,50 150,85 C150,120 75,100 50,100 M50,100 C75,100 150,100 150,135 C150,170 75,150 50,150',
+                        
+                        // Single curved stroke from top right to bottom right
+                        'C': 'M150,70 C150,40 100,40 75,50 C50,60 40,90 40,100 C40,110 50,140 75,150 C100,160 150,160 150,130',
+                        
+                        // Start from top, go down, then do the two curves properly
+                        'D': 'M50,50 V150 M50,50 C150,50 150,150 50,150',
+                        
+                        // Start from top, go down, lift pen, top line left to right, middle line, bottom line
+                        'E': 'M50,50 V150 M50,50 H150 M50,100 H125 M50,150 H150',
+                        
+                        // Start from top, go down, lift pen, top line left to right, middle line
+                        'F': 'M50,50 V150 M50,50 H150 M50,100 H125',
+                        
+                        // Start from top-right, curve around counter-clockwise, then add the small line
+                        'G': 'M150,75 C150,25 50,25 50,75 V125 C50,175 150,175 150,125 V100 H100',
+                        
+                        // Left line top to bottom, right line top to bottom, cross line
+                        'H': 'M50,50 V150 M150,50 V150 M50,100 H150',
+                        
+                        // Simple top to bottom
+                        'I': 'M100,50 V150',
+                        
+                        // Start from top, go down and curve left
+                        'J': 'M100,50 V125 C100,150 75,150 50,125',
+                        
+                        // Left line top to bottom, then two diagonal strokes
+                        'K': 'M50,50 V150 M150,50 L50,100 M50,100 L150,150',
+                        
+                        // Top to bottom, then right
+                        'L': 'M50,50 V150 H150',
+                        
+                        // Start from top-left, go down, diagonal up, diagonal down
+                        'M': 'M50,50 V150 M50,50 L100,150 L150,50 V150',
+                        
+                        // Start from left, go down, diagonal to top-right, down
+                        'N': 'M50,50 V150 M50,50 L150,150 M150,50 V150',
+                        
+                        // Continuous oval shape
+                        'O': 'M50,100 C50,25 150,25 150,100 C150,175 50,175 50,100',
+                        
+                        // Down stroke then curve from top
+                        'P': 'M50,50 V150 M50,50 C150,50 150,100 50,100',
+                        
+                        // Oval shape then diagonal tail
+                        'Q': 'M50,100 C50,25 150,25 150,100 C150,175 50,175 50,100 M100,100 L150,150',
+                        
+                        // Like P but with extra diagonal
+                        'R': 'M50,50 V150 M50,50 C150,50 150,100 50,100 M100,100 L150,150',
+                        
+                        // S-curve from top
+                        'S': 'M150,75 C150,25 50,25 50,75 C50,125 150,125 150,175 C150,225 50,225 50,175',
+                        
+                        // Top line then down middle
+                        'T': 'M50,50 H150 M100,50 V150',
+                        
+                        // Start from left top, go down and curve
+                        'U': 'M50,50 V125 C50,150 150,150 150,125 V50',
+                        
+                        // Two diagonal strokes
+                        'V': 'M50,50 L100,150 L150,50',
+                        
+                        // Series of diagonal strokes
+                        'W': 'M50,50 L75,150 L100,75 L125,150 L150,50',
+                        
+                        // Two diagonal crosses
+                        'X': 'M50,50 L150,150 M150,50 L50,150',
+                        
+                        // Three strokes
+                        'Y': 'M50,50 L100,100 M150,50 L100,100 V150',
+                        
+                        // Three strokes - top, diagonal, bottom
+                        'Z': 'M50,50 H150 L50,150 H150'
+                    },
+
+                    init() {
+                        // Initialize voices for speech synthesis
+                        speechSynth.onvoiceschanged = () => {
+                            const voices = speechSynth.getVoices();
+                            const englishVoice = voices.find(voice => voice.lang.startsWith('en'));
+                            if (englishVoice) {
+                                speechSynth.voice = englishVoice;
+                            }
+                        };
+                        
+                        // Initialize tracking arrays
+                        this.highlightedLetters = [];
+                        this.completedActivities = {
+                            input: false,
+                            recognition: false,
+                            matching: false,
+                            sequencing: false,
+                            animation: false
+                        };
+                    },
+
+                    startActivity() {
+                        if (this.studentName.trim()) {
+                            // Convert name to uppercase and store in nameLetters
+                            this.nameLetters = Array.from(this.studentName.trim().toUpperCase());
+                            // Create shuffled version for matching activity
+                            this.shuffledNameLetters = [...this.nameLetters].sort(() => Math.random() - 0.5);
+                            
+                            // Move to recognition step
+                            this.currentStep = 'recognition';
+                            
+                            // Initialize arrays
+                            this.highlightedLetters = [];
+                            this.sequencedLetters = Array(this.nameLetters.length).fill(null);
+                            this.usedLetters = [];
+                            this.currentSequenceIndex = 0;
+
+                            // Read out the name letters and complete name with animation
+                            this.$nextTick(() => {
+                                setTimeout(() => {
+                                    const letterElements = document.querySelectorAll('.name-display .letter-box');
+                                    
+                                    // First read each letter with a pause and animation
+                                    this.nameLetters.forEach((letter, index) => {
+                                        setTimeout(() => {
+                                            // Speak the letter
+                                            speakText(letter);
+                                            // Add animation class to current letter
+                                            letterElements[index].classList.add('speaking');
+                                            // Remove animation class after animation completes
+                                            setTimeout(() => {
+                                                letterElements[index].classList.remove('speaking');
+                                            }, 1000);
+                                        }, index * 1200);
+                                    });
+
+                                    // Then read the complete name
+                                    setTimeout(() => {
+                                        speakText(this.studentName.trim());
+                                        letterElements.forEach(element => {
+                                            element.classList.add('speaking');
+                                            setTimeout(() => {
+                                                element.classList.remove('speaking');
+                                            }, 1000);
+                                        });
+                                    }, (this.nameLetters.length * 1200) + 500);
+                                }, 500);
+                            });
+                        }
+                    },
+
+                    // Add a method to read the name on demand
+                    readName() {
+                        const letterElements = document.querySelectorAll('.name-display .letter-box');
+                        
+                        // First read each letter with a pause and animation
+                        this.nameLetters.forEach((letter, index) => {
+                            setTimeout(() => {
+                                // Speak the letter
+                                speakText(letter);
+                                // Add animation class to current letter
+                                letterElements[index].classList.add('speaking');
+                                // Remove animation class after animation completes
+                                setTimeout(() => {
+                                    letterElements[index].classList.remove('speaking');
+                                }, 1000);
+                            }, index * 1200);
+                        });
+
+                        // Then read the complete name with all letters highlighted
+                        setTimeout(() => {
+                            speakText(this.studentName.trim());
+                            // Highlight all letters briefly
+                            letterElements.forEach(element => {
+                                element.classList.add('speaking');
+                                setTimeout(() => {
+                                    element.classList.remove('speaking');
+                                }, 1000);
+                            });
+                        }, (this.nameLetters.length * 1200) + 500);
+                    },
+
+                    nextActivity() {
+                        const steps = ['input', 'recognition', 'simple_matching', 'sequencing', 'animation'];
+                        const currentIndex = steps.indexOf(this.currentStep);
+                        
+                        if (currentIndex < steps.length - 1) {
+                            // Move to next activity without celebration
+                            this.currentStep = steps[currentIndex + 1];
+                            
+                            // Initialize next activity if needed
+                            if (this.currentStep === 'simple_matching') {
+                                this.selectedLetter = null;
+                                this.matchedLetters = [];
+                            }
+                        }
+                    },
+
+                    isLetterInName(letter) {
+                        return this.nameLetters.includes(letter);
+                    },
+
+                    playLetterSound(letter) {
+                        if (this.isLetterInName(letter)) {
+                            speakText(letter);
+                        }
+                    },
+
+                    toggleLetter(letter, event) {
+                        if (this.isLetterInName(letter) && event && event.target) {
+                            this.playLetterSound(letter);
+                            
+                            const letterElement = event.target;
+                            letterElement.classList.add('playing-sound');
+                            setTimeout(() => letterElement.classList.remove('playing-sound'), 300);
+
+                            if (!this.highlightedLetters.includes(letter)) {
+                                this.highlightedLetters.push(letter);
+                            }
+                            
+                            // Check if all letters in name have been found
+                            const allLettersFound = this.nameLetters.every(letter => 
+                                this.highlightedLetters.includes(letter)
+                            );
+                            
+                            if (allLettersFound) {
+                                playCelebration();
+                                this.updateProgress();
+                            }
+                        }
+                    },
+
+                    initSortable() {
+                        // Initialize Sortable.js for drag and drop
+                        const source = document.getElementById('letterSource');
+                        if (source) {
+                            new Sortable(source, {
+                                group: 'letters',
+                                animation: 150,
+                                sort: false
+                            });
+
+                            document.querySelectorAll('.dropzone').forEach(zone => {
+                                new Sortable(zone, {
+                                    group: 'letters',
+                                    animation: 150,
+                                    onAdd: (evt) => this.checkLetterMatch(evt)
+                                });
+                            });
+                        }
+                    },
+
+                    checkLetterMatch(evt) {
+                        const letter = evt.item.textContent;
+                        const targetZone = evt.to;
+                        const correctLetter = targetZone.dataset.letter;
+                        const index = Array.from(document.querySelectorAll('.dropzone')).indexOf(targetZone);
+
+                        if (letter === correctLetter) {
+                            this.letterMatches[index] = true;
+                            this.stars = Math.min(5, this.stars + 1);
+                            this.updateProgress();
+                        } else {
+                            evt.item.remove();
+                        }
+                    },
+
+                    updateProgress() {
+                        // Count completed activities
+                        let completedCount = 0;
+                        
+                        // Activity 1 (Input) is completed when name is entered
+                        if (this.studentName.trim()) {
+                            this.completedActivities.input = true;
+                            completedCount++;
+                        }
+
+                        // Activity 2 (Recognition)
+                        if (this.nameLetters.every(letter => this.highlightedLetters.includes(letter))) {
+                            this.completedActivities.recognition = true;
+                            completedCount++;
+                        }
+
+                        // Activity 3 (Matching)
+                        if (this.matchedPairs.length === this.nameLetters.length * 2) {
+                            this.completedActivities.matching = true;
+                            completedCount++;
+                        }
+
+                        // Activity 4 (Sequencing)
+                        if (this.currentSequenceIndex === this.nameLetters.length) {
+                            this.completedActivities.sequencing = true;
+                            completedCount++;
+                        }
+
+                        // Activity 5 (Animation)
+                        if (this.viewedAnimations && this.viewedAnimations.size === new Set(this.nameLetters).size) {
+                            this.completedActivities.animation = true;
+                            completedCount++;
+                        }
+
+                        // Update progress (each activity is worth 20%)
+                        this.progress = completedCount * 20;
+                        // Update stars (one star per completed activity)
+                        this.stars = completedCount;
+                    },
+
+                    showGuide() {
+                        // Implementation for showing writing guide
+                    },
+
+                    selectCard(index, letter) {
+                        if (!this.canFlip || this.matchedPairs.includes(index) || this.selectedCard === index) {
+                            return;
+                        }
+
+                        speakText(letter);
+
+                        if (this.selectedCard === null) {
+                            this.selectedCard = index;
+                            this.revealedCards.push(index);
+                        } else {
+                            this.revealedCards.push(index);
+                            this.canFlip = false;
+
+                            const firstCard = this.selectedCard;
+                            const firstLetter = [...this.nameLetters, ...this.nameLetters][firstCard];
+                            
+                            if (letter === firstLetter) {
+                                this.matchedPairs.push(firstCard, index);
+                                this.selectedCard = null;
+                                this.canFlip = true;
+
+                                // Check if all pairs are matched
+                                if (this.matchedPairs.length === this.nameLetters.length * 2) {
+                                    playCelebration();
+                                    this.updateProgress();
+                                }
+                            } else {
+                                setTimeout(() => {
+                                    this.revealedCards = this.revealedCards.filter(
+                                        card => card !== firstCard && card !== index
+                                    );
+                                    this.selectedCard = null;
+                                    this.canFlip = true;
+                                }, 1000);
+                            }
+                        }
+                    },
+
+                    selectLetterForSequence(letter, index) {
+                        if (this.usedLetters.includes(index)) return;
+                        
+                        if (letter === this.nameLetters[this.currentSequenceIndex]) {
+                            speakText(letter);
+                            this.sequencedLetters[this.currentSequenceIndex] = letter;
+                            this.usedLetters.push(index);
+                            this.currentSequenceIndex++;
+
+                            if (this.currentSequenceIndex === this.nameLetters.length) {
+                                playCelebration();
+                                this.updateProgress();
+                            }
+                        } else {
+                            const element = event.target;
+                            element.classList.add('shake');
+                            setTimeout(() => element.classList.remove('shake'), 500);
+                        }
+                    },
+
+                    showLetterAnimation(letter) {
+                        if (!this.viewedAnimations) this.viewedAnimations = new Set();
+                        this.viewedAnimations.add(letter);
+                        
+                        this.currentAnimatingLetter = letter;
+                        const container = this.$refs.animationContainer;
+                        
+                        // Clear previous animation
+                        container.innerHTML = '';
+                        
+                        // Create SVG
+                        const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+                        svg.setAttribute("viewBox", "0 0 200 200");
+                        svg.setAttribute("class", "letter-animation-svg");
+                        
+                        // Get path data for the letter
+                        const pathData = this.letterPaths[letter];
+                        if (!pathData) return;
+                        
+                        // Split the path into strokes
+                        const strokes = pathData.split('M').filter(Boolean).map(stroke => 'M' + stroke);
+                        
+                        // Create and animate each stroke
+                        strokes.forEach((strokePath, index) => {
+                            const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+                            path.setAttribute("d", strokePath);
+                            path.setAttribute("class", "letter-path");
+                            svg.appendChild(path);
+                            
+                            setTimeout(() => {
+                                path.classList.add('animate-stroke');
+                            }, index * 1000);
+                        });
+                        
+                        container.appendChild(svg);
+                        speakText(letter);
+
+                        // Check if all unique letters have been viewed
+                        if (this.viewedAnimations.size === new Set(this.nameLetters).size) {
+                            playCelebration();
+                            this.updateProgress();
+                        }
+                    }
+                }));
+            });
+        </script>
+    </div>
+</body>
+</html> 

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="description" content="EduModes Answer Key">
+    <meta name="theme-color" content="#22c55e">
+    <title>[[WORKSHEET_TITLE]] - Answer Key</title>
+    
+    <!-- Include Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <style>
+        /* Base Styles */
+        :root {
+            --primary-color: #22c55e;
+            --spacing-unit: clamp(0.5rem, 2vw, 1rem);
+            --font-base: clamp(16px, 2vw, 18px);
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-size: var(--font-base);
+            -webkit-text-size-adjust: 100%;
+        }
+
+        /* Print styles */
+        @media print {
+            .no-print { display: none; }
+            .answer-content { margin: 0; padding: 20px; }
+            .page-break { page-break-before: always; }
+            @page { size: A4; margin: 2cm; }
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="border-b print:border-0 bg-white">
+        <div class="container mx-auto">
+            <div class="px-2 sm:px-4 pt-0 pb-1">
+                <div class="flex items-center justify-between">
+                    <div class="flex flex-col min-w-0">
+                        <!-- Logo -->
+                        <div class="flex items-baseline leading-none">
+                            <span class="text-lg sm:text-xl font-black text-[#EC4899]">E</span>
+                            <span class="text-base sm:text-lg font-black text-sky-500 -ml-0.5">d</span>
+                            <span class="text-base sm:text-lg font-black text-indigo-500">u</span>
+                            <span class="text-lg sm:text-xl font-black text-[#EAB308] ml-0.5">M</span>
+                            <span class="text-base sm:text-lg font-black text-emerald-500 -ml-0.5">o</span>
+                            <span class="text-base sm:text-lg font-black text-teal-500">d</span>
+                            <span class="text-base sm:text-lg font-black text-green-500">e</span>
+                            <span class="text-base sm:text-lg font-black text-teal-500">s</span>
+                        </div>
+                        <a href="https://www.edumodes.com" target="_blank" class="text-[9px] sm:text-[10px] text-gray-500 hover:text-gray-800 leading-tight truncate">www.edumodes.com</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content Container -->
+    <div class="max-w-7xl mx-auto px-2 sm:px-4 py-3 sm:py-6">
+        <!-- Title Section -->
+        <div class="bg-white rounded-lg shadow-md p-3 sm:p-6 mb-4">
+            <h1 class="text-lg sm:text-xl md:text-2xl font-bold text-gray-800 text-center">
+                [[WORKSHEET_TITLE]] - Answer Key
+            </h1>
+        </div>
+
+        <!-- Answers Container -->
+        <div class="space-y-4">
+            <!-- Example Answer Section -->
+            <div class="bg-white rounded-lg shadow-md p-3 sm:p-6">
+                <h2 class="text-base font-medium text-gray-800 mb-3">Question 1</h2>
+                <div class="pl-4 border-l-4 border-green-500">
+                    <p class="text-gray-700">[[QUESTION_1]]</p>
+                    <div class="mt-2">
+                        <p class="font-medium text-green-600">Answer:</p>
+                        <p class="text-gray-700">[[ANSWER_1]]</p>
+                    </div>
+                    <div class="mt-2">
+                        <p class="font-medium text-green-600">Explanation:</p>
+                        <p class="text-gray-700">[[EXPLANATION_1]]</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Add more answer sections following the same pattern -->
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="mt-8 py-4 border-t bg-white print:hidden">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <div class="text-xs text-gray-500">
+                © 2024 EduModes. All rights reserved.
+            </div>
+        </div>
+    </footer>
+</body>
+</html> 
