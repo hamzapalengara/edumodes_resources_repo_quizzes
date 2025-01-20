@@ -1,74 +1,109 @@
 import React from 'react';
 import TipsHeader from '../../../components/shared/layout/Header/TipsHeader';
-import TouchContainer from '../../../components/shared/layout/Container/TouchContainer';
 
 const ColorTips: React.FC = () => {
   return (
-    <div className="min-h-screen bg-white w-full">
+    <div className="min-h-screen bg-white">
       <TipsHeader />
-      <TouchContainer>
-        <div className="max-w-4xl mx-auto p-6 pt-8">
-          <div className="bg-white rounded-lg border border-gray-200 p-6">
-            <h1 className="text-xl font-bold text-center text-gray-800 mb-6">
-              Tips for Parents & Teachers
-            </h1>
 
-            <div className="space-y-8">
-              {/* Getting Started */}
-              <section>
-                <h2 className="text-lg font-bold text-gray-800 mb-3">Getting Started</h2>
-                <div className="bg-blue-50 rounded-lg p-4">
-                  <ul className="space-y-2 text-gray-600">
-                    <li>• Ensure device audio is turned on</li>
-                    <li>• Find a quiet environment for voice recognition</li>
-                    <li>• Position the device at the child's eye level</li>
-                    <li>• Sit with the child to provide guidance</li>
-                  </ul>
-                </div>
-              </section>
+      <main className="container mx-auto px-4 py-8">
+        <div className="max-w-4xl mx-auto">
+          <h1 className="text-4xl font-bold text-center mb-8">
+            Teaching Tips for Colors 🎨
+          </h1>
 
-              {/* Learning Strategies */}
-              <section>
-                <h2 className="text-lg font-bold text-gray-800 mb-3">Learning Strategies</h2>
-                <div className="bg-green-50 rounded-lg p-4">
-                  <ul className="space-y-2 text-gray-600">
-                    <li>• Start with one color at a time</li>
-                    <li>• Use clear, simple language</li>
-                    <li>• Celebrate each successful attempt</li>
-                    <li>• Connect colors to familiar objects</li>
-                  </ul>
-                </div>
-              </section>
-
-              {/* Troubleshooting */}
-              <section>
-                <h2 className="text-lg font-bold text-gray-800 mb-3">Troubleshooting</h2>
-                <div className="bg-yellow-50 rounded-lg p-4">
-                  <ul className="space-y-2 text-gray-600">
-                    <li>• If voice recognition fails, try speaking more clearly</li>
-                    <li>• Ensure microphone access is enabled</li>
-                    <li>• Refresh the page if audio stops working</li>
-                    <li>• Take breaks if the child becomes frustrated</li>
-                  </ul>
-                </div>
-              </section>
-
-              {/* Extension Activities */}
-              <section>
-                <h2 className="text-lg font-bold text-gray-800 mb-3">Extension Activities</h2>
-                <div className="bg-purple-50 rounded-lg p-4">
-                  <ul className="space-y-2 text-gray-600">
-                    <li>• Find objects of each color in your environment</li>
-                    <li>• Draw pictures using the learned colors</li>
-                    <li>• Sort toys or objects by color</li>
-                    <li>• Play "I Spy" with colors</li>
-                  </ul>
-                </div>
-              </section>
+          {/* Activity 1 Tips */}
+          <section className="bg-white rounded-xl shadow-lg p-8 mb-8">
+            <h2 className="text-2xl font-bold text-pink-800 mb-4 flex items-center">
+              <span className="mr-2">🎯</span> Tips for Activity 1: Learning Colors
+            </h2>
+            <div className="space-y-4 text-gray-700">
+              <p className="text-lg">
+                Help children explore and learn colors through these engaging methods:
+              </p>
+              <ul className="space-y-3 ml-6">
+                <li className="flex items-start">
+                  <span className="mr-2">👉</span>
+                  <span>Start with one color at a time to avoid overwhelming the child</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="mr-2">🗣️</span>
+                  <span>Encourage repeating the color names out loud</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="mr-2">🏠</span>
+                  <span>Point out colors in their everyday environment</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="mr-2">🎨</span>
+                  <span>Use art activities to reinforce color recognition</span>
+                </li>
+              </ul>
             </div>
-          </div>
+          </section>
+
+          {/* Activity 2 Tips */}
+          <section className="bg-white rounded-xl shadow-lg p-8 mb-8">
+            <h2 className="text-2xl font-bold text-blue-800 mb-4 flex items-center">
+              <span className="mr-2">🔍</span> Tips for Activity 2: Color Detective Game
+            </h2>
+            <div className="space-y-4 text-gray-700">
+              <p className="text-lg">
+                Make the color identification game more effective with these strategies:
+              </p>
+              <ul className="space-y-3 ml-6">
+                <li className="flex items-start">
+                  <span className="mr-2">🌟</span>
+                  <span>Celebrate each correct answer with enthusiasm</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="mr-2">🤔</span>
+                  <span>If a mistake is made, gently guide them to the correct answer</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="mr-2">🔄</span>
+                  <span>Repeat the activity to reinforce learning</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="mr-2">🎮</span>
+                  <span>Keep the atmosphere playful and encouraging</span>
+                </li>
+              </ul>
+            </div>
+          </section>
+
+          {/* General Teaching Tips */}
+          <section className="bg-blue-50 rounded-xl p-8">
+            <h2 className="text-2xl font-bold text-blue-800 mb-4 flex items-center">
+              <span className="mr-2">💡</span> Additional Teaching Tips
+            </h2>
+            <div className="space-y-4 text-blue-700">
+              <ul className="space-y-3">
+                <li className="flex items-start">
+                  <span className="mr-2">📝</span>
+                  <span>Use consistent examples to help build strong associations</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="mr-2">🎵</span>
+                  <span>Incorporate songs and rhymes about colors</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="mr-2">📚</span>
+                  <span>Read books that focus on colors</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="mr-2">🎨</span>
+                  <span>Do color mixing activities to explore how colors work</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="mr-2">🌈</span>
+                  <span>Make connections to colors in nature and daily life</span>
+                </li>
+              </ul>
+            </div>
+          </section>
         </div>
-      </TouchContainer>
+      </main>
     </div>
   );
 };

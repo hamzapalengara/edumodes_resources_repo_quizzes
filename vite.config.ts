@@ -89,6 +89,8 @@ const createHtmlFiles = (): Plugin => {
         thumbnail: 'Worksheet Preview'
       };
 
+      const timestamp = Date.now();
+
       pages.forEach(page => {
         const isThumbail = page === 'thumbnail';
         const html = `<!DOCTYPE html>
@@ -97,7 +99,10 @@ const createHtmlFiles = (): Plugin => {
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>${titles[page]}</title>
-    <link rel="stylesheet" href="style.css">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <link rel="stylesheet" href="style.css?v=${timestamp}">
     <script>
       window.WORKSHEET_VIEW = '${page}';
     </script>
@@ -106,7 +111,7 @@ const createHtmlFiles = (): Plugin => {
     ${isThumbail ? '<div id="thumbnail-content">' : ''}
     <div id="root"></div>
     ${isThumbail ? '</div>' : ''}
-    <script src="script.js"></script>
+    <script src="script.js?v=${timestamp}"></script>
   </body>
 </html>`;
 
@@ -174,7 +179,21 @@ export default defineConfig({
           throw error
         }
       }
-    } : null
+    } : null,
+    {
+      name: 'html-transform',
+      transformIndexHtml(html: string) {
+        return html.replace(
+          '</head>',
+          `
+          <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+          <meta http-equiv="Pragma" content="no-cache">
+          <meta http-equiv="Expires" content="0">
+          </head>
+          `
+        );
+      }
+    }
   ].filter(Boolean),
   server: {
     port: 5173

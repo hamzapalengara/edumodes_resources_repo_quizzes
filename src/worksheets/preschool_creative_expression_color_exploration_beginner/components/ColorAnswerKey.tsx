@@ -1,54 +1,110 @@
 import React from 'react';
 import AnswerKeyHeader from '../../../components/shared/layout/Header/AnswerKeyHeader';
-import TouchContainer from '../../../components/shared/layout/Container/TouchContainer';
+
+interface ColorInfo {
+  name: string;
+  bgClass: string;
+  emoji: string;
+  examples: string[];
+}
+
+const colors: ColorInfo[] = [
+  { 
+    name: 'Red', 
+    bgClass: 'bg-red-500',
+    emoji: '🍎', 
+    examples: ['apple', 'strawberry', 'fire truck']
+  },
+  { 
+    name: 'Orange',
+    bgClass: 'bg-orange-500',
+    emoji: '🍊', 
+    examples: ['orange', 'carrot', 'sunset']
+  },
+  { 
+    name: 'Yellow',
+    bgClass: 'bg-yellow-400',
+    emoji: '⭐', 
+    examples: ['star', 'sun', 'banana']
+  },
+  { 
+    name: 'Green',
+    bgClass: 'bg-green-500',
+    emoji: '🌿', 
+    examples: ['leaf', 'grass', 'tree']
+  },
+  { 
+    name: 'Blue',
+    bgClass: 'bg-blue-500',
+    emoji: '🌊', 
+    examples: ['ocean', 'sky', 'blueberry']
+  },
+  { 
+    name: 'Indigo',
+    bgClass: 'bg-indigo-500',
+    emoji: '🌌', 
+    examples: ['night sky', 'blueberries', 'butterfly']
+  },
+  { 
+    name: 'Violet',
+    bgClass: 'bg-purple-500',
+    emoji: '🌸', 
+    examples: ['flower', 'grapes', 'butterfly']
+  },
+];
 
 const ColorAnswerKey: React.FC = () => {
-  const colors = [
-    { color: 'Red', name: 'red', bgClass: 'bg-red-500', borderClass: 'border-red-600' },
-    { color: 'Blue', name: 'blue', bgClass: 'bg-blue-500', borderClass: 'border-blue-600' },
-    { color: 'Yellow', name: 'yellow', bgClass: 'bg-yellow-400', borderClass: 'border-yellow-500' },
-    { color: 'Green', name: 'green', bgClass: 'bg-green-500', borderClass: 'border-green-600' },
-  ];
-
   return (
-    <div className="min-h-screen bg-white w-full">
+    <div className="min-h-screen bg-white">
       <AnswerKeyHeader />
-      <TouchContainer>
-        <div className="max-w-4xl mx-auto p-6 pt-8">
-          <div className="bg-white rounded-lg border border-gray-200 p-6">
-            <h1 className="text-xl font-bold text-center text-gray-800 mb-6">
-              Color Recognition Guide
-            </h1>
 
-            <div className="space-y-6">
-              {colors.map((color) => (
-                <div key={color.name} className="flex items-center space-x-4">
-                  <div 
-                    className={`w-16 h-16 ${color.bgClass} border-4 ${color.borderClass} rounded-lg`}
-                    aria-label={`${color.color} color sample`}
-                  />
-                  <div>
-                    <h2 className="text-lg font-bold text-gray-800">{color.color}</h2>
+      <main className="container mx-auto px-4 py-8">
+        <div className="max-w-4xl mx-auto">
+          <h1 className="text-4xl font-bold text-center mb-8">
+            Rainbow Colors - Answer Key 🌈
+          </h1>
+
+          <div className="grid gap-6">
+            {colors.map((color) => (
+              <div 
+                key={color.name}
+                className="bg-white rounded-xl shadow-lg p-6"
+              >
+                <div className="flex items-center gap-6">
+                  {/* Color Sample */}
+                  <div className={`w-24 h-24 ${color.bgClass} rounded-xl shadow-inner flex items-center justify-center`}>
+                    <span className="text-4xl" role="img" aria-label={color.name}>
+                      {color.emoji}
+                    </span>
+                  </div>
+
+                  {/* Color Information */}
+                  <div className="flex-1">
+                    <h2 className="text-2xl font-bold mb-2">
+                      {color.name}
+                    </h2>
                     <p className="text-gray-600">
-                      Pronunciation: "{color.color.toLowerCase()}"
+                      Examples: {color.examples.join(', ')}
                     </p>
                   </div>
                 </div>
-              ))}
-            </div>
+              </div>
+            ))}
+          </div>
 
-            <div className="mt-8 p-4 bg-blue-50 rounded-lg">
-              <h2 className="font-bold text-gray-800 mb-2">Teaching Notes:</h2>
-              <ul className="space-y-2 text-gray-600">
-                <li>• Encourage clear pronunciation of color names</li>
-                <li>• Use real-world examples of each color</li>
-                <li>• Practice color recognition in different contexts</li>
-                <li>• Make the learning experience playful and interactive</li>
-              </ul>
-            </div>
+          <div className="mt-12 bg-blue-50 rounded-xl p-6">
+            <h2 className="text-2xl font-bold text-blue-800 mb-4">
+              Learning Tips 💡
+            </h2>
+            <ul className="text-blue-700 space-y-2">
+              <li>• Each color is shown with its name and common examples</li>
+              <li>• The emoji helps children remember the color through familiar objects</li>
+              <li>• Practice identifying these colors in your surroundings</li>
+              <li>• Use the examples to help remember each color</li>
+            </ul>
           </div>
         </div>
-      </TouchContainer>
+      </main>
     </div>
   );
 };

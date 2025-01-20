@@ -1,117 +1,370 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useCallback } from 'react';
 import WorksheetHeader from '../../../components/shared/layout/Header/WorksheetHeader';
-import TouchContainer from '../../../components/shared/layout/Container/TouchContainer';
-import ScoreDisplay from '../../../components/shared/ScoreDisplay';
+import confetti from 'canvas-confetti/dist/confetti.module.mjs';
 
-interface ColorItem {
-  color: string;
+interface ColorButton {
   name: string;
+  color: string;
   bgClass: string;
   borderClass: string;
+  hoverClass: string;
+  emoji: string;
+  examples: string[];
 }
 
+const colors: ColorButton[] = [
+  { 
+    name: 'Red', 
+    color: '#FF0000', 
+    bgClass: 'bg-red-500', 
+    borderClass: 'border-red-600',
+    hoverClass: 'hover:bg-red-600', 
+    emoji: '🍎', 
+    examples: ['apple', 'strawberry', 'fire truck']
+  },
+  { 
+    name: 'Orange', 
+    color: '#FF7F00', 
+    bgClass: 'bg-orange-500', 
+    borderClass: 'border-orange-600',
+    hoverClass: 'hover:bg-orange-600', 
+    emoji: '🍊', 
+    examples: ['orange', 'carrot', 'sunset']
+  },
+  { 
+    name: 'Yellow', 
+    color: '#FFFF00', 
+    bgClass: 'bg-yellow-400', 
+    borderClass: 'border-yellow-500',
+    hoverClass: 'hover:bg-yellow-500', 
+    emoji: '⭐', 
+    examples: ['star', 'sun', 'banana']
+  },
+  { 
+    name: 'Green', 
+    color: '#00FF00', 
+    bgClass: 'bg-green-500', 
+    borderClass: 'border-green-600',
+    hoverClass: 'hover:bg-green-600', 
+    emoji: '🌿', 
+    examples: ['leaf', 'grass', 'tree']
+  },
+  { 
+    name: 'Blue', 
+    color: '#0000FF', 
+    bgClass: 'bg-blue-500', 
+    borderClass: 'border-blue-600',
+    hoverClass: 'hover:bg-blue-600', 
+    emoji: '🌊', 
+    examples: ['ocean', 'sky', 'blueberry']
+  },
+  { 
+    name: 'Indigo', 
+    color: '#4B0082', 
+    bgClass: 'bg-indigo-500', 
+    borderClass: 'border-indigo-600',
+    hoverClass: 'hover:bg-indigo-600', 
+    emoji: '🌌', 
+    examples: ['night sky', 'blueberries', 'butterfly']
+  },
+  { 
+    name: 'Violet', 
+    color: '#8F00FF', 
+    bgClass: 'bg-purple-500', 
+    borderClass: 'border-purple-600',
+    hoverClass: 'hover:bg-purple-600', 
+    emoji: '🌸', 
+    examples: ['flower', 'grapes', 'butterfly']
+  },
+];
+
 const ColorWorksheet: React.FC = () => {
+  const [selectedColor, setSelectedColor] = useState<string | null>(null);
+  const [currentQuestion, setCurrentQuestion] = useState(0);
   const [score, setScore] = useState(0);
-  const [currentColor, setCurrentColor] = useState<ColorItem | null>(null);
-  const [isListening, setIsListening] = useState(false);
-  const [feedback, setFeedback] = useState('');
+  const [showAnswer, setShowAnswer] = useState(false);
+  const [isProcessingAnswer, setIsProcessingAnswer] = useState(false);
 
-  const colors: ColorItem[] = [
-    { color: 'Red', name: 'red', bgClass: 'bg-red-500', borderClass: 'border-red-600' },
-    { color: 'Blue', name: 'blue', bgClass: 'bg-blue-500', borderClass: 'border-blue-600' },
-    { color: 'Yellow', name: 'yellow', bgClass: 'bg-yellow-400', borderClass: 'border-yellow-500' },
-    { color: 'Green', name: 'green', bgClass: 'bg-green-500', borderClass: 'border-green-600' },
-  ];
+  // Generate random questions for activity 2
+  const [questions] = useState(() => {
+    const shuffled = [...colors].sort(() => Math.random() - 0.5);
+    return shuffled.map(color => ({
+      correctColor: color,
+      options: [
+        color,
+        ...colors
+          .filter(c => c.name !== color.name)
+          .sort(() => Math.random() - 0.5)
+          .slice(0, 3)
+      ].sort(() => Math.random() - 0.5)
+    }));
+  });
 
-  // Initialize speech synthesis
-  useEffect(() => {
-    if ('speechSynthesis' in window) {
-      // Welcome message
-      speak("Welcome to Fun with Colors! Touch any color to begin!");
-    }
+  const speakColor = useCallback((colorName: string) => {
+    const utterance = new SpeechSynthesisUtterance(colorName);
+    utterance.rate = 0.8;
+    utterance.pitch = 1.2;
+    window.speechSynthesis.speak(utterance);
   }, []);
 
-  const speak = (text: string) => {
-    if ('speechSynthesis' in window) {
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.rate = 0.9; // Slightly slower for children
-      utterance.pitch = 1.2; // Slightly higher pitch for engagement
-      window.speechSynthesis.speak(utterance);
+  const triggerConfetti = useCallback((color: string, origin: { x: number, y: number }) => {
+    const defaults = {
+      spread: 360,
+      ticks: 100,
+      gravity: 0,
+      decay: 0.94,
+      startVelocity: 30,
+      shapes: ['circle'],
+      colors: [color],
+      origin
+    };
+
+    function shoot() {
+      confetti({
+        ...defaults,
+        particleCount: 40,
+        scalar: 1.2,
+        shapes: ['circle']
+      });
+
+      confetti({
+        ...defaults,
+        particleCount: 20,
+        scalar: 2.5,
+        shapes: ['circle']
+      });
     }
-  };
 
-  const handleColorClick = (color: ColorItem) => {
-    setCurrentColor(color);
-    speak(`Can you say ${color.color}?`);
-    setIsListening(true);
-    startListening();
-  };
+    shoot();
+  }, []);
 
-  const startListening = () => {
-    if ('webkitSpeechRecognition' in window) {
-      const recognition = new (window as any).webkitSpeechRecognition();
-      recognition.continuous = false;
-      recognition.interimResults = false;
+  const handleColorClick = useCallback((colorName: string, event: React.MouseEvent<HTMLButtonElement>) => {
+    const colorData = colors.find(c => c.name === colorName);
+    if (colorData) {
+      const button = event.currentTarget;
+      const rect = button.getBoundingClientRect();
+      const x = (rect.left + rect.width / 2) / window.innerWidth;
+      const y = (rect.top + rect.height / 2) / window.innerHeight;
+      
+      setSelectedColor(colorName);
+      speakColor(colorName);
+      triggerConfetti(colorData.color, { x, y });
+    }
+  }, [speakColor, triggerConfetti]);
 
-      recognition.onresult = (event: any) => {
-        const spokenWord = event.results[0][0].transcript.toLowerCase();
-        if (currentColor && spokenWord.includes(currentColor.name.toLowerCase())) {
-          setScore(prev => prev + 1);
-          setFeedback('✨ Great job! ✨');
-          speak('Wonderful! You got it right!');
+  const handleAnswerClick = useCallback((selectedAnswer: ColorButton, event: React.MouseEvent<HTMLButtonElement>) => {
+    if (isProcessingAnswer) return;
+    setIsProcessingAnswer(true);
+    
+    const isCorrect = selectedAnswer.name === questions[currentQuestion].correctColor.name;
+    setShowAnswer(true);
+    
+    if (isCorrect) {
+      setScore(prev => prev + 1);
+      
+      const button = event.currentTarget;
+      const rect = button.getBoundingClientRect();
+      const x = (rect.left + rect.width / 2) / window.innerWidth;
+      const y = (rect.top + rect.height / 2) / window.innerHeight;
+      
+      triggerConfetti(selectedAnswer.color, { x, y });
+      
+      // First say "Correct!"
+      const correctUtterance = new SpeechSynthesisUtterance("Correct!");
+      correctUtterance.rate = 0.8;
+      correctUtterance.pitch = 1.2;
+      
+      // Then say the color name after a short delay
+      const colorUtterance = new SpeechSynthesisUtterance(`This is ${selectedAnswer.name}`);
+      colorUtterance.rate = 0.8;
+      colorUtterance.pitch = 1.2;
+      
+      window.speechSynthesis.speak(correctUtterance);
+      setTimeout(() => {
+        window.speechSynthesis.speak(colorUtterance);
+      }, 1000);
+    } else {
+      speakColor('Try again!');
+    }
+
+    setTimeout(() => {
+      setShowAnswer(false);
+      setIsProcessingAnswer(false);
+      if (isCorrect) {
+        if (currentQuestion < questions.length - 1) {
+          setCurrentQuestion(prev => prev + 1);
         } else {
-          setFeedback('Try again!');
-          speak(`Let's try again! Say ${currentColor?.color}`);
+          // Game completed!
+          const completionUtterance = new SpeechSynthesisUtterance("Congratulations! You've completed the color game!");
+          completionUtterance.rate = 0.8;
+          completionUtterance.pitch = 1.2;
+          window.speechSynthesis.speak(completionUtterance);
+          
+          // Trigger multi-color confetti celebration
+          const colors = ['#FF0000', '#FF7F00', '#FFFF00', '#00FF00', '#0000FF', '#4B0082', '#8F00FF'];
+          colors.forEach((color, index) => {
+            setTimeout(() => {
+              triggerConfetti(color, { x: 0.5, y: 0.5 });
+            }, index * 300);
+          });
         }
-        setIsListening(false);
-      };
+      }
+    }, 2000);
+  }, [currentQuestion, questions, triggerConfetti, speakColor, isProcessingAnswer]);
 
-      recognition.start();
-    }
-  };
+  const renderActivity1 = () => (
+    <>
+      <h1 className="text-4xl font-bold text-center mb-4">
+        Let's Learn Colors! 🎨
+      </h1>
 
-  return (
-    <div className="min-h-screen bg-white w-full">
-      <WorksheetHeader />
-      <TouchContainer>
-        <div className="max-w-4xl mx-auto p-6 pt-8">
-          <ScoreDisplay score={score} totalQuestions={colors.length} />
+      <div className="bg-blue-50 rounded-xl p-6 mb-8 shadow-inner">
+        <h2 className="text-2xl font-bold text-blue-800 mb-3">
+          How to Play 🎯
+        </h2>
+        <ul className="text-lg text-blue-700 space-y-2">
+          <li>1. Touch any color card below 👆</li>
+          <li>2. Listen to the color name 👂</li>
+          <li>3. Look at the fun examples! 👀</li>
+          <li>4. Try to find these colors around you! 🔍</li>
+        </ul>
+      </div>
 
-          <div className="bg-white rounded-lg border border-gray-200 p-6">
-            {/* Parent/Teacher Note */}
-            <div className="text-sm text-gray-600 mb-6">
-              Note: This activity requires audio. Please ensure your device's sound is on.
-            </div>
-
-            {/* Color Grid */}
-            <div className="grid grid-cols-2 gap-6 mb-6">
-              {colors.map((color) => (
-                <button
-                  key={color.name}
-                  onClick={() => handleColorClick(color)}
-                  className={`h-32 rounded-lg ${color.bgClass} border-4 ${color.borderClass} 
-                    transform transition-transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-offset-2 focus:ring-${color.name}-300`}
-                  aria-label={`${color.color} color`}
-                />
-              ))}
-            </div>
-
-            {/* Feedback Area */}
-            {feedback && (
-              <div className="text-center text-xl font-bold text-gray-700 mt-4">
-                {feedback}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        {colors.map((color) => (
+          <div 
+            key={color.name} 
+            className={`
+              relative bg-white rounded-3xl p-6 shadow-lg
+              transform transition-all duration-300
+              ${selectedColor === color.name ? 'scale-105' : 'hover:scale-102'}
+              border-4 ${selectedColor === color.name ? color.borderClass : 'border-transparent'}
+            `}
+          >
+            <div className="flex flex-col items-center space-y-4">
+              {/* Large Emoji */}
+              <div className="text-8xl mb-2 transform hover:scale-110 transition-transform duration-300">
+                {color.emoji}
               </div>
-            )}
 
-            {/* Listening Indicator */}
-            {isListening && (
-              <div className="text-center text-gray-600 mt-4">
-                Listening... 🎤
+              {/* Color Button */}
+              <button
+                className={`
+                  w-full py-4 px-6 rounded-2xl shadow-lg 
+                  transition-all duration-300
+                  ${color.bgClass} ${color.hoverClass}
+                  transform hover:scale-105
+                  flex items-center justify-center
+                  border-4 border-white
+                `}
+                onClick={(e) => handleColorClick(color.name, e)}
+              >
+                <span className="text-3xl font-bold tracking-wide text-white drop-shadow-lg">
+                  {color.name}
+                </span>
+              </button>
+
+              {/* Examples */}
+              {selectedColor === color.name && (
+                <div className="mt-4 text-center animate-fade-in">
+                  <p className="text-xl text-gray-700">
+                    Look for: {color.examples.join(', ')} ✨
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+    </>
+  );
+
+  const renderActivity2 = () => {
+    const currentQ = questions[currentQuestion];
+    return (
+      <>
+        <h1 className="text-4xl font-bold text-center mb-4">
+          Color Detective Game 🔍
+        </h1>
+
+        <div className="bg-blue-50 rounded-xl p-6 mb-8 shadow-inner">
+          <h2 className="text-2xl font-bold text-blue-800 mb-3">
+            How to Play 🎯
+          </h2>
+          <ul className="text-lg text-blue-700 space-y-2">
+            <li>1. Look at the color emoji shown below 👀</li>
+            <li>2. Find its matching color from the choices 🎨</li>
+            <li>3. Click the correct color to score points! 🎯</li>
+            <li>4. Listen for the color name when you're right! 🔊</li>
+          </ul>
+        </div>
+
+        <div className="bg-white rounded-3xl p-8 shadow-lg">
+          <div className="text-center mb-6">
+            <div className="text-9xl mb-4 animate-bounce">
+              {currentQ.correctColor.emoji}
+            </div>
+            <p className="text-2xl text-gray-600">
+              What color matches this? 🤔
+            </p>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            {currentQ.options.map((option, index) => (
+              <button
+                key={index}
+                className={`
+                  p-6 rounded-2xl shadow-lg
+                  transition-all duration-300
+                  ${option.bgClass} ${option.hoverClass}
+                  transform hover:scale-105
+                  disabled:opacity-50 disabled:cursor-not-allowed
+                  flex items-center justify-center
+                `}
+                onClick={(e) => handleAnswerClick(option, e)}
+                disabled={showAnswer || isProcessingAnswer}
+              >
+                <span className="text-2xl font-bold text-white drop-shadow-lg">
+                  {option.name}
+                </span>
+              </button>
+            ))}
+          </div>
+
+          <div className="mt-8 text-center">
+            <p className="text-2xl font-bold text-blue-800">
+              Score: {score} / {questions.length} ⭐
+            </p>
+            {currentQuestion === questions.length - 1 && score === questions.length && (
+              <div className="mt-4 p-4 bg-green-100 rounded-xl">
+                <p className="text-2xl font-bold text-green-800">
+                  🎉 Congratulations! You've completed the color game! 🎉
+                </p>
               </div>
             )}
           </div>
         </div>
-      </TouchContainer>
+      </>
+    );
+  };
+
+  return (
+    <div className="min-h-screen bg-white">
+      <WorksheetHeader />
+      
+      <main className="container mx-auto px-4 py-8">
+        <div className="max-w-4xl mx-auto space-y-16">
+          {/* Activity 1 */}
+          <section>
+            {renderActivity1()}
+          </section>
+
+          {/* Activity 2 */}
+          <section>
+            {renderActivity2()}
+          </section>
+        </div>
+      </main>
     </div>
   );
 };

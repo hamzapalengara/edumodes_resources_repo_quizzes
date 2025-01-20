@@ -6,9 +6,10 @@
 3. [Component Architecture](#component-architecture)
 4. [File Specifications](#file-specifications)
 5. [Development Process](#development-process)
-6. [Build Configuration](#build-configuration)
-7. [Testing & Validation](#testing--validation)
-8. [Responsive Design Specifications](#responsive-design-specifications)
+6. [Dashboard Integration](#dashboard-integration)
+7. [Build Configuration](#build-configuration)
+8. [Testing & Validation](#testing--validation)
+9. [Responsive Design Specifications](#responsive-design-specifications)
 
 ## Getting Started
 
@@ -156,16 +157,24 @@ const ResponsiveContainer = styled.div`
 
 ### Directory Structure
 ```
-src/worksheets/[grade]_[subject]_[topic]_[level]/
-├── components/
-│   ├── WorksheetView.tsx        # Main worksheet component
-│   ├── AnswerKeyView.tsx        # Answer key component
-│   ├── TipsView.tsx            # Tips component
-│   └── ThumbnailView.tsx       # Thumbnail component
-├── entries/
-│   └── index.tsx               # Single entry point for all views
-├── title.txt                   # Worksheet title
-└── description.txt            # Worksheet description
+src/
+├── components/     # Reusable React components
+├── hooks/         # Custom React hooks
+├── utils/         # Utility functions
+├── styles/        # CSS and styling files
+├── assets/        # Static assets
+└── worksheets/    # Worksheet components and logic
+    ├── templates/ # Base worksheet templates
+    └── [grade]_[subject]_[topic]_[difficulty]/  # Individual worksheet folders
+        ├── components/
+        │   ├── [Prefix]Worksheet.tsx
+        │   ├── [Prefix]AnswerKey.tsx
+        │   ├── [Prefix]Tips.tsx
+        │   └── [Prefix]Thumbnail.tsx
+        ├── entries/
+        │   └── index.ts
+        ├── title.txt
+        └── description.txt
 ```
 
 ### Naming Convention
@@ -186,7 +195,7 @@ src/worksheets/[grade]_[subject]_[topic]_[level]/
      - `ThumbnailView.tsx`
 
 3. **Entry File**
-   - Always use `index.tsx` for the main entry point
+   - Always use `index.ts` for the main entry point
    - Place in the `entries` directory
 
 ## Component Architecture
@@ -327,11 +336,11 @@ Each view has its own HTML file with specific metadata:
 
 ## Development Process
 
-### 1. Setup
-1. Create worksheet directory with correct naming
-2. Create component files (Worksheet, Answer Key, Tips, Thumbnail)
-3. Create entry point file
-4. Add title.txt and description.txt
+### 1. Creating a New Worksheet
+1. Create a new folder following the naming convention
+2. Create the required component files with the correct prefix
+3. Create `entries/index.ts` with the component exports
+4. Add `title.txt` and `description.txt`
 
 ### 2. Component Development
 1. Implement main worksheet functionality
@@ -344,6 +353,66 @@ Each view has its own HTML file with specific metadata:
 2. Verify responsive design
 3. Check touch interactions
 4. Validate accessibility
+
+## Dashboard Integration
+
+### Worksheet Discovery
+The dashboard automatically discovers and displays worksheets based on the following conventions:
+
+1. **Folder Naming Convention**:
+   ```
+   [grade]_[subject]_[topic]_[difficulty]
+   ```
+   Example: `preschool_art_color_mixing_beginner`
+
+2. **Component Prefix Generation**:
+   - Automatically derived from the topic part of the folder name
+   - Each word is capitalized and joined
+   - Example: `color_mixing` → `ColorMixing`
+
+3. **Required Files**:
+   ```
+   ├── components/
+   │   ├── [Prefix]Worksheet.tsx    # Main worksheet component
+   │   ├── [Prefix]AnswerKey.tsx    # Answer key view
+   │   ├── [Prefix]Tips.tsx         # Teaching tips
+   │   └── [Prefix]Thumbnail.tsx    # Preview thumbnail
+   ├── entries/
+   │   └── index.ts                 # Component exports
+   ├── title.txt                    # Worksheet title
+   └── description.txt              # Worksheet description
+   ```
+
+4. **Entry Point Structure** (`entries/index.ts`):
+   ```typescript
+   import { lazy } from 'react';
+   
+   export const Worksheet = lazy(() => import('../components/[Prefix]Worksheet'));
+   export const AnswerKey = lazy(() => import('../components/[Prefix]AnswerKey'));
+   export const Tips = lazy(() => import('../components/[Prefix]Tips'));
+   export const Thumbnail = lazy(() => import('../components/[Prefix]Thumbnail'));
+   ```
+
+### Metadata Generation
+The dashboard automatically generates metadata from the folder name:
+- Grade: Formatted from first part (e.g., `preschool` → `Preschool`, `grade2` → `Grade 2`)
+- Subject: Formatted from second part (e.g., `art` → `Art`)
+- Topic: Formatted from third part (e.g., `color_mixing` → `Color Mixing`)
+- Difficulty: Formatted from fourth part (e.g., `beginner` → `Beginner`)
+
+### Example
+For a worksheet folder named `preschool_art_color_mixing_beginner`:
+1. Component prefix will be `ColorMixing`
+2. Required component files:
+   - `ColorMixingWorksheet.tsx`
+   - `ColorMixingAnswerKey.tsx`
+   - `ColorMixingTips.tsx`
+   - `ColorMixingThumbnail.tsx`
+3. Dashboard metadata:
+   - Grade: "Preschool"
+   - Subject: "Art"
+   - Topic: "Color Mixing"
+   - Difficulty: "Beginner"
 
 ## Build Configuration
 
@@ -358,12 +427,7 @@ export default defineConfig({
         dir: `dist/${WORKSHEET_ID}`,
         format: 'iife',
         entryFileNames: 'script.js',
-        assetFileNames: (assetInfo) => {
-          if (assetInfo.name?.endsWith('.css')) {
-            return 'styles.css'
-          }
-          return 'assets/[name][extname]'
-        }
+        assetFileNames: 'assets/[name][extname]'
       }
     }
   }
