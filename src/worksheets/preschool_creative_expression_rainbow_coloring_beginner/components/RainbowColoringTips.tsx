@@ -7,89 +7,76 @@ const RainbowColoringTips: React.FC = () => {
       <WorksheetHeader />
       
       <div className="max-w-4xl mx-auto">
-        <h1 className="text-4xl font-bold text-center mb-4">
-          Rainbow Coloring - Tips for Parents and Teachers 🌈
+        <h1 className="text-4xl font-bold text-center mb-8">
+          Teaching Tips 📚
         </h1>
 
-        <div className="space-y-6">
-          {/* Overview */}
-          <div className="bg-white rounded-xl p-6 shadow-lg">
-            <h2 className="text-2xl font-bold text-blue-800 mb-3">
-              Activity Overview
-            </h2>
-            <p className="text-gray-700">
-              This interactive worksheet helps children learn about colors while creating their own rainbow.
-              The activity combines color recognition, sequencing, and fine motor skills in an engaging way.
-            </p>
-          </div>
-
-          {/* Learning Objectives */}
-          <div className="bg-white rounded-xl p-6 shadow-lg">
-            <h2 className="text-2xl font-bold text-blue-800 mb-3">
-              Learning Objectives
-            </h2>
-            <ul className="list-disc list-inside space-y-2 text-gray-700">
-              <li>Recognize and name basic colors</li>
-              <li>Understand color sequences in a rainbow</li>
-              <li>Develop fine motor skills through interactive coloring</li>
-              <li>Learn about patterns and order in nature</li>
+        {/* Activity 1: Rainbow Tips */}
+        <div className="bg-white rounded-xl p-6 mb-8 shadow-lg">
+          <h2 className="text-2xl font-bold text-blue-800 mb-4">
+            1. Rainbow Colors Activity
+          </h2>
+          <div className="space-y-4">
+            <p className="text-lg">Help children learn the rainbow colors with these tips:</p>
+            <ul className="list-disc list-inside space-y-2 text-gray-700 ml-4">
+              <li>Use the mnemonic "ROY G. BIV" to remember the color order</li>
+              <li>Point out rainbows in nature after rain</li>
+              <li>Look for these colors in everyday objects</li>
+              <li>Practice saying each color name clearly</li>
+              <li>Discuss how rainbows form in nature</li>
             </ul>
           </div>
+        </div>
 
-          {/* Teaching Tips */}
-          <div className="bg-white rounded-xl p-6 shadow-lg">
-            <h2 className="text-2xl font-bold text-blue-800 mb-3">
-              Teaching Tips
-            </h2>
-            <div className="space-y-4">
-              <div className="bg-blue-50 p-4 rounded-lg">
-                <h3 className="font-bold text-blue-800 mb-2">Before the Activity:</h3>
-                <ul className="list-disc list-inside space-y-1 text-gray-700">
-                  <li>Discuss rainbows and when we see them in nature</li>
-                  <li>Show pictures of real rainbows</li>
-                  <li>Practice naming colors in everyday objects</li>
-                </ul>
-              </div>
-
-              <div className="bg-green-50 p-4 rounded-lg">
-                <h3 className="font-bold text-green-800 mb-2">During the Activity:</h3>
-                <ul className="list-disc list-inside space-y-1 text-gray-700">
-                  <li>Say each color name out loud as it's selected</li>
-                  <li>Encourage discussion about favorite colors</li>
-                  <li>Help with the sequence if needed</li>
-                </ul>
-              </div>
-
-              <div className="bg-purple-50 p-4 rounded-lg">
-                <h3 className="font-bold text-purple-800 mb-2">Extension Activities:</h3>
-                <ul className="list-disc list-inside space-y-1 text-gray-700">
-                  <li>Create rainbow art with different materials</li>
-                  <li>Go on a color scavenger hunt</li>
-                  <li>Sing songs about rainbows and colors</li>
-                </ul>
-              </div>
-            </div>
+        {/* Activity 2: Drawing Tips */}
+        <div className="bg-white rounded-xl p-6 mb-8 shadow-lg">
+          <h2 className="text-2xl font-bold text-blue-800 mb-4">
+            2. Happy Sun Activity
+          </h2>
+          <div className="space-y-4">
+            <p className="text-lg">Encourage creativity and expression:</p>
+            <ul className="list-disc list-inside space-y-2 text-gray-700 ml-4">
+              <li>Let children choose their favorite colors</li>
+              <li>Discuss why the sun is important</li>
+              <li>Talk about warm and cool colors</li>
+              <li>Ask them why they chose certain colors</li>
+              <li>Celebrate their unique color choices</li>
+            </ul>
           </div>
+        </div>
 
-          {/* Troubleshooting */}
-          <div className="bg-white rounded-xl p-6 shadow-lg">
-            <h2 className="text-2xl font-bold text-blue-800 mb-3">
-              Troubleshooting
-            </h2>
-            <div className="space-y-2">
-              <p className="text-gray-700">
-                <span className="font-semibold">If the child struggles with color order:</span>
-                {" "}Introduce the "ROY G. BIV" memory aid and practice it together.
-              </p>
-              <p className="text-gray-700">
-                <span className="font-semibold">If attention wanders:</span>
-                {" "}Break the activity into smaller segments and celebrate each completed arc.
-              </p>
-              <p className="text-gray-700">
-                <span className="font-semibold">For color recognition issues:</span>
-                {" "}Use real objects of each color as reference points.
-              </p>
-            </div>
+        {/* Activity 3: Pattern Tips */}
+        <div className="bg-white rounded-xl p-6 mb-8 shadow-lg">
+          <h2 className="text-2xl font-bold text-blue-800 mb-4">
+            3. Color Patterns Activity
+          </h2>
+          <div className="space-y-4">
+            <p className="text-lg">Help children understand patterns:</p>
+            <ul className="list-disc list-inside space-y-2 text-gray-700 ml-4">
+              <li>Start with the simplest pattern (all same color)</li>
+              <li>Use words like "next" and "takes turns"</li>
+              <li>Point to each box while saying the pattern</li>
+              <li>Find patterns in their environment</li>
+              <li>Celebrate each completed pattern</li>
+            </ul>
+          </div>
+        </div>
+
+        {/* General Teaching Tips */}
+        <div className="bg-white rounded-xl p-6 shadow-lg">
+          <h2 className="text-2xl font-bold text-blue-800 mb-4">
+            General Tips
+          </h2>
+          <div className="space-y-4">
+            <ul className="list-disc list-inside space-y-2 text-gray-700 ml-4">
+              <li>Keep the session fun and engaging</li>
+              <li>Take breaks if needed</li>
+              <li>Offer positive reinforcement</li>
+              <li>Allow for mistakes and learning</li>
+              <li>Make connections to real-world objects</li>
+              <li>Use clear, simple instructions</li>
+              <li>Celebrate their achievements</li>
+            </ul>
           </div>
         </div>
       </div>

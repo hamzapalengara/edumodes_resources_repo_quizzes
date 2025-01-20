@@ -341,15 +341,15 @@ const RainbowColoringWorksheet: React.FC = () => {
         {/* Activity 1: Rainbow */}
         <div className="mb-12">
           <div className="bg-white rounded-xl p-6 mb-6 shadow-lg">
-            <h2 className="text-2xl font-bold text-blue-800 mb-3">
+          <h2 className="text-2xl font-bold text-blue-800 mb-3">
               1. Build Your Rainbow! 🌈
-            </h2>
-            <ul className="text-lg text-blue-700 space-y-2">
+          </h2>
+          <ul className="text-lg text-blue-700 space-y-2">
               <li>• Start from the top of the rainbow 🎯</li>
               <li>• Pick the correct color when prompted 🎨</li>
               <li>• Click the arc to color it 🖌️</li>
-            </ul>
-          </div>
+          </ul>
+        </div>
 
           {/* Current Step Indicator */}
           <div className="bg-white rounded-xl p-4 mb-6 shadow-md text-center">
@@ -364,13 +364,13 @@ const RainbowColoringWorksheet: React.FC = () => {
             </h3>
           </div>
 
-          {/* Color Palette */}
+        {/* Color Palette */}
           <div className="flex flex-wrap justify-center gap-4 mb-6">
-            {colors.map((color) => (
-              <button
-                key={color.name}
-                onClick={() => handleColorSelect(color)}
-                className={`
+          {colors.map((color) => (
+            <button
+              key={color.name}
+              onClick={() => handleColorSelect(color)}
+              className={`
                   w-14 h-14 rounded-full
                   ${color.bgClass}
                   ${selectedColor === color.name ? `ring-4 ${color.borderClass} scale-110` : ''}
@@ -505,16 +505,16 @@ const RainbowColoringWorksheet: React.FC = () => {
                 onClick={() => setSelectedColor(color.name)}
                 className={`
                   w-14 h-14 rounded-full
-                  ${color.bgClass}
-                  ${selectedColor === color.name ? `ring-4 ${color.borderClass} scale-110` : ''}
-                  ${color.hoverClass}
-                  transform transition-all duration-300
-                  shadow-lg
-                `}
-                aria-label={`Select ${color.name} color`}
-              />
-            ))}
-          </div>
+                ${color.bgClass}
+                ${selectedColor === color.name ? `ring-4 ${color.borderClass} scale-110` : ''}
+                ${color.hoverClass}
+                transform transition-all duration-300
+                shadow-lg
+              `}
+              aria-label={`Select ${color.name} color`}
+            />
+          ))}
+        </div>
 
           {/* Drawing Area */}
           <div className="relative w-full h-[400px] bg-white rounded-xl shadow-lg p-6">
