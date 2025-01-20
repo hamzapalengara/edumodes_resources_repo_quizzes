@@ -2,7 +2,7 @@ import React from 'react';
 import { lazy } from 'react';
 
 // Import types
-interface WorksheetSet {
+export interface WorksheetSet {
   id: string;
   title: string;
   description: string;
@@ -12,12 +12,10 @@ interface WorksheetSet {
     Tips: React.LazyExoticComponent<React.ComponentType>;
     Thumbnail: React.LazyExoticComponent<React.ComponentType>;
   };
-  metadata: {
-    grade: string;
-    subject: string;
-    topic: string;
-    difficulty: string;
-  };
+  grade: string;
+  subject: string;
+  topic: string;
+  difficulty: string;
 }
 
 // Import all worksheet files
@@ -89,12 +87,10 @@ export function discoverWorksheets(): WorksheetSet[] {
         title,
         description,
         components,
-        metadata: {
-          grade,
-          subject,
-          topic,
-          difficulty
-        }
+        grade,
+        subject,
+        topic,
+        difficulty
       });
     } catch (error) {
       console.error(`Error processing worksheet ${id}:`, error);

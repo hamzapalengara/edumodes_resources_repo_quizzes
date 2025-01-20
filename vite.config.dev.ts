@@ -5,7 +5,6 @@ import type { ServerResponse } from 'http'
 import baseConfig from './vite.config.base'
 import { WORKSHEET_ID } from './vite.config.base'
 import path from 'path'
-import fs from 'fs'
 import chokidar from 'chokidar'
 
 export default mergeConfig(

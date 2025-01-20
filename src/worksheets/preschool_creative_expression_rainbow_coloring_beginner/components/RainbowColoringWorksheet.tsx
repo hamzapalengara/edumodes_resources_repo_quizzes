@@ -11,22 +11,6 @@ interface ColorButton {
   order: number;
 }
 
-interface ColorMix {
-  color1: string;
-  color2: string;
-  result: string;
-  resultName: string;
-}
-
-const colorMixes: ColorMix[] = [
-  { color1: '#FF0000', color2: '#FFD700', result: '#FF7F00', resultName: 'Orange' },
-  { color1: '#FFD700', color2: '#2196F3', result: '#4CAF50', resultName: 'Green' },
-  { color1: '#FF0000', color2: '#2196F3', result: '#9C27B0', resultName: 'Purple' },
-  { color1: '#FF0000', color2: '#4CAF50', result: '#8B4513', resultName: 'Brown' },
-  { color1: '#FFD700', color2: '#FF0000', result: '#FF4500', resultName: 'Coral' },
-  { color1: '#2196F3', color2: '#4CAF50', result: '#00CED1', resultName: 'Turquoise' },
-];
-
 const colors: ColorButton[] = [
   { 
     name: 'Red', 
@@ -102,9 +86,6 @@ interface ColorPattern {
 const RainbowColoringWorksheet: React.FC = () => {
   const [selectedColor, setSelectedColor] = useState<string | null>(null);
   const [currentStep, setCurrentStep] = useState(1);
-  const [isRainbowComplete, setIsRainbowComplete] = useState(false);
-  const [selectedMixColors, setSelectedMixColors] = useState<string[]>([]);
-  const [discoveredColors, setDiscoveredColors] = useState<string[]>([]);
   const [rainbowArcs, setRainbowArcs] = useState<RainbowArc[]>([
     { id: 0, color: '', isColored: false, name: 'Red' },
     { id: 1, color: '', isColored: false, name: 'Orange' },
@@ -205,7 +186,6 @@ const RainbowColoringWorksheet: React.FC = () => {
       setTimeout(() => {
         const completionUtterance = new SpeechSynthesisUtterance("Wonderful! You've completed the rainbow! Now let's discover more colors by mixing!");
         window.speechSynthesis.speak(completionUtterance);
-        setIsRainbowComplete(true);
         
         // Celebrate with all colors
         colors.forEach((color, index) => {
@@ -222,29 +202,6 @@ const RainbowColoringWorksheet: React.FC = () => {
       }, 1000);
     }
   }, [selectedColor, currentStep, triggerConfetti]);
-
-  const handleColorMix = useCallback((color: string) => {
-    setSelectedMixColors(prev => {
-      if (prev.length === 2) return [color];
-      return [...prev, color];
-    });
-
-    if (selectedMixColors.length === 1) {
-      const mix = colorMixes.find(m => 
-        (m.color1 === selectedMixColors[0] && m.color2 === color) ||
-        (m.color2 === selectedMixColors[0] && m.color1 === color)
-      );
-
-      if (mix) {
-        setTimeout(() => {
-          triggerConfetti(mix.result);
-          const utterance = new SpeechSynthesisUtterance(`Amazing! You created ${mix.resultName}!`);
-          window.speechSynthesis.speak(utterance);
-          setDiscoveredColors(prev => [...prev, mix.result]);
-        }, 300);
-      }
-    }
-  }, [selectedMixColors, triggerConfetti]);
 
   const handleDrawingClick = useCallback((partId: string) => {
     if (!selectedColor) {
