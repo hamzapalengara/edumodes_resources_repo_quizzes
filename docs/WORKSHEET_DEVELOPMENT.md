@@ -10,30 +10,34 @@
 7. [Build Configuration](#build-configuration)
 8. [Testing & Validation](#testing--validation)
 9. [Responsive Design Specifications](#responsive-design-specifications)
+10. [Using the Template](#using-the-template)
 
 ## Getting Started
 
 ### Development Commands
 
-To start development on a worksheet, use the following command in PowerShell:
+To start development, use the following command in PowerShell:
 
 ```powershell
-# Start development server
-$env:VITE_WORKSHEET_ID="your_worksheet_id"; npm run dev
-
-# Example
-$env:VITE_WORKSHEET_ID="grade2_mathematics_addition_beginner"; npm run dev
+# Start development server with dashboard
+npm run dev
 ```
 
 This will:
 - Start the development server at http://localhost:5173
+- Load the worksheet development dashboard
 - Enable hot module replacement
-- Serve the worksheet, answer key, tips, and thumbnail pages
 - Auto-reload on file changes
+
+The development server uses `vite.config.dev.ts` which:
+- Loads a dashboard interface for worksheet development
+- Shows all available worksheets
+- Provides quick access to each worksheet's views (worksheet, answer key, tips, thumbnail)
+- Enables real-time preview of changes
 
 ### Build Commands
 
-To build a worksheet for production:
+To build a specific worksheet for production:
 
 ```powershell
 # Build for production
@@ -43,7 +47,7 @@ $env:WORKSHEET_ID="your_worksheet_id"; npm run build
 $env:WORKSHEET_ID="grade2_mathematics_addition_beginner"; npm run build
 ```
 
-The build process will:
+The build process (using `vite.config.prod.ts`) will:
 1. Compile TypeScript files
 2. Bundle and transform modules
 3. Generate HTML files:
@@ -55,17 +59,18 @@ The build process will:
 5. Output all files to `dist/[worksheet_id]/`
 
 ### Important Notes
-- Development uses `VITE_WORKSHEET_ID` environment variable
-- Production build uses `WORKSHEET_ID` environment variable
+- Development mode uses `vite.config.dev.ts` and loads a dashboard interface
+- Production build uses `vite.config.prod.ts` and requires `WORKSHEET_ID` environment variable
 - All built files are self-contained
 - Production builds are minified and optimized
 
 ### Development URLs
-During development, access your worksheet at:
-- Main Worksheet: http://localhost:5173/worksheet.html
-- Answer Key: http://localhost:5173/answer_key.html
-- Tips: http://localhost:5173/tips.html
-- Thumbnail: http://localhost:5173/thumbnail.html
+During development, access the dashboard at http://localhost:5173
+The dashboard provides links to view each worksheet's:
+- Main Worksheet
+- Answer Key
+- Tips
+- Thumbnail
 
 ## Core Requirements
 
@@ -416,10 +421,31 @@ For a worksheet folder named `preschool_art_color_mixing_beginner`:
 
 ## Build Configuration
 
-### 1. Vite Configuration
+### 1. Development Configuration
 ```typescript
+// vite.config.dev.ts
 export default defineConfig({
-  plugins: [react(), copyFiles(), createHtmlFiles()],
+  plugins: [react()],
+  build: {
+    rollupOptions: {
+      input: {
+        main: path.resolve('src/index.html')
+      }
+    }
+  }
+})
+```
+
+### 2. Production Configuration
+```typescript
+// vite.config.prod.ts
+export default defineConfig({
+  plugins: [
+    react(),
+    copyFiles(),
+    createHtmlFiles(),
+    generateThumbnail()
+  ],
   build: {
     rollupOptions: {
       input: path.resolve(`src/worksheets/${WORKSHEET_ID}/entries/index.tsx`),
@@ -434,18 +460,27 @@ export default defineConfig({
 })
 ```
 
-### 2. Build Output
+### 3. Build Output
 ```
 dist/[worksheet_id]/
 ├── worksheet.html
 ├── answer_key.html
 ├── tips.html
 ├── thumbnail.html
+├── thumbnail.png
 ├── script.js
 ├── styles.css
 ├── title.txt
 └── description.txt
 ```
+
+### 4. Development Dashboard
+The development server provides a dashboard that:
+- Lists all available worksheets
+- Shows worksheet metadata
+- Provides quick access to all views
+- Enables real-time preview
+- Supports rapid development workflow
 
 ## Testing & Validation
 
@@ -936,50 +971,70 @@ The build process includes robust error handling for:
    - Check dark/light modes
    - Validate accessibility
 
-## Creating New Worksheet Sets
+## Using the Template
 
-### 1. Setup Steps
+### Basic Template Location
+The basic worksheet template is located in `src/worksheets/templates/basic/`. This template provides a standardized structure that should be followed when creating new worksheets.
+
+### Template Structure
 ```
-1. Create new directory in src/worksheets/
-   [grade]_[subject]_[topic]_[level]/
-   Example: grade2_mathematics_addition_beginner/
-
-2. Create required files:
-   ├── entries/
-   │   └── index.tsx         # Main entry point
-   ├── components/
-   │   ├── WorksheetView.tsx # Interactive worksheet
-   │   ├── AnswerKeyView.tsx # Answer key
-   │   └── TipsView.tsx      # Tips and guidance
-   ├── title.txt            # Worksheet title
-   └── description.txt      # Worksheet description
-```
-
-### 2. Build Process
-The build process is dynamic and supports multiple worksheets. You can specify which worksheet to build in two ways:
-
-1. **Using Environment Variable**:
-```bash
-# Windows PowerShell
-$env:WORKSHEET_ID="grade2_mathematics_addition_beginner"; npm run build
-
-# Windows CMD
-set WORKSHEET_ID=grade2_mathematics_addition_beginner && npm run build
-
-# Unix/Linux/Mac
-WORKSHEET_ID=grade2_mathematics_addition_beginner npm run build
+templates/basic/
+├── components/              # React components
+│   ├── BasicWorksheet.tsx  # Main worksheet view
+│   ├── BasicAnswerKey.tsx  # Answer key view
+│   ├── BasicTips.tsx       # Teaching tips view
+│   └── BasicThumbnail.tsx  # Thumbnail preview
+├── entries/
+│   └── index.tsx           # Main entry point
+├── title.txt               # Worksheet title
+└── description.txt         # Worksheet description
 ```
 
-2. **Using Command Line Argument**:
-```bash
-npm run build --worksheet=grade2_mathematics_addition_beginner
-```
+### Creating a New Worksheet
+1. Copy the basic template directory
+2. Rename it following the convention: `[grade]_[subject]_[topic]_[difficulty]`
+3. Rename the component files replacing "Basic" with your topic name in PascalCase
+4. Update the imports in `index.tsx` to match your new component names
+5. Update `title.txt` and `description.txt` with your worksheet's information
+6. Implement your worksheet's functionality in the components
 
-The build configuration automatically:
-- Validates that the worksheet directory exists
-- Sets up the correct input/output paths
-- Handles file copying and thumbnail generation
-- Creates isolated builds for each worksheet
+### Key Files and Their Purpose
+
+1. **entries/index.tsx**
+   - Main entry point
+   - Handles React initialization
+   - Manages view switching
+   - Implements lazy loading
+
+2. **components/[Prefix]Worksheet.tsx**
+   - Main interactive worksheet
+   - Contains the core learning activity
+   - Uses shared components and layouts
+
+3. **components/[Prefix]AnswerKey.tsx**
+   - Shows solutions and explanations
+   - Provides answer validation
+   - Includes teaching notes if needed
+
+4. **components/[Prefix]Tips.tsx**
+   - Contains teaching guidelines
+   - Lists learning objectives
+   - Provides implementation tips
+
+5. **components/[Prefix]Thumbnail.tsx**
+   - Creates worksheet preview
+   - Uses standard dimensions (500x375)
+   - Shows key worksheet information
+
+### Best Practices
+1. Always start with the template
+2. Follow the naming conventions
+3. Implement all required components
+4. Use lazy loading for better performance
+5. Include proper TypeScript types
+6. Add comprehensive comments
+7. Follow the mobile-first approach
+8. Use Tailwind CSS for styling
 
 ```typescript
 // vite.config.ts
