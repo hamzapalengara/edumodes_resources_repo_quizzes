@@ -21,10 +21,6 @@ const validateWorksheet = () => {
   // Check for required files
   const requiredFiles = [
     'entries/index.tsx',
-    'entries/worksheet.tsx',
-    'entries/answer-key.tsx',
-    'entries/tips.tsx',
-    'entries/thumbnail.tsx',
     'title.txt',
     'description.txt'
   ]
@@ -221,7 +217,6 @@ export default mergeConfig(
           format: 'iife',
           entryFileNames: 'script.js',
           chunkFileNames: 'script.js',
-          manualChunks: undefined,
           assetFileNames: (assetInfo) => {
             if (assetInfo.name === 'style.css') return 'style.css';
             return `assets/[name]-[hash].[ext]`;
