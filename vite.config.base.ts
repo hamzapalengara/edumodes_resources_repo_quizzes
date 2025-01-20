@@ -6,7 +6,7 @@ import path from 'path'
 export const WORKSHEET_ID = process.env.WORKSHEET_ID || process.env.VITE_WORKSHEET_ID
 
 if (!WORKSHEET_ID) {
-  console.warn('No WORKSHEET_ID provided. Using default worksheet for development.')
+  console.info('No WORKSHEET_ID provided. Running in dashboard mode.')
 }
 
 export default defineConfig({
