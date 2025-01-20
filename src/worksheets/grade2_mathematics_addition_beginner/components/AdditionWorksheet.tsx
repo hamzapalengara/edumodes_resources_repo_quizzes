@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import WorksheetHeader from '../../../components/shared/layout/Header/WorksheetHeader';
 import TouchContainer from '../../../components/shared/layout/Container/TouchContainer';
+import ScoreDisplay from '../../../components/shared/ScoreDisplay';
 
 const AdditionWorksheet: React.FC = () => {
   const [score] = useState(0);
@@ -15,15 +16,14 @@ const AdditionWorksheet: React.FC = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 w-full">
-      <WorksheetHeader>
-        <div className="text-sm text-gray-600 px-4">
-          Score: {score}/{totalQuestions}
-        </div>
-      </WorksheetHeader>
+    <div className="min-h-screen bg-white w-full">
+      <WorksheetHeader />
       <TouchContainer>
-        <div className="max-w-4xl mx-auto p-6">
-          <div className="bg-white rounded-lg shadow-md p-6">
+        <div className="max-w-4xl mx-auto p-6 pt-8">
+          {/* Score Display */}
+          <ScoreDisplay score={score} totalQuestions={totalQuestions} />
+
+          <div className="bg-white rounded-lg border border-gray-200 p-6">
             <h1 className="text-xl font-bold text-center text-gray-800 mb-6">
               Two-Digit Addition Practice
             </h1>

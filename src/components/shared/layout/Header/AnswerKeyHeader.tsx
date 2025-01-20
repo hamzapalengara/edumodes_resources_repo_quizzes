@@ -7,7 +7,10 @@ interface AnswerKeyHeaderProps {
 
 const AnswerKeyHeader: React.FC<AnswerKeyHeaderProps> = ({ children }) => {
   return (
-    <BaseHeader gradient="bg-gradient-to-r from-green-500 to-emerald-700">
+    <BaseHeader 
+      gradient="bg-gradient-to-r from-green-500 to-emerald-700"
+      themeColor="#22c55e"
+    >
       {children}
     </BaseHeader>
   );

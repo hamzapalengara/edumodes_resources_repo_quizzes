@@ -1,18 +1,14 @@
 import React from 'react';
-import WorksheetHeader from '../../../components/shared/layout/Header/WorksheetHeader';
+import TipsHeader from '../../../components/shared/layout/Header/TipsHeader';
 import TouchContainer from '../../../components/shared/layout/Container/TouchContainer';
 
 const AdditionTips: React.FC = () => {
   return (
-    <div className="min-h-screen bg-gray-50 w-full">
-      <WorksheetHeader>
-        <div className="text-sm text-gray-600 px-4">
-          Tips & Guidance
-        </div>
-      </WorksheetHeader>
+    <div className="min-h-screen bg-white w-full">
+      <TipsHeader />
       <TouchContainer>
-        <div className="max-w-4xl mx-auto p-6">
-          <div className="bg-white rounded-lg shadow-md p-6">
+        <div className="max-w-4xl mx-auto p-6 pt-8">
+          <div className="bg-white rounded-lg border border-gray-200 p-6">
             <h2 className="text-lg font-bold text-gray-700 mb-4">How to Add Two-Digit Numbers</h2>
             <ul className="space-y-4 text-gray-600">
               <li className="flex items-start">

@@ -7,7 +7,10 @@ interface TipsHeaderProps {
 
 const TipsHeader: React.FC<TipsHeaderProps> = ({ children }) => {
   return (
-    <BaseHeader gradient="bg-gradient-to-r from-yellow-500 to-orange-500">
+    <BaseHeader 
+      gradient="bg-gradient-to-r from-yellow-500 to-orange-500"
+      themeColor="#f59e0b"
+    >
       {children}
     </BaseHeader>
   );

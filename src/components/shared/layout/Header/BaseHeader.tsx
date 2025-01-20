@@ -3,9 +3,27 @@ import React from 'react';
 interface BaseHeaderProps {
   gradient?: string;  // Tailwind gradient classes
   children?: React.ReactNode;
+  themeColor?: string; // Theme color for meta tag
 }
 
-const BaseHeader: React.FC<BaseHeaderProps> = ({ gradient = '', children }) => {
+const BaseHeader: React.FC<BaseHeaderProps> = ({ 
+  gradient = '', 
+  children,
+  themeColor = '#EC4899' // Default pink theme
+}) => {
+  // Update theme color meta tag
+  React.useEffect(() => {
+    const metaThemeColor = document.querySelector('meta[name="theme-color"]');
+    if (metaThemeColor) {
+      metaThemeColor.setAttribute('content', themeColor);
+    } else {
+      const meta = document.createElement('meta');
+      meta.name = 'theme-color';
+      meta.content = themeColor;
+      document.head.appendChild(meta);
+    }
+  }, [themeColor]);
+
   return (
     <nav className="border-b print:border-0 bg-white">
       <div className="container mx-auto">

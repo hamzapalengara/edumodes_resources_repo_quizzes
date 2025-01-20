@@ -983,4 +983,37 @@ export default defineConfig({
    - Include clear commit messages
    - Document any special requirements
 
+## Core Layout & Styling
+```typescript
+// Base layout requirements
+const LAYOUT_REQUIREMENTS = {
+  background: 'bg-white',    // White background for all pages
+  borders: 'border border-gray-200',  // Subtle borders instead of shadows
+  borderRadius: 'rounded-lg',
+  padding: {
+    container: 'p-6',
+    contentTop: 'pt-8'      // Extra top padding for content
+  }
+};
+
+// Example implementation
+const ContentContainer = styled.div`
+  ${LAYOUT_REQUIREMENTS.background}
+  ${LAYOUT_REQUIREMENTS.borders}
+  ${LAYOUT_REQUIREMENTS.borderRadius}
+  ${LAYOUT_REQUIREMENTS.padding.container}
+`;
+```
+
+### Header Colors
+- Worksheet: `from-pink-500 to-yellow-500`
+- Answer Key: `from-green-500 to-emerald-500`
+- Tips: `from-amber-500 to-amber-700`
+
+### Important Styling Notes
+- Use white backgrounds (`bg-white`) for all main containers
+- Prefer subtle borders over shadows for visual separation
+- Use `border border-gray-200` for container boundaries
+- Maintain consistent padding and spacing
+
 [Rest of documentation continues...] 

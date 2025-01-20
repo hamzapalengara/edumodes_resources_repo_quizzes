@@ -7,7 +7,10 @@ interface WorksheetHeaderProps {
 
 const WorksheetHeader: React.FC<WorksheetHeaderProps> = ({ children }) => {
   return (
-    <BaseHeader gradient="bg-gradient-to-r from-pink-500 to-yellow-500">
+    <BaseHeader 
+      gradient="bg-gradient-to-r from-pink-500 to-yellow-500"
+      themeColor="#EC4899"
+    >
       {children}
     </BaseHeader>
   );

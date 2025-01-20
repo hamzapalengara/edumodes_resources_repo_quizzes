@@ -3,6 +3,8 @@ import react from '@vitejs/plugin-react'
 import path from 'path'
 import fs from 'fs'
 import { generateWorksheetThumbnails } from './src/utils/thumbnail-generator'
+import type { ViteDevServer, Connect } from 'vite'
+import type { ServerResponse } from 'http'
 
 // Get worksheet ID from environment variable
 const WORKSHEET_ID = process.env.WORKSHEET_ID || process.env.VITE_WORKSHEET_ID
@@ -35,13 +37,14 @@ const createHtmlFiles = (): Plugin => {
         
         if (page) {
           const titles: Record<string, string> = {
-            worksheet: 'Addition Worksheet',
+            worksheet: WORKSHEET_ID?.includes('addition') ? 'Addition Worksheet' : 'Color Exploration Worksheet',
             answer_key: 'Answer Key',
             tips: 'Tips & Guidance',
             thumbnail: 'Worksheet Preview'
           };
 
           const isThumbail = page === 'thumbnail';
+          const entryFile = page === 'answer_key' ? 'answer-key' : page;
           const html = `<!DOCTYPE html>
 <html lang="en">
   <head>
@@ -55,15 +58,15 @@ const createHtmlFiles = (): Plugin => {
       window.$RefreshSig$ = () => (type) => type
       window.__vite_plugin_react_preamble_installed__ = true
     </script>
+    <script>
+      window.WORKSHEET_VIEW = '${page}';
+    </script>
   </head>
   <body>
     ${isThumbail ? '<div id="thumbnail-content">' : ''}
     <div id="root"></div>
     ${isThumbail ? '</div>' : ''}
-    <script>
-      window.WORKSHEET_VIEW = '${page}';
-    </script>
-    <script type="module" src="/src/worksheets/${WORKSHEET_ID || 'grade2_mathematics_addition_beginner'}/entries/index.tsx"></script>
+    <script type="module" src="src/worksheets/${WORKSHEET_ID || 'grade2_mathematics_addition_beginner'}/entries/${entryFile}.tsx"></script>
   </body>
 </html>`;
           
@@ -80,7 +83,7 @@ const createHtmlFiles = (): Plugin => {
       const pages = ['worksheet', 'answer_key', 'tips', 'thumbnail'] as const;
       type Page = typeof pages[number];
       const titles: Record<Page, string> = {
-        worksheet: 'Addition Worksheet',
+        worksheet: WORKSHEET_ID?.includes('addition') ? 'Addition Worksheet' : 'Color Exploration Worksheet',
         answer_key: 'Answer Key',
         tips: 'Tips & Guidance',
         thumbnail: 'Worksheet Preview'
@@ -94,7 +97,7 @@ const createHtmlFiles = (): Plugin => {
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>${titles[page]}</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="style.css">
     <script>
       window.WORKSHEET_VIEW = '${page}';
     </script>
@@ -144,40 +147,57 @@ export default defineConfig({
     react({
       jsxRuntime: 'automatic'
     }),
-    createHtmlFiles(),
-    copyFiles(),
+    // Development mode plugins
     {
+      name: 'configure-server',
+      configureServer(server: ViteDevServer) {
+        server.middlewares.use((req: Connect.IncomingMessage, _res: ServerResponse, next: Connect.NextFunction) => {
+          // Redirect all requests to index.html in development
+          if (req.url?.endsWith('.html')) {
+            req.url = '/';
+          }
+          next();
+        });
+      },
+    },
+    // Production mode plugins
+    process.env.NODE_ENV === 'production' ? createHtmlFiles() : null,
+    process.env.NODE_ENV === 'production' ? copyFiles() : null,
+    process.env.NODE_ENV === 'production' ? {
       name: 'generate-thumbnails',
       closeBundle: async () => {
-        if (process.env.NODE_ENV === 'production') {
-          try {
-            const distDir = path.resolve(__dirname, 'dist')
-            await generateWorksheetThumbnails(distDir)
-          } catch (error) {
-            console.error('Failed to generate thumbnails:', error)
-            throw error
-          }
+        try {
+          const distDir = path.resolve(__dirname, 'dist')
+          await generateWorksheetThumbnails(distDir)
+        } catch (error) {
+          console.error('Failed to generate thumbnails:', error)
+          throw error
         }
       }
-    }
-  ],
+    } : null
+  ].filter(Boolean),
+  server: {
+    port: 5173
+  },
   build: {
     rollupOptions: {
-      input: path.resolve(`src/worksheets/${WORKSHEET_ID}/entries/index.tsx`),
+      input: process.env.NODE_ENV === 'production' ? 
+        path.resolve(__dirname, `src/worksheets/${WORKSHEET_ID}/entries/index.tsx`) : 
+        path.resolve(__dirname, 'index.html'),
       output: {
-        dir: `dist/${WORKSHEET_ID}`,
+        dir: WORKSHEET_ID ? `dist/${WORKSHEET_ID}` : 'dist',
         format: 'iife',
         entryFileNames: 'script.js',
+        chunkFileNames: 'script.js',
+        manualChunks: undefined,
         assetFileNames: (assetInfo) => {
-          if (assetInfo.name?.endsWith('.css')) {
-            return 'styles.css'
-          }
-          return 'assets/[name][extname]'
+          if (assetInfo.name === 'style.css') return 'style.css';
+          return `assets/[name]-[hash].[ext]`;
         }
       }
     },
     sourcemap: false,
-    emptyOutDir: true,
+    emptyOutDir: false,
     cssCodeSplit: false,
     minify: true
   },
