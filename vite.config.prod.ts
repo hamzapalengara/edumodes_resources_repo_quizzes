@@ -5,6 +5,7 @@ import fs from 'fs'
 import baseConfig from './vite.config.base'
 import { WORKSHEET_ID } from './vite.config.base'
 import type { Plugin } from 'vite'
+import puppeteer from 'puppeteer'
 
 // Validate single worksheet and get its metadata
 const validateWorksheet = () => {
@@ -156,6 +157,55 @@ const copyFiles = (worksheetInfo: ReturnType<typeof validateWorksheet>): Plugin 
   }
 })
 
+// Generate thumbnail image
+const generateThumbnail = (worksheetInfo: ReturnType<typeof validateWorksheet>): Plugin => ({
+  name: 'generate-thumbnail',
+  closeBundle: async () => {
+    const destDir = path.resolve(process.cwd(), `dist/${worksheetInfo.id}`)
+    const thumbnailHtml = path.join(destDir, 'thumbnail.html')
+    const thumbnailPng = path.join(destDir, 'thumbnail.png')
+    
+    console.log('\nGenerating thumbnail image...')
+    
+    let browser;
+    try {
+      // Launch browser and create screenshot
+      browser = await puppeteer.launch()
+      const page = await browser.newPage()
+      
+      // Set viewport size for thumbnail
+      await page.setViewport({
+        width: 500,
+        height: 375,
+        deviceScaleFactor: 1
+      })
+      
+      console.log('Loading thumbnail HTML...')
+      // Load the thumbnail HTML
+      await page.goto(`file://${thumbnailHtml}`)
+      
+      // Wait for content to load
+      await page.waitForSelector('#thumbnail-content')
+      
+      console.log('Taking screenshot...')
+      // Take screenshot
+      await page.screenshot({
+        path: thumbnailPng,
+        type: 'png'
+      })
+      
+      console.log(`Thumbnail generated successfully: ${thumbnailPng}`)
+    } catch (error) {
+      console.error('Error generating thumbnail:', error)
+      throw error
+    } finally {
+      if (browser) {
+        await browser.close()
+      }
+    }
+  }
+})
+
 // Validate and get worksheet info
 const worksheetInfo = validateWorksheet()
 
@@ -185,7 +235,8 @@ export default mergeConfig(
     },
     plugins: [
       createHtmlFiles(worksheetInfo),
-      copyFiles(worksheetInfo)
+      copyFiles(worksheetInfo),
+      generateThumbnail(worksheetInfo)
     ]
   })
 ) 
