@@ -6,83 +6,93 @@ const MultiplicationAnswerKey: React.FC = () => {
   const answers = [
     {
       story: 'You have 3 baskets with 2 apples in each basket.',
+      total: 'In total, there are 6 apples.',
       repeated: '2 + 2 + 2',
       multiplication: '3 × 2',
       result: 6,
       visual: '🍎🍎 + 🍎🍎 + 🍎🍎',
-      explanation: 'We can see 3 groups of 2 apples. Adding 2 three times (2 + 2 + 2) is the same as multiplying 3 × 2 = 6'
+      explanation: 'We can see 3 groups of 2 apples. Adding 2 three times (2 + 2 + 2) gives us 6, which is the same as multiplying 3 × 2 = 6'
     },
     {
       story: 'There are 3 dog parks with 3 puppies in each park.',
+      total: 'In total, there are 9 puppies.',
       repeated: '3 + 3 + 3',
       multiplication: '3 × 3',
       result: 9,
       visual: '🐶🐶🐶 + 🐶🐶🐶 + 🐶🐶🐶',
-      explanation: 'We have 3 parks with 3 puppies each. Adding 3 three times (3 + 3 + 3) is the same as multiplying 3 × 3 = 9'
+      explanation: 'We have 3 parks with 3 puppies each. Adding 3 three times (3 + 3 + 3) gives us 9, which is the same as multiplying 3 × 3 = 9'
     },
     {
       story: 'You have 2 friends, and each friend gets 4 balloons.',
+      total: 'In total, there are 8 balloons.',
       repeated: '4 + 4',
       multiplication: '2 × 4',
       result: 8,
       visual: '🎈🎈🎈🎈 + 🎈🎈🎈🎈',
-      explanation: 'Each friend gets 4 balloons, and we have 2 friends. Adding 4 two times (4 + 4) is the same as multiplying 2 × 4 = 8'
+      explanation: 'Each friend gets 4 balloons, and we have 2 friends. Adding 4 two times (4 + 4) gives us 8, which is the same as multiplying 2 × 4 = 8'
     },
     {
       story: '4 children each get 2 ice cream cones.',
+      total: 'In total, there are 8 ice cream cones.',
       repeated: '2 + 2 + 2 + 2',
       multiplication: '4 × 2',
       result: 8,
       visual: '🍦🍦 + 🍦🍦 + 🍦🍦 + 🍦🍦',
-      explanation: 'Each child gets 2 ice creams, and there are 4 children. Adding 2 four times (2 + 2 + 2 + 2) is the same as multiplying 4 × 2 = 8'
+      explanation: 'Each child gets 2 ice creams, and there are 4 children. Adding 2 four times (2 + 2 + 2 + 2) gives us 8, which is the same as multiplying 4 × 2 = 8'
     },
     {
       story: 'You completed 2 tasks and earned 5 stars for each task!',
+      total: 'In total, there are 10 stars.',
       repeated: '5 + 5',
       multiplication: '2 × 5',
       result: 10,
       visual: '⭐⭐⭐⭐⭐ + ⭐⭐⭐⭐⭐',
-      explanation: 'You earned 5 stars for each of the 2 tasks. Adding 5 two times (5 + 5) is the same as multiplying 2 × 5 = 10'
+      explanation: 'You earned 5 stars for each of the 2 tasks. Adding 5 two times (5 + 5) gives us 10, which is the same as multiplying 2 × 5 = 10'
     },
     {
       story: '4 birthday parties each have 3 presents to open.',
+      total: 'In total, there are 12 presents.',
       repeated: '3 + 3 + 3 + 3',
       multiplication: '4 × 3',
       result: 12,
       visual: '🎁🎁🎁 + 🎁🎁🎁 + 🎁🎁🎁 + 🎁🎁🎁',
-      explanation: 'There are 4 parties with 3 presents each. Adding 3 four times (3 + 3 + 3 + 3) is the same as multiplying 4 × 3 = 12'
+      explanation: 'There are 4 parties with 3 presents each. Adding 3 four times (3 + 3 + 3 + 3) gives us 12, which is the same as multiplying 4 × 3 = 12'
     },
     {
       story: '5 teams each scored 2 points in the game.',
+      total: 'In total, there are 10 points.',
       repeated: '2 + 2 + 2 + 2 + 2',
       multiplication: '5 × 2',
       result: 10,
       visual: '🌟🌟 + 🌟🌟 + 🌟🌟 + 🌟🌟 + 🌟🌟',
-      explanation: 'Each team scored 2 points, and there are 5 teams. Adding 2 five times (2 + 2 + 2 + 2 + 2) is the same as multiplying 5 × 2 = 10'
+      explanation: 'Each team scored 2 points, and there are 5 teams. Adding 2 five times (2 + 2 + 2 + 2 + 2) gives us 10, which is the same as multiplying 5 × 2 = 10'
     },
     {
       story: 'You baked 2 batches of cookies with 6 cookies in each batch.',
+      total: 'In total, there are 12 cookies.',
       repeated: '6 + 6',
       multiplication: '2 × 6',
       result: 12,
       visual: '🍪🍪🍪🍪🍪🍪 + 🍪🍪🍪🍪🍪🍪',
-      explanation: 'Each batch has 6 cookies, and you baked 2 batches. Adding 6 two times (6 + 6) is the same as multiplying 2 × 6 = 12'
+      explanation: 'Each batch has 6 cookies, and you baked 2 batches. Adding 6 two times (6 + 6) gives us 12, which is the same as multiplying 2 × 6 = 12'
     },
     {
       story: '3 art classes each need 4 paint brushes.',
+      total: 'In total, there are 12 paint brushes.',
       repeated: '4 + 4 + 4',
       multiplication: '3 × 4',
       result: 12,
       visual: '🎨🎨🎨🎨 + 🎨🎨🎨🎨 + 🎨🎨🎨🎨',
-      explanation: 'Each class needs 4 brushes, and there are 3 classes. Adding 4 three times (4 + 4 + 4) is the same as multiplying 3 × 4 = 12'
+      explanation: 'Each class needs 4 brushes, and there are 3 classes. Adding 4 three times (4 + 4 + 4) gives us 12, which is the same as multiplying 3 × 4 = 12'
     },
     {
       story: 'You planted 5 flower pots with 3 flowers in each pot.',
+      total: 'In total, there are 15 flowers.',
       repeated: '3 + 3 + 3 + 3 + 3',
       multiplication: '5 × 3',
       result: 15,
       visual: '🌸🌸🌸 + 🌸🌸🌸 + 🌸🌸🌸 + 🌸🌸🌸 + 🌸🌸🌸',
-      explanation: 'Each pot has 3 flowers, and there are 5 pots. Adding 3 five times (3 + 3 + 3 + 3 + 3) is the same as multiplying 5 × 3 = 15'
+      explanation: 'Each pot has 3 flowers, and there are 5 pots. Adding 3 five times (3 + 3 + 3 + 3 + 3) gives us 15, which is the same as multiplying 5 × 3 = 15'
     }
   ];
 
@@ -105,8 +115,11 @@ const MultiplicationAnswerKey: React.FC = () => {
                   </div>
                   
                   {/* Story */}
-                  <div className="text-lg text-gray-700 mb-4">
+                  <div className="text-lg text-gray-700 mb-2">
                     {answer.story}
+                  </div>
+                  <div className="text-lg text-purple-600 italic mb-4">
+                    {answer.total}
                   </div>
 
                   {/* Visual */}
@@ -116,10 +129,17 @@ const MultiplicationAnswerKey: React.FC = () => {
 
                   {/* Solution */}
                   <div className="bg-white rounded-lg p-4 border-2 border-purple-100">
-                    <div className="text-xl text-purple-600 font-medium mb-2">
-                      {answer.repeated} = {answer.multiplication} = {answer.result}
+                    <div className="flex flex-col gap-4">
+                      {/* Repeated Addition */}
+                      <div className="text-xl text-purple-600 font-medium">
+                        Repeated Addition: {answer.repeated} = {answer.result}
+                      </div>
+                      {/* Multiplication */}
+                      <div className="text-xl text-purple-600 font-medium">
+                        Multiplication: {answer.multiplication} = {answer.result}
+                      </div>
                     </div>
-                    <div className="text-gray-600 bg-purple-50 p-3 rounded">
+                    <div className="text-gray-600 bg-purple-50 p-3 rounded mt-4">
                       <span className="font-medium text-purple-700">How did we solve it? 🤔</span>
                       <br />
                       {answer.explanation}

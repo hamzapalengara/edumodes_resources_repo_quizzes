@@ -7,7 +7,9 @@ import Confetti from 'react-confetti';
 const MultiplicationWorksheet: React.FC = () => {
   const [score, setScore] = useState(0);
   const [totalQuestions] = useState(10);
-  const [userAnswers, setUserAnswers] = useState<string[]>(Array(10).fill(''));
+  const [userAnswers, setUserAnswers] = useState<{ addition: string; multiplication: string }[]>(
+    Array(10).fill({ addition: '', multiplication: '' })
+  );
   const [feedback, setFeedback] = useState<Array<'correct' | 'incorrect' | null>>(Array(10).fill(null));
   const [showCelebration, setShowCelebration] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
@@ -34,76 +36,89 @@ const MultiplicationWorksheet: React.FC = () => {
       multiplication: '3 × 2',
       result: 6,
       visual: '🍎🍎 + 🍎🍎 + 🍎🍎',
-      story: 'You have 3 baskets with 2 apples in each basket.'
+      story: 'You have 3 baskets with 2 apples in each basket.',
+      question: 'What is the total number of apples?'
     },
     {
       repeated: '3 + 3 + 3',
       multiplication: '3 × 3',
       result: 9,
       visual: '🐶🐶🐶 + 🐶🐶🐶 + 🐶🐶🐶',
-      story: 'There are 3 dog parks with 3 puppies in each park.'
+      story: 'There are 3 dog parks with 3 puppies in each park.',
+      question: 'What is the total number of puppies?'
     },
     {
       repeated: '4 + 4',
       multiplication: '2 × 4',
       result: 8,
       visual: '🎈🎈🎈🎈 + 🎈🎈🎈🎈',
-      story: 'You have 2 friends, and each friend gets 4 balloons.'
+      story: 'You have 2 friends, and each friend gets 4 balloons.',
+      question: 'What is the total number of balloons?'
     },
     {
       repeated: '2 + 2 + 2 + 2',
       multiplication: '4 × 2',
       result: 8,
       visual: '🍦🍦 + 🍦🍦 + 🍦🍦 + 🍦🍦',
-      story: '4 children each get 2 ice cream cones.'
+      story: '4 children each get 2 ice cream cones.',
+      question: 'What is the total number of ice cream cones?'
     },
     {
       repeated: '5 + 5',
       multiplication: '2 × 5',
       result: 10,
       visual: '⭐⭐⭐⭐⭐ + ⭐⭐⭐⭐⭐',
-      story: 'You completed 2 tasks and earned 5 stars for each task!'
+      story: 'You completed 2 tasks and earned 5 stars for each task!',
+      question: 'What is the total number of stars you earned?'
     },
     {
       repeated: '3 + 3 + 3 + 3',
       multiplication: '4 × 3',
       result: 12,
       visual: '🎁🎁🎁 + 🎁🎁🎁 + 🎁🎁🎁 + 🎁🎁🎁',
-      story: '4 birthday parties each have 3 presents to open.'
+      story: '4 birthday parties each have 3 presents to open.',
+      question: 'What is the total number of presents?'
     },
     {
       repeated: '2 + 2 + 2 + 2 + 2',
       multiplication: '5 × 2',
       result: 10,
       visual: '🌟🌟 + 🌟🌟 + 🌟🌟 + 🌟🌟 + 🌟🌟',
-      story: '5 teams each scored 2 points in the game.'
+      story: '5 teams each scored 2 points in the game.',
+      question: 'What is the total number of points scored?'
     },
     {
       repeated: '6 + 6',
       multiplication: '2 × 6',
       result: 12,
       visual: '🍪🍪🍪🍪🍪🍪 + 🍪🍪🍪🍪🍪🍪',
-      story: 'You baked 2 batches of cookies with 6 cookies in each batch.'
+      story: 'You baked 2 batches of cookies with 6 cookies in each batch.',
+      question: 'What is the total number of cookies?'
     },
     {
       repeated: '4 + 4 + 4',
       multiplication: '3 × 4',
       result: 12,
       visual: '🎨🎨🎨🎨 + 🎨🎨🎨🎨 + 🎨🎨🎨🎨',
-      story: '3 art classes each need 4 paint brushes.'
+      story: '3 art classes each need 4 paint brushes.',
+      question: 'What is the total number of paint brushes needed?'
     },
     {
       repeated: '3 + 3 + 3 + 3 + 3',
       multiplication: '5 × 3',
       result: 15,
       visual: '🌸🌸🌸 + 🌸🌸🌸 + 🌸🌸🌸 + 🌸🌸🌸 + 🌸🌸🌸',
-      story: 'You planted 5 flower pots with 3 flowers in each pot.'
+      story: 'You planted 5 flower pots with 3 flowers in each pot.',
+      question: 'What is the total number of flowers planted?'
     }
   ];
 
-  const handleAnswerChange = (index: number, value: string) => {
+  const handleAnswerChange = (index: number, type: 'addition' | 'multiplication', value: string) => {
     const newAnswers = [...userAnswers];
-    newAnswers[index] = value;
+    newAnswers[index] = {
+      ...newAnswers[index],
+      [type]: value
+    };
     setUserAnswers(newAnswers);
     
     // Clear feedback for this question
@@ -114,7 +129,9 @@ const MultiplicationWorksheet: React.FC = () => {
 
   const checkAnswer = (index: number) => {
     const newFeedback = [...feedback];
-    newFeedback[index] = Number(userAnswers[index]) === problems[index].result ? 'correct' : 'incorrect';
+    const isAdditionCorrect = Number(userAnswers[index].addition) === problems[index].result;
+    const isMultiplicationCorrect = Number(userAnswers[index].multiplication) === problems[index].result;
+    newFeedback[index] = isAdditionCorrect && isMultiplicationCorrect ? 'correct' : 'incorrect';
     setFeedback(newFeedback);
 
     // Calculate new score after setting feedback
@@ -185,7 +202,7 @@ const MultiplicationWorksheet: React.FC = () => {
               <h2 className="font-bold text-blue-800 mb-2 text-lg">Let's Play! 🎮</h2>
               <p className="text-blue-700">
                 Help solve these fun multiplication puzzles! Read each story, look at the pictures, 
-                and write your answer in the magic box. Check each answer to see if you got it right! ✨
+                and write your answers in both magic boxes. Check if you got both right! ✨
               </p>
             </div>
 
@@ -206,9 +223,11 @@ const MultiplicationWorksheet: React.FC = () => {
                       Puzzle {index + 1}
                     </div>
 
-                    {/* Story */}
+                    {/* Story and Question */}
                     <div className="text-lg font-medium mb-2 text-gray-700">
                       {problem.story}
+                      <br />
+                      <span className="text-blue-600 font-bold">{problem.question}</span>
                     </div>
                     
                     {/* Visual representation */}
@@ -216,16 +235,35 @@ const MultiplicationWorksheet: React.FC = () => {
                       {problem.visual}
                     </div>
 
-                    {/* Equation and Input */}
-                    <div className="flex flex-col items-center gap-4">
+                    {/* Equations and Inputs */}
+                    <div className="flex flex-col items-center gap-6">
+                      {/* Repeated Addition */}
                       <div className="flex items-center gap-4 text-xl">
                         <div className="font-medium text-blue-600">
-                          {problem.repeated} = {problem.multiplication} = 
+                          {problem.repeated} = 
                         </div>
                         <input
                           type="number"
-                          value={userAnswers[index]}
-                          onChange={(e) => handleAnswerChange(index, e.target.value)}
+                          value={userAnswers[index].addition}
+                          onChange={(e) => handleAnswerChange(index, 'addition', e.target.value)}
+                          className={`w-20 h-12 text-center text-xl border-3 rounded-lg focus:outline-none transition-all duration-300 ${
+                            feedback[index] === 'correct' ? 'border-green-400 bg-green-100' :
+                            feedback[index] === 'incorrect' ? 'border-red-400 bg-red-100' :
+                            'border-blue-300 focus:border-blue-500 hover:border-blue-400'
+                          }`}
+                          placeholder="?"
+                        />
+                      </div>
+
+                      {/* Multiplication */}
+                      <div className="flex items-center gap-4 text-xl">
+                        <div className="font-medium text-blue-600">
+                          {problem.multiplication} = 
+                        </div>
+                        <input
+                          type="number"
+                          value={userAnswers[index].multiplication}
+                          onChange={(e) => handleAnswerChange(index, 'multiplication', e.target.value)}
                           className={`w-20 h-12 text-center text-xl border-3 rounded-lg focus:outline-none transition-all duration-300 ${
                             feedback[index] === 'correct' ? 'border-green-400 bg-green-100' :
                             feedback[index] === 'incorrect' ? 'border-red-400 bg-red-100' :
@@ -247,18 +285,6 @@ const MultiplicationWorksheet: React.FC = () => {
                       >
                         {feedback[index] === 'correct' ? 'Correct! 🌟' : 'Check Answer'}
                       </button>
-
-                      {/* Feedback Messages */}
-                      {feedback[index] === 'correct' && (
-                        <div className="text-green-600 text-center mt-2 animate-bounce">
-                          Amazing! You got it right! 🎉
-                        </div>
-                      )}
-                      {feedback[index] === 'incorrect' && (
-                        <div className="text-red-600 text-center mt-2">
-                          Try again! You can do it! 💪
-                        </div>
-                      )}
                     </div>
                   </div>
                 </div>
