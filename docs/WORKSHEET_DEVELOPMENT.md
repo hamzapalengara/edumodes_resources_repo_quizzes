@@ -1135,4 +1135,94 @@ const ContentContainer = styled.div`
 - Use `border border-gray-200` for container boundaries
 - Maintain consistent padding and spacing
 
+### Mobile-First Layout Guidelines
+
+#### 1. Container Structure
+```typescript
+// Base container structure
+<div className="min-h-screen bg-white w-full">
+  <WorksheetHeader />
+  <TouchContainer>
+    {/* Main content container */}
+    <div className="w-full md:max-w-4xl md:mx-auto md:p-6 md:pt-8">
+      {/* Content wrapper */}
+      <div className="bg-white md:rounded-lg md:border md:border-gray-200 p-4 md:p-6">
+        {/* Content goes here */}
+      </div>
+    </div>
+  </TouchContainer>
+</div>
+```
+
+#### 2. Small Screen Specifications
+- **No horizontal margins or padding at root level**
+  - Use `w-full` on mobile containers
+  - Apply margins and max-width only on `md` breakpoint and above
+  - Keep content edge-to-edge on mobile
+
+```typescript
+// ❌ Don't use horizontal margins/padding on mobile
+<div className="mx-4 p-4"> // Wrong
+  
+// ✅ Use responsive classes instead
+<div className="w-full md:max-w-4xl md:mx-auto md:p-6">
+```
+
+#### 3. Content Padding
+- Base content padding: `p-4` on mobile, `p-6` on desktop
+- Section spacing: `space-y-6` for consistent vertical rhythm
+- Button padding: `px-6 py-2` for touch targets
+```typescript
+// Example content section
+<div className="space-y-6">
+  <div className="bg-blue-50 rounded-lg p-4 md:p-6 border-2 border-blue-200">
+    {/* Section content */}
+  </div>
+</div>
+```
+
+#### 4. Interactive Elements
+- Full-width buttons on mobile: `w-full md:w-auto`
+- Input fields: `w-16 md:w-20` for number inputs
+- Touch targets: Minimum 44px height
+```typescript
+// Example button
+<button className="w-full md:w-auto px-6 py-2 rounded-full">
+  Check Answer
+</button>
+
+// Example input
+<input className="w-16 md:w-20 h-12 text-center" />
+```
+
+#### 5. Grid Layouts
+- Single column on mobile, multiple columns on desktop
+- Consistent gap spacing: `gap-3 md:gap-4`
+```typescript
+// Example grid
+<div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
+  {/* Grid items */}
+</div>
+```
+
+#### 6. Typography and Spacing
+- Base text margins: `mb-2` for paragraphs, `mb-4` for sections
+- Font sizes: Scale down on mobile
+```typescript
+// Example typography
+<h1 className="text-2xl md:text-3xl mb-6">Title</h1>
+<p className="text-lg mb-2">Content</p>
+```
+
+#### 7. Visual Elements
+- Break words to prevent overflow: `break-words`
+- Center-align visual content: `text-center`
+- Scale down visual elements: `text-2xl md:text-3xl`
+```typescript
+// Example visual element
+<div className="text-2xl md:text-3xl text-center break-words">
+  {/* Visual content */}
+</div>
+```
+
 [Rest of documentation continues...] 
