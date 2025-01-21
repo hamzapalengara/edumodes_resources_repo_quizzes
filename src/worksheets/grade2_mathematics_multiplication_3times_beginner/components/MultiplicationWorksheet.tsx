@@ -74,7 +74,7 @@ const MultiplicationWorksheet: React.FC = () => {
       }
     ];
 
-    const initialProblems = storyProblems.map((story, index) => ({
+    const initialProblems = storyProblems.map(story => ({
       multiplicand: story.multiplicand,
       multiplier: 3,
       userAnswer: '',
