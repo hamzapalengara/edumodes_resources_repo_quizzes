@@ -1,0 +1,1 @@
+An interactive shape recognition game for preschoolers (ages 3-4) that helps them identify and learn basic shapes (circle, square, triangle, rectangle) through engaging scenes. Children explore a park, beach, and zoo while finding shapes in everyday objects. Features audio feedback and celebrations to make learning fun and rewarding. 
