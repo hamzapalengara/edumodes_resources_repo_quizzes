@@ -1,1 +1,0 @@
-A basic worksheet template that provides the standard structure for creating new worksheets. This template includes all required components and follows the best practices for worksheet development. 
