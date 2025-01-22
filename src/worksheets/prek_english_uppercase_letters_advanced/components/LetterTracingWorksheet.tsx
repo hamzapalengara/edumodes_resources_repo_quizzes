@@ -105,6 +105,19 @@ const LetterTracingWorksheet: React.FC = () => {
   const currentLetter = LETTERS[currentLetterIndex];
   const currentPath = currentLetter.paths[currentPathIndex];
 
+  // Add speech synthesis
+  const speak = (text: string) => {
+    if ('speechSynthesis' in window) {
+      // Cancel any ongoing speech
+      window.speechSynthesis.cancel();
+      
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.rate = 0.9;
+      utterance.pitch = 1;
+      window.speechSynthesis.speak(utterance);
+    }
+  };
+
   // Reset progress when changing letters
   React.useEffect(() => {
     setCurrentPathIndex(0);
@@ -222,26 +235,10 @@ const LetterTracingWorksheet: React.FC = () => {
     return Math.sqrt(Math.pow(p2.x - p1.x, 2) + Math.pow(p2.y - p1.y, 2));
   };
 
-  // Add speech synthesis
-  const speak = (text: string) => {
-    if ('speechSynthesis' in window) {
-      // Cancel any ongoing speech
-      window.speechSynthesis.cancel();
-      
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.rate = 0.9;
-      utterance.pitch = 1;
-      window.speechSynthesis.speak(utterance);
-    }
-  };
-
   // Modify handleLetterComplete to include speech
   const handleLetterComplete = () => {
     setShowSuccess(true);
     setScore(prev => prev + 10);
-    
-    // Speak the letter and word
-    speak(`${currentLetter.char} is for ${currentLetter.object}. Great job!`);
     
     // Generate more confetti items with varied speeds and sizes
     const items: ConfettiItem[] = [];
@@ -345,16 +342,6 @@ const LetterTracingWorksheet: React.FC = () => {
               </div>
               <a href="https://www.edumodes.com" target="_blank" className="text-[9px] sm:text-[10px] text-gray-400 hover:text-white leading-tight truncate">www.edumodes.com</a>
             </div>
-            <div className="flex items-center space-x-4">
-              <div className="flex items-center gap-2 bg-black/30 px-3 py-1.5 rounded-full border border-gray-700">
-                <span className="text-yellow-300 text-lg">⭐</span>
-                <span className="text-white font-medium">Score: {score}</span>
-              </div>
-              <div className="flex items-center gap-2 bg-black/30 px-3 py-1.5 rounded-full border border-gray-700">
-                <span className="text-white font-medium">Letter {currentLetterIndex + 1} of {LETTERS.length}</span>
-                <span className="text-lg">🚀</span>
-              </div>
-            </div>
           </div>
         </div>
       </header>
@@ -366,6 +353,20 @@ const LetterTracingWorksheet: React.FC = () => {
           <span>Space Letter Adventure</span>
           <span>👨‍🚀</span>
         </h1>
+      </div>
+
+      {/* Score and Progress Section */}
+      <div className="bg-black/30 backdrop-blur-sm border-b border-gray-700">
+        <div className="container mx-auto px-4 py-2 flex flex-col sm:flex-row items-center justify-center gap-3">
+          <div className="flex items-center gap-2 bg-black/30 px-4 py-2 rounded-full border border-gray-700">
+            <span className="text-yellow-300 text-lg">⭐</span>
+            <span className="text-white font-medium">Score: {score}</span>
+          </div>
+          <div className="flex items-center gap-2 bg-black/30 px-4 py-2 rounded-full border border-gray-700">
+            <span className="text-white font-medium">Letter {currentLetterIndex + 1} of {LETTERS.length}</span>
+            <span className="text-lg">🚀</span>
+          </div>
+        </div>
       </div>
 
       {/* Main Content */}
