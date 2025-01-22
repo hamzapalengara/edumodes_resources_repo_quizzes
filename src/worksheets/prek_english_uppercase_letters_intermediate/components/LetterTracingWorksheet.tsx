@@ -13,7 +13,6 @@ export interface Letter {
   }[];
 }
 
-// Add this new interface for confetti items
 interface ConfettiItem {
   id: number;
   x: number;
@@ -25,109 +24,106 @@ interface ConfettiItem {
 
 export const LETTERS: Letter[] = [
   {
-    char: 'A',
-    object: 'Apple',
-    objectEmoji: '🍎',
-    viewBox: '0 0 200 200',
-    paths: [
-      { id: 'left', d: 'M40 160L100 40', order: 1 },
-      { id: 'right', d: 'M100 40L160 160', order: 2 },
-      { id: 'middle', d: 'M70 100L130 100', order: 3 }
-    ]
-  },
-  {
-    char: 'B',
-    object: 'Ball',
-    objectEmoji: '⚽',
+    char: 'K',
+    object: 'Killer Whale',
+    objectEmoji: '🐋',
     viewBox: '0 0 200 200',
     paths: [
       { id: 'vertical', d: 'M40 40L40 160', order: 1 },
-      { id: 'top', d: 'M40 40C80 40 140 40 140 70S80 100 40 100', order: 2 },
-      { id: 'bottom', d: 'M40 100C80 100 140 100 140 130S80 160 40 160', order: 3 }
+      { id: 'diagonal-top', d: 'M40 100L140 40', order: 2 },
+      { id: 'diagonal-bottom', d: 'M40 100L140 160', order: 3 }
     ]
   },
   {
-    char: 'C',
-    object: 'Cat',
-    objectEmoji: '🐱',
-    viewBox: '0 0 200 200',
-    paths: [
-      { id: 'curve', d: 'M160 60C120 20 40 40 40 100S120 180 160 140', order: 1 }
-    ]
-  },
-  {
-    char: 'D',
-    object: 'Dog',
-    objectEmoji: '🐶',
+    char: 'L',
+    object: 'Lobster',
+    objectEmoji: '🦞',
     viewBox: '0 0 200 200',
     paths: [
       { id: 'vertical', d: 'M40 40L40 160', order: 1 },
-      { id: 'curve', d: 'M40 40C120 40 160 70 160 100S120 160 40 160', order: 2 }
+      { id: 'horizontal', d: 'M40 160L140 160', order: 2 }
     ]
   },
   {
-    char: 'E',
-    object: 'Elephant',
-    objectEmoji: '🐘',
+    char: 'M',
+    object: 'Manta Ray',
+    objectEmoji: '🦈',
+    viewBox: '0 0 200 200',
+    paths: [
+      { id: 'left', d: 'M40 160L40 40', order: 1 },
+      { id: 'middle-left', d: 'M40 40L100 120', order: 2 },
+      { id: 'middle-right', d: 'M100 120L160 40', order: 3 },
+      { id: 'right', d: 'M160 40L160 160', order: 4 }
+    ]
+  },
+  {
+    char: 'N',
+    object: 'Narwhal',
+    objectEmoji: '🐋',
+    viewBox: '0 0 200 200',
+    paths: [
+      { id: 'left', d: 'M40 160L40 40', order: 1 },
+      { id: 'diagonal', d: 'M40 40L160 160', order: 2 },
+      { id: 'right', d: 'M160 160L160 40', order: 3 }
+    ]
+  },
+  {
+    char: 'O',
+    object: 'Octopus',
+    objectEmoji: '🐙',
+    viewBox: '0 0 200 200',
+    paths: [
+      { id: 'circle', d: 'M100 40C60 40 40 60 40 100S60 160 100 160S160 140 160 100S140 40 100 40', order: 1 }
+    ]
+  },
+  {
+    char: 'P',
+    object: 'Pufferfish',
+    objectEmoji: '🐡',
     viewBox: '0 0 200 200',
     paths: [
       { id: 'vertical', d: 'M40 40L40 160', order: 1 },
-      { id: 'top', d: 'M40 40L140 40', order: 2 },
-      { id: 'middle', d: 'M40 100L120 100', order: 3 },
-      { id: 'bottom', d: 'M40 160L140 160', order: 4 }
+      { id: 'loop', d: 'M40 40C80 40 140 40 140 70S80 100 40 100', order: 2 }
     ]
   },
   {
-    char: 'F',
-    object: 'Fish',
+    char: 'Q',
+    object: 'Queen Angelfish',
     objectEmoji: '🐠',
     viewBox: '0 0 200 200',
     paths: [
+      { id: 'circle', d: 'M100 40C60 40 40 60 40 100S60 160 100 160S160 140 160 100S140 40 100 40', order: 1 },
+      { id: 'tail', d: 'M100 100L160 160', order: 2 }
+    ]
+  },
+  {
+    char: 'R',
+    object: 'Ray',
+    objectEmoji: '🦈',
+    viewBox: '0 0 200 200',
+    paths: [
       { id: 'vertical', d: 'M40 40L40 160', order: 1 },
-      { id: 'top', d: 'M40 40L140 40', order: 2 },
-      { id: 'middle', d: 'M40 100L120 100', order: 3 }
+      { id: 'loop', d: 'M40 40C80 40 140 40 140 70S80 100 40 100', order: 2 },
+      { id: 'leg', d: 'M40 100L140 160', order: 3 }
     ]
   },
   {
-    char: 'G',
-    object: 'Giraffe',
-    objectEmoji: '🦒',
+    char: 'S',
+    object: 'Seahorse',
+    objectEmoji: '🐠',
     viewBox: '0 0 200 200',
     paths: [
-      { id: 'curve', d: 'M160 60C120 20 40 40 40 100S120 180 160 140', order: 1 },
-      { id: 'hook', d: 'M160 140L160 100L120 100', order: 2 }
+      { id: 'curve', d: 'M160 60C120 20 60 20 40 60S60 120 100 120S160 120 140 160S80 180 40 140', order: 1 }
     ]
   },
   {
-    char: 'H',
-    object: 'Horse',
-    objectEmoji: '🐎',
+    char: 'T',
+    object: 'Turtle',
+    objectEmoji: '🐢',
     viewBox: '0 0 200 200',
     paths: [
-      { id: 'left', d: 'M40 40L40 160', order: 1 },
-      { id: 'right', d: 'M160 40L160 160', order: 2 },
-      { id: 'middle', d: 'M40 100L160 100', order: 3 }
-    ]
-  },
-  {
-    char: 'I',
-    object: 'Ice Cream',
-    objectEmoji: '🍦',
-    viewBox: '0 0 200 200',
-    paths: [
-      { id: 'top', d: 'M70 40L130 40', order: 1 },
-      { id: 'vertical', d: 'M100 40L100 160', order: 2 },
-      { id: 'bottom', d: 'M70 160L130 160', order: 3 }
-    ]
-  },
-  {
-    char: 'J',
-    object: 'Jellyfish',
-    objectEmoji: '🎐',
-    viewBox: '0 0 200 200',
-    paths: [
-      { id: 'top', d: 'M70 40L130 40', order: 1 },
-      { id: 'hook', d: 'M100 40L100 120C100 160 60 160 40 140', order: 2 }
+      { id: 'horizontal', d: 'M40 40L160 40', order: 1 },
+      { id: 'vertical', d: 'M100 40L100 160', order: 2 }
     ]
   }
 ];
@@ -278,34 +274,6 @@ const LetterTracingWorksheet: React.FC = () => {
     }
   };
 
-  // Add navigation functions
-  const handlePrevLetter = () => {
-    if (currentLetterIndex > 0) {
-      setCurrentLetterIndex(prev => prev - 1);
-      setCurrentPathIndex(0);
-      setFilledPaths([]);
-      setProgress(0);
-      setLastPoint(0);
-    }
-  };
-
-  const handleNextLetter = () => {
-    if (currentLetterIndex < LETTERS.length - 1) {
-      setCurrentLetterIndex(prev => prev + 1);
-      setCurrentPathIndex(0);
-      setFilledPaths([]);
-      setProgress(0);
-      setLastPoint(0);
-    }
-  };
-
-  const handleTryAgain = () => {
-    setCurrentPathIndex(0);
-    setFilledPaths([]);
-    setProgress(0);
-    setLastPoint(0);
-  };
-
   // Modify handleLetterComplete to include speech
   const handleLetterComplete = () => {
     setShowSuccess(true);
@@ -365,10 +333,41 @@ const LetterTracingWorksheet: React.FC = () => {
     }
   };
 
+  const handlePrevLetter = () => {
+    if (currentLetterIndex > 0) {
+      setCurrentLetterIndex(prev => prev - 1);
+      setCurrentPathIndex(0);
+      setFilledPaths([]);
+      setProgress(0);
+      setLastPoint(0);
+      setPathLengths({});
+    }
+  };
+
+  const handleNextLetter = () => {
+    if (currentLetterIndex < LETTERS.length - 1) {
+      setCurrentLetterIndex(prev => prev + 1);
+      setCurrentPathIndex(0);
+      setFilledPaths([]);
+      setProgress(0);
+      setLastPoint(0);
+      setPathLengths({});
+    }
+  };
+
+  const handleTryAgain = () => {
+    setCurrentPathIndex(0);
+    setFilledPaths([]);
+    setProgress(0);
+    setLastPoint(0);
+    setPathLengths({});
+    speak(`Let's try the letter ${currentLetter.char} again`);
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-b from-green-50 via-green-100 to-emerald-200 bg-[url('/forest-bg.png')] bg-cover bg-center bg-blend-soft-light">
+    <div className="min-h-screen bg-gradient-to-b from-sky-50 via-cyan-100 to-blue-200 bg-[url('/ocean-bg.png')] bg-cover bg-center bg-blend-soft-light">
       {/* Header */}
-      <header className="bg-gradient-to-b from-emerald-800/90 to-emerald-700/90 shadow-lg backdrop-blur-sm">
+      <header className="bg-gradient-to-b from-blue-800/90 to-blue-700/90 shadow-lg backdrop-blur-sm">
         <div className="py-4 px-4">
           <div className="flex items-center justify-between">
             {/* Edumodes Logo */}
@@ -392,7 +391,7 @@ const LetterTracingWorksheet: React.FC = () => {
               </div>
               <div className="flex items-center">
                 <span className="text-white">Letter {currentLetterIndex + 1} of {LETTERS.length}</span>
-                <span className="text-lg ml-1">🍃</span>
+                <span className="text-lg ml-1">🌊</span>
               </div>
             </div>
           </div>
@@ -401,7 +400,7 @@ const LetterTracingWorksheet: React.FC = () => {
 
       {/* Title Section */}
       <div className="bg-white/80 backdrop-blur-sm shadow-md">
-        <h1 className="text-2xl md:text-3xl font-bold text-emerald-800 text-center py-3">
+        <h1 className="text-2xl md:text-3xl font-bold text-blue-800 text-center py-3">
           Letter Tracing Adventure
         </h1>
       </div>
@@ -409,27 +408,19 @@ const LetterTracingWorksheet: React.FC = () => {
       {/* Main Content */}
       <main className="p-4">
         {/* Letter Display */}
-        <div className="bg-white/90 backdrop-blur-sm rounded-xl shadow-xl p-6 mb-4 border-2 border-emerald-100/50">
+        <div className="bg-white/90 backdrop-blur-sm rounded-xl shadow-xl p-6 mb-4 border-2 border-blue-100/50">
           <div className="text-center mb-4">
-            <span className="text-6xl font-bold text-emerald-800">{currentLetter.char}</span>
+            <span className="text-6xl font-bold text-blue-800">{currentLetter.char}</span>
           </div>
           <div className="text-center mb-2">
             <span className="text-3xl filter drop-shadow-md">{currentLetter.objectEmoji}</span>
-            <span className="ml-3 text-emerald-800 font-medium">{currentLetter.char} is for {currentLetter.object}</span>
+            <span className="ml-3 text-blue-800 font-medium">{currentLetter.char} is for {currentLetter.object}</span>
           </div>
         </div>
 
         {/* Tracing Area */}
-        <div className="bg-white/90 backdrop-blur-sm rounded-xl shadow-xl p-6 border-2 border-emerald-100/50">
+        <div className="bg-white/90 backdrop-blur-sm rounded-xl shadow-xl p-6 border-2 border-blue-100/50">
           <div className="relative aspect-square max-w-[400px] mx-auto">
-            {/* Try Again button */}
-            <button
-              onClick={handleTryAgain}
-              className="absolute -top-2 -right-2 z-10 bg-white rounded-full w-12 h-12 flex items-center justify-center shadow-md border border-emerald-100 text-2xl text-emerald-600 hover:bg-emerald-50 active:bg-emerald-100"
-            >
-              🔄
-            </button>
-
             <svg
               ref={svgRef}
               viewBox={currentLetter.viewBox}
@@ -442,7 +433,7 @@ const LetterTracingWorksheet: React.FC = () => {
               onPointerCancel={handlePointerUp}
             >
               {/* Background decoration */}
-              <circle cx="100" cy="100" r="80" fill="rgba(167, 243, 208, 0.2)" />
+              <circle cx="100" cy="100" r="80" fill="rgba(186, 230, 253, 0.2)" />
               
               {currentLetter.paths.map((path, index) => (
                 <g key={path.id}>
@@ -462,7 +453,7 @@ const LetterTracingWorksheet: React.FC = () => {
                       ref={index === currentPathIndex ? pathRef : null}
                       d={path.d}
                       fill="none"
-                      stroke="#059669"
+                      stroke="#0284c7"
                       strokeWidth="20"
                       strokeLinecap="round"
                       strokeLinejoin="round"
@@ -488,7 +479,7 @@ const LetterTracingWorksheet: React.FC = () => {
                     }
                   }}
                   r="8"
-                  fill="#059669"
+                  fill="#0284c7"
                   className="animate-pulse"
                 />
               )}
@@ -496,38 +487,39 @@ const LetterTracingWorksheet: React.FC = () => {
 
             {/* Next stroke hint */}
             <div className="absolute top-2 left-0 right-0 text-center">
-              <span className="bg-emerald-100 text-emerald-800 text-sm px-3 py-1.5 rounded-full font-medium shadow-sm">
-                Start at the green dot and trace the letter
+              <span className="bg-sky-100 text-blue-800 text-sm px-3 py-1.5 rounded-full font-medium shadow-sm">
+                Start at the blue dot and trace the letter
               </span>
             </div>
           </div>
 
           {/* Instructions */}
-          <div className="mt-4 text-center text-sm text-emerald-700 font-medium">
+          <div className="mt-4 text-center text-sm text-blue-700 font-medium">
             Follow the gray lines with your finger or mouse to trace each part of the letter
           </div>
 
-          {/* Navigation Buttons */}
-          <div className="flex items-center justify-center gap-6 mt-6">
-            <button 
+          {/* Navigation and Try Again Buttons */}
+          <div className="mt-6 flex items-center justify-center gap-4">
+            <button
               onClick={handlePrevLetter}
               disabled={currentLetterIndex === 0}
-              className={`p-4 rounded-full w-16 h-16 flex items-center justify-center text-2xl shadow-md border-2 ${
-                currentLetterIndex === 0 
-                  ? 'bg-gray-100 text-gray-400 border-gray-200' 
-                  : 'bg-white text-emerald-600 border-emerald-100 hover:bg-emerald-50 active:bg-emerald-100'
-              }`}
+              className="w-12 h-12 rounded-full bg-blue-100 text-blue-800 text-xl font-medium hover:bg-blue-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+              aria-label="Previous Letter"
             >
               ⬅️
             </button>
-            <button 
+            <button
+              onClick={handleTryAgain}
+              className="w-12 h-12 rounded-full bg-blue-600 text-white text-xl font-medium hover:bg-blue-700 flex items-center justify-center"
+              aria-label="Try Again"
+            >
+              🔄
+            </button>
+            <button
               onClick={handleNextLetter}
               disabled={currentLetterIndex === LETTERS.length - 1}
-              className={`p-4 rounded-full w-16 h-16 flex items-center justify-center text-2xl shadow-md border-2 ${
-                currentLetterIndex === LETTERS.length - 1 
-                  ? 'bg-gray-100 text-gray-400 border-gray-200' 
-                  : 'bg-white text-emerald-600 border-emerald-100 hover:bg-emerald-50 active:bg-emerald-100'
-              }`}
+              className="w-12 h-12 rounded-full bg-blue-100 text-blue-800 text-xl font-medium hover:bg-blue-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+              aria-label="Next Letter"
             >
               ➡️
             </button>
@@ -538,7 +530,7 @@ const LetterTracingWorksheet: React.FC = () => {
         <AnimatePresence>
           {showSuccess && (
             <>
-              {/* Forest particles */}
+              {/* Ocean particles */}
               {confetti.map((item) => (
                 <motion.div
                   key={item.id}
@@ -561,7 +553,7 @@ const LetterTracingWorksheet: React.FC = () => {
                   className="fixed pointer-events-none z-50"
                   style={{
                     color: item.type === 'emoji' ? 'inherit' : 
-                           `hsl(${140 + Math.random() * 40}, ${70 + Math.random() * 20}%, ${45 + Math.random() * 15}%)`,
+                           `hsl(${200 + Math.random() * 40}, ${70 + Math.random() * 20}%, ${45 + Math.random() * 15}%)`,
                     textShadow: '0 0 5px rgba(0,0,0,0.2)',
                     fontSize: item.type === 'emoji' ? '2.5rem' : '2rem',
                     fontWeight: 'bold',
@@ -569,7 +561,7 @@ const LetterTracingWorksheet: React.FC = () => {
                 >
                   {item.type === 'emoji' ? 
                     currentLetter.objectEmoji : 
-                    Math.random() > 0.7 ? '🍃' : currentLetter.char}
+                    Math.random() > 0.7 ? '🌊' : currentLetter.char}
                 </motion.div>
               ))}
             </>
