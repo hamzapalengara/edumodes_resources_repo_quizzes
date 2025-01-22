@@ -183,7 +183,8 @@ const LetterTracingWorksheet: React.FC = () => {
     
     return {
       x: point.x * scale.x,
-      y: point.y * scale.y
+      y: point.y * scale.y,
+      threshold: Math.max(30, Math.min(50, rect.width / 8)) // Adaptive threshold based on screen size
     };
   };
 
@@ -209,7 +210,7 @@ const LetterTracingWorksheet: React.FC = () => {
     }
 
     // Allow starting from any point if close enough to the path
-    if (minDistance < 50) {
+    if (minDistance < point.threshold) {
       setIsDrawing(true);
       setProgress(closestLength / pathLength);
       setLastPoint(closestLength);
@@ -242,7 +243,7 @@ const LetterTracingWorksheet: React.FC = () => {
     }
 
     // Update progress if close enough to path
-    if (minDistance < 50) {
+    if (minDistance < point.threshold) {
       const newProgress = closestLength / pathLength;
       // Allow some backtracking but prefer forward progress
       if (closestLength >= lastPoint - 20) {
@@ -451,7 +452,7 @@ const LetterTracingWorksheet: React.FC = () => {
                     d={path.d}
                     fill="none"
                     stroke="#d1d5db"
-                    strokeWidth="20"
+                    strokeWidth="24"
                     strokeLinecap="round"
                     strokeLinejoin="round"
                   />
@@ -463,7 +464,7 @@ const LetterTracingWorksheet: React.FC = () => {
                       d={path.d}
                       fill="none"
                       stroke="#059669"
-                      strokeWidth="20"
+                      strokeWidth="24"
                       strokeLinecap="round"
                       strokeLinejoin="round"
                       strokeDasharray={pathLengths[path.id] || 1000}
@@ -487,50 +488,43 @@ const LetterTracingWorksheet: React.FC = () => {
                       el.setAttribute('cy', point.y.toString());
                     }
                   }}
-                  r="8"
+                  r="10"
                   fill="#059669"
                   className="animate-pulse"
                 />
               )}
             </svg>
 
-            {/* Next stroke hint */}
-            <div className="absolute top-2 left-0 right-0 text-center">
-              <span className="bg-emerald-100 text-emerald-800 text-sm px-3 py-1.5 rounded-full font-medium shadow-sm">
-                Start at the green dot and trace the letter
-              </span>
+            {/* Instructions */}
+            <div className="mt-4 text-center text-sm text-emerald-700 font-medium">
+              Follow the gray lines with your finger or mouse to trace each part of the letter
             </div>
-          </div>
 
-          {/* Instructions */}
-          <div className="mt-4 text-center text-sm text-emerald-700 font-medium">
-            Follow the gray lines with your finger or mouse to trace each part of the letter
-          </div>
-
-          {/* Navigation Buttons */}
-          <div className="flex items-center justify-center gap-6 mt-6">
-            <button 
-              onClick={handlePrevLetter}
-              disabled={currentLetterIndex === 0}
-              className={`p-4 rounded-full w-16 h-16 flex items-center justify-center text-2xl shadow-md border-2 ${
-                currentLetterIndex === 0 
-                  ? 'bg-gray-100 text-gray-400 border-gray-200' 
-                  : 'bg-white text-emerald-600 border-emerald-100 hover:bg-emerald-50 active:bg-emerald-100'
-              }`}
-            >
-              ⬅️
-            </button>
-            <button 
-              onClick={handleNextLetter}
-              disabled={currentLetterIndex === LETTERS.length - 1}
-              className={`p-4 rounded-full w-16 h-16 flex items-center justify-center text-2xl shadow-md border-2 ${
-                currentLetterIndex === LETTERS.length - 1 
-                  ? 'bg-gray-100 text-gray-400 border-gray-200' 
-                  : 'bg-white text-emerald-600 border-emerald-100 hover:bg-emerald-50 active:bg-emerald-100'
-              }`}
-            >
-              ➡️
-            </button>
+            {/* Navigation Buttons */}
+            <div className="flex items-center justify-center gap-6 mt-6">
+              <button 
+                onClick={handlePrevLetter}
+                disabled={currentLetterIndex === 0}
+                className={`p-4 rounded-full w-16 h-16 flex items-center justify-center text-2xl shadow-md border-2 ${
+                  currentLetterIndex === 0 
+                    ? 'bg-gray-100 text-gray-400 border-gray-200' 
+                    : 'bg-white text-emerald-600 border-emerald-100 hover:bg-emerald-50 active:bg-emerald-100'
+                }`}
+              >
+                ⬅️
+              </button>
+              <button 
+                onClick={handleNextLetter}
+                disabled={currentLetterIndex === LETTERS.length - 1}
+                className={`p-4 rounded-full w-16 h-16 flex items-center justify-center text-2xl shadow-md border-2 ${
+                  currentLetterIndex === LETTERS.length - 1 
+                    ? 'bg-gray-100 text-gray-400 border-gray-200' 
+                    : 'bg-white text-emerald-600 border-emerald-100 hover:bg-emerald-50 active:bg-emerald-100'
+                }`}
+              >
+                ➡️
+              </button>
+            </div>
           </div>
         </div>
 
