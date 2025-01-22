@@ -16,13 +16,30 @@ export interface WorksheetSet {
   subject: string;
   topic: string;
   difficulty: string;
+  timestamp: number; // Unix timestamp of last modification
 }
 
-// Import all worksheet files
-const worksheetFiles = import.meta.glob('../worksheets/*/components/*Worksheet.tsx', { eager: true });
-const answerKeyFiles = import.meta.glob('../worksheets/*/components/*AnswerKey.tsx', { eager: true });
-const tipsFiles = import.meta.glob('../worksheets/*/components/*Tips.tsx', { eager: true });
-const thumbnailFiles = import.meta.glob('../worksheets/*/components/*Thumbnail.tsx', { eager: true });
+// Import all worksheet files with metadata
+const worksheetFiles = import.meta.glob('../worksheets/*/components/*Worksheet.tsx', { 
+  eager: true,
+  import: 'default',
+  query: { timestamp: true } // This will include the file's timestamp
+});
+const answerKeyFiles = import.meta.glob('../worksheets/*/components/*AnswerKey.tsx', { 
+  eager: true,
+  import: 'default',
+  query: { timestamp: true }
+});
+const tipsFiles = import.meta.glob('../worksheets/*/components/*Tips.tsx', { 
+  eager: true,
+  import: 'default',
+  query: { timestamp: true }
+});
+const thumbnailFiles = import.meta.glob('../worksheets/*/components/*Thumbnail.tsx', { 
+  eager: true,
+  import: 'default',
+  query: { timestamp: true }
+});
 const titleFiles = import.meta.glob('../worksheets/*/title.txt', { eager: true, as: 'raw' });
 const descriptionFiles = import.meta.glob('../worksheets/*/description.txt', { eager: true, as: 'raw' });
 
@@ -67,6 +84,21 @@ export function discoverWorksheets(): WorksheetSet[] {
       const title = titleFiles[titlePath] || 'Untitled Worksheet';
       const description = descriptionFiles[descriptionPath] || 'No description available';
 
+      // Get the latest modification time from all worksheet files
+      const filesToCheck = {
+        worksheet: worksheetFiles[worksheetComponent],
+        answerKey: answerKeyComponent ? answerKeyFiles[answerKeyComponent] : null,
+        tips: tipsComponent ? tipsFiles[tipsComponent] : null,
+        thumbnail: thumbnailComponent ? thumbnailFiles[thumbnailComponent] : null
+      };
+
+      // Get the latest timestamp from the files
+      const timestamp = Math.max(
+        ...Object.values(filesToCheck)
+          .filter(Boolean)
+          .map(file => (file as any)?.__timestamp || 0)
+      );
+
       // Create lazy components with defaults for missing ones
       const components = {
         Worksheet: lazy(() => import(worksheetComponent)),
@@ -90,7 +122,8 @@ export function discoverWorksheets(): WorksheetSet[] {
         grade,
         subject,
         topic,
-        difficulty
+        difficulty,
+        timestamp: timestamp || Date.now() // Fallback to current time if no timestamp available
       });
     } catch (error) {
       console.error(`Error processing worksheet ${id}:`, error);
