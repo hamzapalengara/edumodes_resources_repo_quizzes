@@ -10,6 +10,19 @@ interface LetterState {
   userInput?: string;
 }
 
+// Add interface for worksheet summary
+interface WorksheetSummary {
+  summary: {
+    total_questions: number;
+    questions_attempted: number;
+    correct_answers: number;
+    incorrect_answers: number;
+    total_score: number;
+    completion_time: string;
+    time_spent_seconds: number;
+  }
+}
+
 const ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').map(letter => ({
   value: letter,
   isHidden: Math.random() < 0.4, // Randomly hide ~40% of letters
@@ -20,12 +33,58 @@ const LetterRecognitionWorksheet: React.FC = () => {
   const [score, setScore] = useState(0);
   const [showSuccess, setShowSuccess] = useState(false);
   const [isComplete, setIsComplete] = useState(false);
+  
+  // Add new state variables for tracking
+  const [startTime] = useState<Date>(new Date());
+  const [questionsAttempted, setQuestionsAttempted] = useState(0);
+  const [incorrectAnswers, setIncorrectAnswers] = useState(0);
 
   // Add reference to track current speech
   const currentSpeech = React.useRef<SpeechSynthesisUtterance | null>(null);
 
   const totalQuestions = letters.filter(l => l.isHidden).length;
   const maxScore = totalQuestions * 10;
+
+  // Add message listener for summary request
+  React.useEffect(() => {
+    const handleMessage = (event: MessageEvent) => {
+      console.log('📝 Worksheet received message:', event.data);
+      
+      // Handle both string and object message formats
+      const isRequestingSummary = 
+        event.data === 'GET_SUMMARY' || 
+        event.data === 'REQUEST_SUMMARY' ||
+        event.data?.type === 'REQUEST_SUMMARY' ||
+        event.data?.type === 'GET_SUMMARY';
+
+      if (isRequestingSummary) {
+        console.log('📊 Creating worksheet summary...');
+        const summary: WorksheetSummary = {
+          summary: {
+            total_questions: totalQuestions,
+            questions_attempted: questionsAttempted,
+            correct_answers: score / 10,
+            incorrect_answers: incorrectAnswers,
+            total_score: (score / maxScore) * 100,
+            completion_time: new Date().toISOString(),
+            time_spent_seconds: Math.round((new Date().getTime() - startTime.getTime()) / 1000)
+          }
+        };
+        console.log('📤 Sending worksheet summary:', summary);
+        window.parent.postMessage({ type: 'WORKSHEET_SUMMARY', data: summary }, '*');
+      }
+    };
+
+    window.addEventListener('message', handleMessage);
+    
+    // Log when listener is attached
+    console.log('🎯 Worksheet summary listener attached');
+    
+    return () => {
+      console.log('🔄 Worksheet summary listener removed');
+      window.removeEventListener('message', handleMessage);
+    };
+  }, [score, questionsAttempted, incorrectAnswers, totalQuestions, maxScore, startTime]);
 
   // Function to stop current speech
   const stopCurrentSpeech = () => {
@@ -56,6 +115,9 @@ const LetterRecognitionWorksheet: React.FC = () => {
     setScore(0);
     setIsComplete(false);
     setShowSuccess(false);
+    // Reset tracking variables
+    setQuestionsAttempted(0);
+    setIncorrectAnswers(0);
   };
 
   const handleLetterInput = (index: number, value: string) => {
@@ -64,6 +126,11 @@ const LetterRecognitionWorksheet: React.FC = () => {
     const letter = newLetters[index];
 
     if (letter.isHidden) {
+      // Increment questions attempted if this is a new attempt or a different answer
+      if (!letter.userInput || letter.userInput !== upperValue) {
+        setQuestionsAttempted(prev => prev + 1);
+      }
+
       letter.userInput = upperValue;
       letter.isCorrect = upperValue === letter.value;
 
@@ -91,6 +158,9 @@ const LetterRecognitionWorksheet: React.FC = () => {
           celebrationAudio.play().catch(console.error);
         }
       } else if (upperValue !== '') {
+        // Increment incorrect answers counter
+        setIncorrectAnswers(prev => prev + 1);
+
         // Play error sound
         const errorAudio = new Audio('/error.mp3');
         errorAudio.play().catch(console.error);
