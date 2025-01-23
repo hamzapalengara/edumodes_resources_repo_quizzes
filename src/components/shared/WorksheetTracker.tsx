@@ -7,6 +7,7 @@ export interface WorksheetSummary {
     correct_answers: number;
     incorrect_answers: number;
     total_score: number;
+    points_per_correct_question: number;
     completion_time: string;
     time_spent_seconds: number;
   }
@@ -76,7 +77,8 @@ const WorksheetTracker: React.FC<WorksheetTrackerProps> = ({
             questions_attempted: questionsAttempted,
             correct_answers: correctAnswers,
             incorrect_answers: incorrectAnswers,
-            total_score: (score / maxScore) * 100,
+            total_score: score,
+            points_per_correct_question: pointsPerQuestion,
             completion_time: new Date().toISOString(),
             time_spent_seconds: Math.round((new Date().getTime() - startTime.getTime()) / 1000)
           }
@@ -97,7 +99,7 @@ const WorksheetTracker: React.FC<WorksheetTrackerProps> = ({
       console.log('🔄 Worksheet summary listener removed');
       window.removeEventListener('message', handleMessage);
     };
-  }, [score, questionsAttempted, correctAnswers, incorrectAnswers, totalQuestions, maxScore, startTime, onSummaryGenerated]);
+  }, [score, questionsAttempted, correctAnswers, incorrectAnswers, totalQuestions, maxScore, startTime, onSummaryGenerated, pointsPerQuestion]);
 
   // Score tracking methods
   const addPoints = (points: number = pointsPerQuestion) => {

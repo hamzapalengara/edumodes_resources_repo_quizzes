@@ -41,6 +41,9 @@ interface TrackerMethods {
   reset: () => void;
 }
 
+// Worksheet specific configuration
+const POINTS_PER_QUESTION = 10;
+
 const BodyPartsWorksheet: React.FC = () => {
   const [parts, setParts] = useState(BODY_PARTS.map(part => ({ ...part, isCorrect: false })));
   
@@ -134,6 +137,7 @@ const BodyPartsWorksheet: React.FC = () => {
   return (
     <WorksheetTracker
       totalQuestions={BODY_PARTS.length}
+      pointsPerQuestion={POINTS_PER_QUESTION}
       onSummaryGenerated={handleSummaryGenerated}
     >
       {({ 
