@@ -14,33 +14,29 @@ interface BodyPart {
 }
 
 const BODY_PARTS: BodyPart[] = [
-  { id: 'head', name: 'Head', label: 'This is where your brain lives!', position: { x: 5, y: 50 }, labelPosition: 'right' },
-  { id: 'eye', name: 'Eyes', label: 'They help you see the world!', position: { x: 70, y: 10 }, labelPosition: 'right' },
-  { id: 'mouth', name: 'Mouth', label: 'For eating and smiling!', position: { x: 20, y: 10 }, labelPosition: 'left' },
-  { id: 'lips', name: 'Lips', label: 'For speaking and smiling!', position: { x: 10, y: 25 }, labelPosition: 'left' },
-  { id: 'tongue', name: 'Tongue', label: 'For tasting yummy food!', position: { x: 80, y: 25 }, labelPosition: 'right' },
-  { id: 'ear', name: 'Ears', label: 'They help you hear sounds!', position: { x: 95, y: 45 }, labelPosition: 'right' },
-  { id: 'nose', name: 'Nose', label: 'For smelling lovely things!', position: { x: 80, y: 65 }, labelPosition: 'right' },
-  { id: 'arm', name: 'Arms', label: 'For hugging and reaching!', position: { x: 50, y: 95 }, labelPosition: 'left' },
-  { id: 'hand', name: 'Hands', label: 'For clapping and holding!', position: { x: 5, y: 85 }, labelPosition: 'left' },
-  { id: 'leg', name: 'Legs', label: 'They help you jump and run!', position: { x: 80, y: 80 }, labelPosition: 'right' },
-  { id: 'foot', name: 'Feet', label: 'For walking and dancing!', position: { x: 20, y: 65 }, labelPosition: 'left' },
+  { id: 'hair', name: 'Hair', label: 'It grows on top of your head!', position: { x: 90, y: 30 }, labelPosition: 'right' },
+  { id: 'head', name: 'Head', label: 'This is where your brain lives!', position: { x: 13, y: 45 }, labelPosition: 'right' },
+  { id: 'eye', name: 'Eyes', label: 'They help you see the world!', position: { x: 58, y: 10 }, labelPosition: 'right' },
+  { id: 'mouth', name: 'Mouth', label: 'For eating and smiling!', position: { x: 38, y: 10 }, labelPosition: 'left' },
+  { id: 'lips', name: 'Lips', label: 'For speaking and smiling!', position: { x: 21, y: 25 }, labelPosition: 'left' },
+  { id: 'tongue', name: 'Tongue', label: 'For tasting yummy food!', position: { x: 77, y: 20 }, labelPosition: 'right' },
+  { id: 'ear', name: 'Ears', label: 'They help you hear sounds!', position: { x: 88, y: 50 }, labelPosition: 'right' },
+  { id: 'nose', name: 'Nose', label: 'For smelling lovely things!', position: { x: 90, y: 65 }, labelPosition: 'right' },
+  { id: 'stomach', name: 'Stomach', label: 'Where your food goes after eating!', position: { x: 50, y: 50 }, labelPosition: 'right' },
+  { id: 'arm', name: 'Arms', label: 'For hugging and reaching!', position: { x: 50, y: 92 }, labelPosition: 'left' },
+  { id: 'hand', name: 'Hands', label: 'For clapping and holding!', position: { x: 20, y: 88 }, labelPosition: 'left' },
+  { id: 'leg', name: 'Legs', label: 'They help you jump and run!', position: { x: 80, y: 85 }, labelPosition: 'right' },
+  { id: 'foot', name: 'Feet', label: 'For walking and dancing!', position: { x: 10, y: 69 }, labelPosition: 'left' },
 ];
 
 const BodyPartsWorksheet: React.FC = () => {
   const [score, setScore] = useState(0);
-  const [showSuccess, setShowSuccess] = useState(false);
-  const [currentMessage, setCurrentMessage] = useState('');
   const [isComplete, setIsComplete] = useState(false);
   const [parts, setParts] = useState(BODY_PARTS.map(part => ({ ...part, isCorrect: false })));
-  const [selectedPart, setSelectedPart] = useState<string | null>(null);
 
   // Function to speak text
   const speak = (partName: string, description: string) => {
     if ('speechSynthesis' in window) {
-      // Cancel any ongoing speech and clear the queue
-      window.speechSynthesis.cancel();
-
       // Create and configure new utterance for name
       const nameUtterance = new SpeechSynthesisUtterance(partName);
       nameUtterance.rate = 0.7;  // Slower rate for clarity
@@ -53,41 +49,40 @@ const BodyPartsWorksheet: React.FC = () => {
       descriptionUtterance.pitch = 1.0;  // Normal pitch
       descriptionUtterance.volume = 1;
 
-      // Clean up after speaking is done
+      // Play success sound first
+      try {
+        const audio = new Audio('/assets/sounds/success.mp3');
+        audio.play().catch(error => {
+          console.log('Success sound could not be played:', error);
+        });
+      } catch (error) {
+        console.log('Error creating audio:', error);
+      }
+
+      // Queue the speech after a small delay to let the success sound play
+      setTimeout(() => {
+        window.speechSynthesis.speak(nameUtterance);
+        window.speechSynthesis.speak(descriptionUtterance);
+      }, 300);
+
+      // Clean up after all speaking is done
       descriptionUtterance.onend = () => {
-        window.speechSynthesis.cancel();
+        // Only cancel if this was the last utterance
+        if (!window.speechSynthesis.speaking) {
+          window.speechSynthesis.cancel();
+        }
       };
-
-      // Clean up if there's an error
-      nameUtterance.onerror = descriptionUtterance.onerror = () => {
-        window.speechSynthesis.cancel();
-      };
-
-      // Speak name first, then description
-      window.speechSynthesis.speak(nameUtterance);
-      window.speechSynthesis.speak(descriptionUtterance);
     }
   };
 
   const handlePartClick = (partId: string) => {
     const part = parts.find(p => p.id === partId);
     if (part) {
-      setSelectedPart(partId);
       speak(part.name, part.label);
-      setCurrentMessage(`${part.name}: ${part.label}`);
-
-      // If there's no currently selected part, just select this one
-      if (!selectedPart) {
-        setSelectedPart(partId);
-      } 
-      // If there's already a selected part, check if it matches
-      else if (selectedPart === partId) {
-        // Same part clicked twice, mark it as correct
+      
+      // Only handle match logic if part isn't already correct
+      if (!part.isCorrect) {
         handlePartMatch(partId);
-        setSelectedPart(null);
-      } else {
-        // Different part clicked, reset selection
-        setSelectedPart(partId);
       }
     }
   };
@@ -102,19 +97,6 @@ const BodyPartsWorksheet: React.FC = () => {
 
     setParts(newParts);
     setScore(prev => prev + 10);
-    setShowSuccess(true);
-    setTimeout(() => setShowSuccess(false), 1500);
-
-    // Play success sound with proper path and error handling
-    try {
-      const audio = new Audio('/assets/sounds/success.mp3');
-      audio.play().catch(error => {
-        console.log('Success sound could not be played:', error);
-        // Continue with the game flow even if sound fails
-      });
-    } catch (error) {
-      console.log('Error creating audio:', error);
-    }
 
     // Check if all parts are correct
     if (newParts.every(part => part.isCorrect)) {
@@ -134,18 +116,15 @@ const BodyPartsWorksheet: React.FC = () => {
     setParts(BODY_PARTS.map(part => ({ ...part, isCorrect: false })));
     setScore(0);
     setIsComplete(false);
-    setShowSuccess(false);
-    setCurrentMessage('');
-    setSelectedPart(null);
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50">
       <WorksheetHeader />
       
-      <div className="max-w-4xl mx-auto p-4">
-        <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
-          <h1 className="text-2xl sm:text-3xl font-bold text-center text-purple-800 mb-6">
+      <div className="max-w-4xl mx-auto">
+        <div className="bg-white shadow-lg">
+          <h1 className="text-2xl sm:text-3xl font-bold text-center text-purple-800 mb-6 pt-6">
             Learn Your Body Parts! 🎯
           </h1>
 
@@ -153,9 +132,9 @@ const BodyPartsWorksheet: React.FC = () => {
             <ScoreDisplay score={score} totalQuestions={BODY_PARTS.length * 10} />
           </div>
 
-          <div className="relative aspect-[1/1] bg-gradient-to-b from-blue-50 to-purple-50 rounded-xl p-4">
+          <div className="relative aspect-[1/1] bg-gradient-to-b from-blue-50 to-purple-50">
             <div className="absolute inset-0 flex items-center justify-center">
-              <div className="relative w-96">
+              <div className="relative w-full">
                 {/* Body outline image */}
                 <img 
                   src={bodyOutlineSvg}
@@ -163,7 +142,7 @@ const BodyPartsWorksheet: React.FC = () => {
                   className="w-full h-auto"
                 />
 
-                {/* Clickable labels */}
+                {/* Clickable areas */}
                 {parts.map((part) => (
                   <div
                     key={part.id}
@@ -174,21 +153,7 @@ const BodyPartsWorksheet: React.FC = () => {
                       transform: 'translate(-50%, -50%)'
                     }}
                   >
-                    <motion.div
-                      animate={selectedPart === part.id ? {
-                        scale: [1, 1.2, 1],
-                        boxShadow: [
-                          '0 0 0 0px rgba(124, 58, 237, 0)',
-                          '0 0 0 4px rgba(124, 58, 237, 0.3)',
-                          '0 0 0 0px rgba(124, 58, 237, 0)'
-                        ]
-                      } : {}}
-                      transition={{
-                        duration: 1.5,
-                        repeat: Infinity,
-                        ease: "easeInOut"
-                      }}
-                    >
+                    <motion.div>
                       <motion.button
                         className="block"
                         onClick={() => handlePartClick(part.id)}
@@ -196,15 +161,13 @@ const BodyPartsWorksheet: React.FC = () => {
                         whileTap={{ scale: 0.95 }}
                         style={{ transformOrigin: 'center center' }}
                       >
-                        <span className={`px-2 py-1 text-xs font-medium rounded-md shadow-sm transition-colors block
-                          ${part.isCorrect 
-                            ? 'bg-green-100 text-green-700' 
-                            : selectedPart === part.id
-                              ? 'bg-yellow-100 text-yellow-700 ring-2 ring-yellow-400'
-                              : 'bg-white/80 text-gray-700 hover:bg-purple-50'}`}
-                        >
-                          {part.name}
-                        </span>
+                        <div 
+                          className={`w-20 h-14 rounded-lg cursor-pointer transition-colors
+                            ${part.isCorrect 
+                              ? 'bg-transparent' 
+                              : 'bg-transparent hover:bg-purple-300/30'}`}
+                          aria-label={part.name}
+                        />
                       </motion.button>
                     </motion.div>
                   </div>
@@ -214,7 +177,7 @@ const BodyPartsWorksheet: React.FC = () => {
           </div>
 
           {/* Word bank */}
-          <div className="mt-6 grid grid-cols-3 sm:grid-cols-4 gap-4">
+          <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 p-2">
             {BODY_PARTS.map((part) => {
               const isActive = !parts.find(p => p.id === part.id)?.isCorrect;
               return (
@@ -234,34 +197,8 @@ const BodyPartsWorksheet: React.FC = () => {
               );
             })}
           </div>
-
-          {/* Current message */}
-          {currentMessage && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="mt-6 text-center text-purple-600 font-medium"
-            >
-              {currentMessage}
-            </motion.div>
-          )}
         </div>
-
-        {/* Success Animation */}
-        {showSuccess && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0 }}
-            className="fixed inset-0 pointer-events-none flex items-center justify-center"
-          >
-            <div className="bg-white/90 backdrop-blur-sm rounded-full px-8 py-4 shadow-lg">
-              <p className="text-2xl font-bold text-purple-600">
-                Well done! 🌟
-              </p>
-            </div>
-          </motion.div>
-        )}
+      </div>
 
         {/* Completion Message */}
         {isComplete && (
@@ -324,7 +261,6 @@ const BodyPartsWorksheet: React.FC = () => {
             </motion.div>
           </motion.div>
         )}
-      </div>
     </div>
   );
 };
