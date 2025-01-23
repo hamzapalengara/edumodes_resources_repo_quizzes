@@ -1,5 +1,5 @@
 import React from 'react';
-import WorksheetHeader from '../../../components/shared/layout/Header/WorksheetHeader';
+import AnswerKeyHeader from '../../../components/shared/layout/Header/AnswerKeyHeader';
 import TouchContainer from '../../../components/shared/layout/Container/TouchContainer';
 
 const COLORS = [
@@ -18,7 +18,7 @@ const COLORS = [
 const ColorMatchingAnswerKey: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-50">
-      <WorksheetHeader />
+      <AnswerKeyHeader />
       
       <TouchContainer>
         <div className="w-full md:max-w-4xl md:mx-auto p-4 md:p-6">
