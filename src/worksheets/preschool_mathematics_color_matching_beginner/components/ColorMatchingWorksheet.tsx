@@ -13,7 +13,7 @@ import {
 import { restrictToWindowEdges } from '@dnd-kit/modifiers';
 import WorksheetHeader from '../../../components/shared/layout/Header/WorksheetHeader';
 import ScoreDisplay from '../../../components/shared/ScoreDisplay';
-import Confetti from 'react-confetti';
+import WorksheetTracker, { WorksheetSummary } from '../../../components/shared/WorksheetTracker';
 
 interface ColorObject {
   id: string;
@@ -114,8 +114,10 @@ const AUDIO_MESSAGES = {
   teal: "Teal turtle"
 };
 
+// Worksheet specific configuration
+const POINTS_PER_QUESTION = 10;
+
 const ColorMatchingWorksheet: React.FC = () => {
-  const [score, setScore] = useState(0);
   const [showSuccess, setShowSuccess] = useState(false);
   const [showError, setShowError] = useState(false);
   const [completedColors, setCompletedColors] = useState<string[]>([]);
@@ -137,250 +139,240 @@ const ColorMatchingWorksheet: React.FC = () => {
     })
   );
 
-  const handleDragEnd = useCallback((event: DragEndEvent) => {
-    console.log('Drag end event:', event);
-    const { active, over } = event;
-    
-    console.log('Active:', active);
-    console.log('Over:', over);
-    
-    if (over) {
-      console.log('Checking match...');
-      console.log('Active ID:', active.id);
-      console.log('Over ID:', over.id);
-      
-      if (active.id === over.id) {
-        console.log('Correct match!');
-        // Correct match
-        setScore((prev) => prev + 10);
-        setCompletedColors((prev) => {
-          console.log('Previous completed colors:', prev);
-          console.log('Adding color:', active.id);
-          return [...prev, active.id as string];
-        });
-        setShowSuccess(true);
-        setShowError(false);
-        setErrorColor('');
-        
-        // Play success sound
-        const audio = new Audio('/success.mp3');
-        audio.play().catch((error) => {
-          console.log('Audio play error:', error);
-        });
-        
-        // Get color object and set feedback
-        const colorObj = COLORS.find(c => c.id === active.id);
-        console.log('Found color object:', colorObj);
-        
-        if (colorObj) {
-          const colorId = active.id as keyof typeof AUDIO_MESSAGES;
-          const celebrationMessage = AUDIO_MESSAGES[colorId];
-          console.log('Setting feedback message:', celebrationMessage);
-          setFeedbackMessage(celebrationMessage);
-          
-          // Speak the color name
-          if ('speechSynthesis' in window) {
-            const utterance = new SpeechSynthesisUtterance(celebrationMessage.replace(/[^a-zA-Z\s]/g, ''));
-            utterance.rate = 0.9;
-            window.speechSynthesis.speak(utterance);
-          }
-        }
-        
-        setTimeout(() => {
-          console.log('Clearing success state');
-          setShowSuccess(false);
-          setFeedbackMessage('');
-        }, 2000);
-      } else {
-        console.log('Wrong match!');
-        // Wrong match
-        setShowError(true);
-        setShowSuccess(false);
-        const targetColor = COLORS.find(c => c.id === over.id);
-        setErrorColor(over.id as string);
-        const message = `Try again! This doesn't match the ${targetColor?.name} color.`;
-        console.log('Setting error message:', message);
-        setFeedbackMessage(message);
-        
-        setTimeout(() => {
-          console.log('Clearing error state');
-          setShowError(false);
-          setErrorColor('');
-          setFeedbackMessage('');
-        }, 2000);
-      }
-    }
-  }, []);
-
-  const remainingObjects = COLORS.filter(color => !completedColors.includes(color.id));
-  const isComplete = completedColors.length === COLORS.length;
-
-  console.log('Render state:', {
-    score,
-    showSuccess,
-    showError,
-    completedColors,
-    feedbackMessage,
-    remainingObjects,
-    isComplete
-  });
+  const handleSummaryGenerated = (summary: WorksheetSummary) => {
+    console.log('Worksheet completed:', summary);
+  };
 
   return (
-    <div className="min-h-screen bg-white">
-      <WorksheetHeader />
+    <WorksheetTracker
+      totalQuestions={COLORS.length}
+      pointsPerQuestion={POINTS_PER_QUESTION}
+      onSummaryGenerated={handleSummaryGenerated}
+    >
+      {({ score, maxScore, markAttempted, markCorrect, markIncorrect, reset }) => {
+        const handleDragEnd = useCallback((event: DragEndEvent) => {
+          console.log('Drag end event:', event);
+          const { active, over } = event;
+          
+          if (over) {
+            markAttempted();
+            
+            if (active.id === over.id) {
+              console.log('Correct match!');
+              // Correct match
+              markCorrect();
+              setCompletedColors((prev) => [...prev, active.id as string]);
+              setShowSuccess(true);
+              setShowError(false);
+              setErrorColor('');
+              
+              // Play success sound
+              const audio = new Audio('/success.mp3');
+              audio.play().catch(console.error);
+              
+              // Get color object and set feedback
+              const colorObj = COLORS.find(c => c.id === active.id);
+              
+              if (colorObj) {
+                const colorId = active.id as keyof typeof AUDIO_MESSAGES;
+                const celebrationMessage = AUDIO_MESSAGES[colorId];
+                setFeedbackMessage(celebrationMessage);
+                
+                // Speak the color name
+                if ('speechSynthesis' in window) {
+                  const utterance = new SpeechSynthesisUtterance(celebrationMessage.replace(/[^a-zA-Z\s]/g, ''));
+                  utterance.rate = 0.9;
+                  window.speechSynthesis.speak(utterance);
+                }
+              }
+              
+              setTimeout(() => {
+                setShowSuccess(false);
+                setFeedbackMessage('');
+              }, 2000);
+            } else {
+              console.log('Wrong match!');
+              // Wrong match
+              markIncorrect();
+              setShowError(true);
+              setShowSuccess(false);
+              const targetColor = COLORS.find(c => c.id === over.id);
+              setErrorColor(over.id as string);
+              const message = `Try again! This doesn't match the ${targetColor?.name} color.`;
+              setFeedbackMessage(message);
+              
+              setTimeout(() => {
+                setShowError(false);
+                setErrorColor('');
+                setFeedbackMessage('');
+              }, 2000);
+            }
+          }
+        }, [markAttempted, markCorrect, markIncorrect]);
 
-      <div className="flex-1 flex flex-col max-w-xs sm:max-w-md md:max-w-2xl mx-auto w-full px-0 sm:px-4 py-4">
-        {/* Title Section */}
-        <div className="mx-2 sm:mx-0 mb-4">
-          <h1 className="text-2xl sm:text-3xl font-bold text-center text-violet-800">
-            Rainbow Adventure
-          </h1>
-        </div>
+        const remainingObjects = COLORS.filter(color => !completedColors.includes(color.id));
+        const isComplete = completedColors.length === COLORS.length;
 
-        {/* Score Display with enhanced styling */}
-        <div className="mx-2 sm:mx-0 mb-4 bg-gradient-to-r from-pink-50 to-yellow-50 rounded-xl p-3 shadow-sm border border-pink-100">
-          <ScoreDisplay score={score} totalQuestions={100} />
-        </div>
+        const handleReset = () => {
+          setCompletedColors([]);
+          setShowSuccess(false);
+          setShowError(false);
+          setFeedbackMessage('');
+          setErrorColor('');
+          reset();
+        };
 
-        {!isComplete ? (
-          <DndContext
-            sensors={sensors}
-            modifiers={[restrictToWindowEdges]}
-            onDragEnd={handleDragEnd}
-          >
-            {/* Instructions and Feedback */}
-            <div className="text-center mx-2 sm:mx-0 mb-4">
-              <div className="bg-blue-50 rounded-lg p-3 shadow-sm border border-blue-100">
-                <AnimatePresence mode="wait">
-                  {feedbackMessage ? (
-                    <motion.p
-                      key="feedback"
-                      initial={{ opacity: 0, y: -10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: 10 }}
-                      className={`text-base sm:text-lg font-medium ${
-                        showError ? 'text-red-500' : showSuccess ? 'text-green-500' : ''
-                      }`}
-                    >
-                      {feedbackMessage}
-                    </motion.p>
-                  ) : (
-                    <motion.p
-                      key="instruction"
-                      initial={{ opacity: 0, y: -10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: 10 }}
-                      className="text-base sm:text-lg font-medium text-blue-700"
-                    >
-                      Match the objects to their colors!
-                    </motion.p>
-                  )}
-                </AnimatePresence>
+        return (
+          <div className="min-h-screen bg-white">
+            <WorksheetHeader />
+
+            <div className="flex-1 flex flex-col max-w-xs sm:max-w-md md:max-w-2xl mx-auto w-full px-0 sm:px-4 py-4">
+              {/* Title Section */}
+              <div className="mx-2 sm:mx-0 mb-4">
+                <h1 className="text-2xl sm:text-3xl font-bold text-center text-violet-800">
+                  Rainbow Adventure
+                </h1>
               </div>
-            </div>
 
-            <div className="flex flex-col gap-6 mx-2 sm:mx-0">
-              {/* Objects to Match - Top Section */}
-              <div className="bg-white rounded-xl p-4 shadow-md border-2 border-dashed border-blue-200">
-                <h3 className="text-center text-blue-700 font-medium mb-4">Drag these objects! ✨</h3>
-                <div className="grid grid-cols-4 gap-4 justify-items-center">
-                  {remainingObjects.map((obj) => (
-                    <DraggableObject
-                      key={obj.id}
-                      id={obj.id}
-                      emoji={obj.emoji}
-                    />
-                  ))}
-                </div>
+              {/* Score Display with enhanced styling */}
+              <div className="mx-2 sm:mx-0 mb-4 bg-gradient-to-r from-pink-50 to-yellow-50 rounded-xl p-3 shadow-sm border border-pink-100">
+                <ScoreDisplay score={score} totalQuestions={maxScore} />
               </div>
 
-              {/* Color Buckets - Bottom Section */}
-              <div className="bg-white rounded-xl p-4 shadow-md border-2 border-dashed border-purple-200">
-                <h3 className="text-center text-purple-700 font-medium mb-4">Drop on matching colors! 🎯</h3>
-                <div className="grid grid-cols-4 md:grid-cols-5 gap-3 justify-items-center">
-                  {COLORS.map((color) => (
-                    <DroppableColorBucket
-                      key={color.id}
-                      id={color.id}
-                      color={color.color}
-                      isCompleted={completedColors.includes(color.id)}
-                      showError={showError && errorColor === color.id}
-                      emoji={color.emoji}
-                    />
-                  ))}
-                </div>
-              </div>
-            </div>
-          </DndContext>
-        ) : (
-          <div className="flex-1 flex flex-col items-center justify-center text-center">
-            <motion.div
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              className="bg-gradient-to-r from-pink-50 to-yellow-50 rounded-xl p-8 shadow-lg border border-pink-100"
-            >
-              <div className="space-y-4">
-                <h2 className="text-2xl sm:text-3xl font-bold text-pink-600">
-                  🎉 Amazing Job! 🌈
-                </h2>
-                <p className="text-lg sm:text-xl text-purple-700">You've matched all the colors!</p>
-                <div className="bg-white rounded-lg p-4 shadow-inner">
-                  <p className="text-xl sm:text-2xl font-bold text-blue-600">Final Score: {score}/100</p>
-                </div>
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => {
-                    setScore(0);
-                    setCompletedColors([]);
-                    setFeedbackMessage('');
-                    setErrorColor('');
-                  }}
-                  className="mt-4 bg-gradient-to-r from-pink-500 to-yellow-500 text-white px-8 py-3 rounded-lg text-lg sm:text-xl font-medium shadow-lg hover:shadow-xl transition-shadow"
+              {!isComplete ? (
+                <DndContext
+                  sensors={sensors}
+                  modifiers={[restrictToWindowEdges]}
+                  onDragEnd={handleDragEnd}
                 >
-                  Play Again! 🎮
-                </motion.button>
-              </div>
-            </motion.div>
-          </div>
-        )}
+                  {/* Instructions and Feedback */}
+                  <div className="text-center mx-2 sm:mx-0 mb-4">
+                    <div className="bg-blue-50 rounded-lg p-3 shadow-sm border border-blue-100">
+                      <AnimatePresence mode="wait">
+                        {feedbackMessage ? (
+                          <motion.p
+                            key="feedback"
+                            initial={{ opacity: 0, y: -10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: 10 }}
+                            className={`text-base sm:text-lg font-medium ${
+                              showError ? 'text-red-500' : showSuccess ? 'text-green-500' : ''
+                            }`}
+                          >
+                            {feedbackMessage}
+                          </motion.p>
+                        ) : (
+                          <motion.p
+                            key="instruction"
+                            initial={{ opacity: 0, y: -10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: 10 }}
+                            className="text-base sm:text-lg font-medium text-blue-700"
+                          >
+                            Match the objects to their colors!
+                          </motion.p>
+                        )}
+                      </AnimatePresence>
+                    </div>
+                  </div>
 
-        {/* Success Animation with Confetti */}
-        <AnimatePresence>
-          {showSuccess && (
-            <>
-              <Confetti
-                width={window.innerWidth}
-                height={window.innerHeight}
-                recycle={false}
-                numberOfPieces={200}
-                gravity={0.3}
-              />
-              <motion.div
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                exit={{ scale: 0 }}
-                className="fixed inset-0 pointer-events-none flex items-center justify-center"
-              >
+                  <div className="flex flex-col gap-6 mx-2 sm:mx-0">
+                    {/* Objects to Match - Top Section */}
+                    <div className="bg-white rounded-xl p-4 shadow-md border-2 border-dashed border-blue-200">
+                      <h3 className="text-center text-blue-700 font-medium mb-4">Drag these objects! ✨</h3>
+                      <div className="grid grid-cols-4 gap-4 justify-items-center">
+                        {remainingObjects.map((obj) => (
+                          <DraggableObject
+                            key={obj.id}
+                            id={obj.id}
+                            emoji={obj.emoji}
+                          />
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Color Buckets - Bottom Section */}
+                    <div className="bg-white rounded-xl p-4 shadow-md border-2 border-dashed border-purple-200">
+                      <h3 className="text-center text-purple-700 font-medium mb-4">Drop on matching colors! 🎯</h3>
+                      <div className="grid grid-cols-4 md:grid-cols-5 gap-3 justify-items-center">
+                        {COLORS.map((color) => (
+                          <DroppableColorBucket
+                            key={color.id}
+                            id={color.id}
+                            color={color.color}
+                            isCompleted={completedColors.includes(color.id)}
+                            showError={showError && errorColor === color.id}
+                            emoji={color.emoji}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </DndContext>
+              ) : (
                 <motion.div
-                  animate={{
-                    scale: [1, 1.2, 1],
-                    rotate: [0, 360],
-                  }}
-                  transition={{
-                    duration: 0.5,
-                    ease: "easeInOut",
-                  }}
-                  className="text-4xl sm:text-5xl"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="fixed inset-0 flex items-center justify-center bg-black/50"
                 >
-                  ✨
+                  <motion.div
+                    className="bg-white rounded-xl p-8 text-center max-w-md mx-4"
+                    initial={{ scale: 0, y: 100 }}
+                    animate={{ scale: 1, y: 0 }}
+                    transition={{ type: "spring", bounce: 0.4 }}
+                  >
+                    <motion.div
+                      className="text-8xl mb-6"
+                      animate={{ 
+                        scale: [1, 1.2, 1],
+                        rotate: [0, 10, -10, 0],
+                        y: [0, -10, 0]
+                      }}
+                      transition={{ 
+                        duration: 2,
+                        repeat: Infinity,
+                        repeatType: "reverse"
+                      }}
+                    >
+                      🌈
+                    </motion.div>
+
+                    <motion.h2
+                      className="text-3xl font-bold text-violet-800 mb-4"
+                      animate={{ scale: [1, 1.1, 1] }}
+                      transition={{ duration: 1, repeat: Infinity }}
+                    >
+                      Amazing Job! 🎉
+                    </motion.h2>
+
+                    <p className="text-gray-600 mb-6 text-lg">
+                      You've matched all the colors!
+                    </p>
+
+                    <motion.div 
+                      className="text-xl font-bold text-violet-600 mb-6"
+                      animate={{ scale: [1, 1.1, 1] }}
+                      transition={{ duration: 1, repeat: Infinity }}
+                    >
+                      Score: {score}/{maxScore}
+                    </motion.div>
+
+                    <motion.button
+                      className="px-6 py-3 bg-violet-600 text-white rounded-lg font-bold hover:bg-violet-700"
+                      onClick={handleReset}
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                    >
+                      Try Again
+                    </motion.button>
+                  </motion.div>
                 </motion.div>
-              </motion.div>
-            </>
-          )}
-        </AnimatePresence>
-      </div>
-    </div>
+              )}
+            </div>
+          </div>
+        );
+      }}
+    </WorksheetTracker>
   );
 };
 

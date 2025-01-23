@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import WorksheetHeader from '../../../components/shared/layout/Header/WorksheetHeader';
 import ScoreDisplay from '../../../components/shared/ScoreDisplay';
-import WorksheetTracker from '../../../components/shared/WorksheetTracker';
+import WorksheetTracker, { WorksheetSummary } from '../../../components/shared/WorksheetTracker';
 
 interface LetterState {
   value: string;
@@ -10,6 +10,9 @@ interface LetterState {
   isCorrect?: boolean;
   userInput?: string;
 }
+
+// Worksheet specific configuration
+const POINTS_PER_QUESTION = 10;
 
 const ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').map(letter => ({
   value: letter,
@@ -55,8 +58,8 @@ const LetterRecognitionWorksheet: React.FC = () => {
   return (
     <WorksheetTracker 
       totalQuestions={totalQuestions}
-      onSummaryGenerated={(summary) => {
-        // Optional: Handle summary generation if needed
+      pointsPerQuestion={POINTS_PER_QUESTION}
+      onSummaryGenerated={(summary: WorksheetSummary) => {
         console.log('Summary generated:', summary);
       }}
     >
