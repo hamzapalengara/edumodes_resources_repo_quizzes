@@ -1,5 +1,6 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import WorksheetTracker, { WorksheetSummary } from '../../../components/shared/WorksheetTracker';
 
 export interface Letter {
   char: string;
@@ -88,12 +89,24 @@ export const LETTERS: Letter[] = [
   }
 ];
 
+interface WorksheetTrackerRenderProps {
+  score: number;
+  maxScore: number;
+  addPoints: (points?: number) => void;
+  markAttempted: () => void;
+  markCorrect: () => void;
+  markIncorrect: () => void;
+  questionsAttempted: number;
+  correctAnswers: number;
+  incorrectAnswers: number;
+  reset: () => void;
+}
+
 const LetterTracingWorksheet: React.FC = () => {
   const [currentLetterIndex, setCurrentLetterIndex] = useState(0);
   const [currentPathIndex, setCurrentPathIndex] = useState(0);
   const [filledPaths, setFilledPaths] = useState<string[]>([]);
   const [showSuccess, setShowSuccess] = useState(false);
-  const [score, setScore] = useState(0);
   const [isDrawing, setIsDrawing] = useState(false);
   const [progress, setProgress] = useState(0);
   const [lastPoint, setLastPoint] = useState<number>(0);
@@ -101,6 +114,7 @@ const LetterTracingWorksheet: React.FC = () => {
   const svgRef = useRef<SVGSVGElement>(null);
   const pathRef = useRef<SVGPathElement>(null);
   const [confetti, setConfetti] = useState<ConfettiItem[]>([]);
+  const markCorrectRef = useRef<(() => void) | null>(null);
 
   const currentLetter = LETTERS[currentLetterIndex];
   const currentPath = currentLetter.paths[currentPathIndex];
@@ -187,7 +201,58 @@ const LetterTracingWorksheet: React.FC = () => {
     }
   };
 
-  const handlePointerMove = (e: React.PointerEvent) => {
+  // Modified handleLetterComplete to use WorksheetTracker
+  const handleLetterComplete = useCallback((markCorrect: () => void) => {
+    setShowSuccess(true);
+    markCorrect(); // Use WorksheetTracker's markCorrect instead of local score
+    
+    // Generate more confetti items with varied speeds and sizes
+    const items: ConfettiItem[] = [];
+    for (let i = 0; i < 40; i++) {
+      items.push({
+        id: i,
+        x: Math.random() * 100,
+        y: -20 - Math.random() * 40,
+        rotation: Math.random() * 360,
+        scale: 0.3 + Math.random() * 0.7,
+        type: Math.random() > 0.5 ? 'emoji' : 'letter'
+      });
+    }
+    setConfetti(items);
+
+    setTimeout(() => {
+      setShowSuccess(false);
+      setConfetti([]);
+      if (currentLetterIndex < LETTERS.length - 1) {
+        setCurrentLetterIndex(prev => prev + 1);
+        setCurrentPathIndex(0);
+        setFilledPaths([]);
+      }
+    }, 3000);
+  }, [currentLetterIndex]);
+
+  // Modified handlePathComplete to use WorksheetTracker's markCorrect
+  const handlePathComplete = useCallback((markCorrect: () => void) => {
+    const currentLength = pathRef.current?.getTotalLength() || 0;
+    setPathLengths(prev => ({
+      ...prev,
+      [currentPath.id]: currentLength
+    }));
+    setFilledPaths(prev => [...prev, currentPath.id]);
+    setIsDrawing(false);
+    setProgress(1);
+    setLastPoint(0);
+    
+    if (currentPathIndex === currentLetter.paths.length - 1) {
+      handleLetterComplete(markCorrect);
+    } else {
+      setCurrentPathIndex(prev => prev + 1);
+      setProgress(0);
+      speak("Good! Keep going!");
+    }
+  }, [currentPath.id, currentPathIndex, currentLetter.paths.length, handleLetterComplete]);
+
+  const handlePointerMove = useCallback((e: React.PointerEvent) => {
     if (!isDrawing) return;
 
     const svg = svgRef.current;
@@ -221,11 +286,11 @@ const LetterTracingWorksheet: React.FC = () => {
       }
       
       // Complete path if we're near the end
-      if (newProgress > 0.85) {
-        handlePathComplete();
+      if (newProgress > 0.85 && markCorrectRef.current) {
+        handlePathComplete(markCorrectRef.current);
       }
     }
-  };
+  }, [isDrawing, lastPoint, progress, handlePathComplete]);
 
   const handlePointerUp = () => {
     setIsDrawing(false);
@@ -235,61 +300,10 @@ const LetterTracingWorksheet: React.FC = () => {
     return Math.sqrt(Math.pow(p2.x - p1.x, 2) + Math.pow(p2.y - p1.y, 2));
   };
 
-  // Modify handleLetterComplete to include speech
-  const handleLetterComplete = () => {
-    setShowSuccess(true);
-    setScore(prev => prev + 10);
-    
-    // Generate more confetti items with varied speeds and sizes
-    const items: ConfettiItem[] = [];
-    for (let i = 0; i < 40; i++) {
-      items.push({
-        id: i,
-        x: Math.random() * 100,
-        y: -20 - Math.random() * 40, // Start higher above screen
-        rotation: Math.random() * 360,
-        scale: 0.3 + Math.random() * 0.7, // More size variation
-        type: Math.random() > 0.5 ? 'emoji' : 'letter' // More emojis
-      });
-    }
-    setConfetti(items);
-
-    setTimeout(() => {
-      setShowSuccess(false);
-      setConfetti([]);
-      if (currentLetterIndex < LETTERS.length - 1) {
-        setCurrentLetterIndex(prev => prev + 1);
-        setCurrentPathIndex(0);
-        setFilledPaths([]);
-      }
-    }, 3000); // Longer animation duration
-  };
-
   // Add speech when starting a new letter
   React.useEffect(() => {
     speak(`Let's trace the letter ${currentLetter.char}`);
   }, [currentLetterIndex]);
-
-  // Add speech for path completion
-  const handlePathComplete = () => {
-    const currentLength = pathRef.current?.getTotalLength() || 0;
-    setPathLengths(prev => ({
-      ...prev,
-      [currentPath.id]: currentLength
-    }));
-    setFilledPaths(prev => [...prev, currentPath.id]);
-    setIsDrawing(false);
-    setProgress(1); // Set to 1 to ensure complete fill
-    setLastPoint(0);
-    
-    if (currentPathIndex === currentLetter.paths.length - 1) {
-      handleLetterComplete();
-    } else {
-      setCurrentPathIndex(prev => prev + 1);
-      setProgress(0);
-      speak("Good! Keep going!");
-    }
-  };
 
   const handlePrevLetter = () => {
     if (currentLetterIndex > 0) {
@@ -323,210 +337,228 @@ const LetterTracingWorksheet: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#0B1C48] via-[#1B3B8C] to-[#0B1C48] bg-[url('/space-bg.png')] bg-cover bg-center bg-blend-soft-light">
-      {/* Header */}
-      <header className="bg-gradient-to-b from-black/80 to-gray-900/80 shadow-lg backdrop-blur-sm border-b border-gray-700">
-        <div className="py-4 px-4">
-          <div className="flex items-center justify-between">
-            {/* Edumodes Logo */}
-            <div className="flex flex-col min-w-0">
-              <div className="flex items-baseline leading-none">
-                <span className="text-lg sm:text-xl font-black text-[#EC4899]">E</span>
-                <span className="text-base sm:text-lg font-black text-sky-500 -ml-0.5">d</span>
-                <span className="text-base sm:text-lg font-black text-indigo-500">u</span>
-                <span className="text-lg sm:text-xl font-black text-[#EAB308] ml-0.5">M</span>
-                <span className="text-base sm:text-lg font-black text-emerald-500 -ml-0.5">o</span>
-                <span className="text-base sm:text-lg font-black text-teal-500">d</span>
-                <span className="text-base sm:text-lg font-black text-green-500">e</span>
-                <span className="text-base sm:text-lg font-black text-teal-500">s</span>
+    <WorksheetTracker 
+      totalQuestions={LETTERS.length}
+      pointsPerQuestion={10}
+      onSummaryGenerated={(summary: WorksheetSummary) => {
+        console.log('Space Letter Adventure Summary:', summary);
+      }}
+    >
+      {({ score, maxScore, markCorrect, reset }: WorksheetTrackerRenderProps) => {
+        // Store markCorrect in ref
+        markCorrectRef.current = markCorrect;
+
+        return (
+          <div className="min-h-screen bg-gradient-to-b from-[#0B1C48] via-[#1B3B8C] to-[#0B1C48] bg-[url('/space-bg.png')] bg-cover bg-center bg-blend-soft-light">
+            {/* Header */}
+            <header className="bg-gradient-to-b from-black/80 to-gray-900/80 shadow-lg backdrop-blur-sm border-b border-gray-700">
+              <div className="py-4 px-4">
+                <div className="flex items-center justify-between">
+                  {/* Edumodes Logo */}
+                  <div className="flex flex-col min-w-0">
+                    <div className="flex items-baseline leading-none">
+                      <span className="text-lg sm:text-xl font-black text-[#EC4899]">E</span>
+                      <span className="text-base sm:text-lg font-black text-sky-500 -ml-0.5">d</span>
+                      <span className="text-base sm:text-lg font-black text-indigo-500">u</span>
+                      <span className="text-lg sm:text-xl font-black text-[#EAB308] ml-0.5">M</span>
+                      <span className="text-base sm:text-lg font-black text-emerald-500 -ml-0.5">o</span>
+                      <span className="text-base sm:text-lg font-black text-teal-500">d</span>
+                      <span className="text-base sm:text-lg font-black text-green-500">e</span>
+                      <span className="text-base sm:text-lg font-black text-teal-500">s</span>
+                    </div>
+                    <a href="https://www.edumodes.com" target="_blank" className="text-[9px] sm:text-[10px] text-gray-400 hover:text-white leading-tight truncate">www.edumodes.com</a>
+                  </div>
+                </div>
               </div>
-              <a href="https://www.edumodes.com" target="_blank" className="text-[9px] sm:text-[10px] text-gray-400 hover:text-white leading-tight truncate">www.edumodes.com</a>
+            </header>
+
+            {/* Title Section */}
+            <div className="bg-black/50 backdrop-blur-sm shadow-lg border-b border-gray-700">
+              <h1 className="text-2xl md:text-3xl font-bold text-white text-center py-3 flex items-center justify-center gap-3">
+                <span>🛸</span>
+                <span>Space Letter Adventure</span>
+                <span>👨‍🚀</span>
+              </h1>
             </div>
-          </div>
-        </div>
-      </header>
 
-      {/* Title Section */}
-      <div className="bg-black/50 backdrop-blur-sm shadow-lg border-b border-gray-700">
-        <h1 className="text-2xl md:text-3xl font-bold text-white text-center py-3 flex items-center justify-center gap-3">
-          <span>🛸</span>
-          <span>Space Letter Adventure</span>
-          <span>👨‍🚀</span>
-        </h1>
-      </div>
+            {/* Score and Progress Section - Updated to use WorksheetTracker score */}
+            <div className="bg-black/30 backdrop-blur-sm border-b border-gray-700">
+              <div className="container mx-auto px-4 py-2 flex flex-col sm:flex-row items-center justify-center gap-3">
+                <div className="flex items-center gap-2 bg-black/30 px-4 py-2 rounded-full border border-gray-700">
+                  <span className="text-yellow-300 text-lg">⭐</span>
+                  <span className="text-white font-medium">Score: {score}/{maxScore}</span>
+                </div>
+                <div className="flex items-center gap-2 bg-black/30 px-4 py-2 rounded-full border border-gray-700">
+                  <span className="text-white font-medium">Letter {currentLetterIndex + 1} of {LETTERS.length}</span>
+                  <span className="text-lg">🚀</span>
+                </div>
+              </div>
+            </div>
 
-      {/* Score and Progress Section */}
-      <div className="bg-black/30 backdrop-blur-sm border-b border-gray-700">
-        <div className="container mx-auto px-4 py-2 flex flex-col sm:flex-row items-center justify-center gap-3">
-          <div className="flex items-center gap-2 bg-black/30 px-4 py-2 rounded-full border border-gray-700">
-            <span className="text-yellow-300 text-lg">⭐</span>
-            <span className="text-white font-medium">Score: {score}</span>
-          </div>
-          <div className="flex items-center gap-2 bg-black/30 px-4 py-2 rounded-full border border-gray-700">
-            <span className="text-white font-medium">Letter {currentLetterIndex + 1} of {LETTERS.length}</span>
-            <span className="text-lg">🚀</span>
-          </div>
-        </div>
-      </div>
+            {/* Main Content */}
+            <main className="p-4">
+              {/* Letter Display */}
+              <div className="bg-black/40 backdrop-blur-sm rounded-xl shadow-xl p-6 mb-4 border-2 border-gray-700">
+                <div className="text-center mb-4">
+                  <span className="text-6xl font-bold text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.5)]">{currentLetter.char}</span>
+                </div>
+                <div className="text-center mb-2">
+                  <span className="text-3xl filter drop-shadow-md">{currentLetter.objectEmoji}</span>
+                  <span className="ml-3 text-gray-200 font-medium">{currentLetter.char} is for {currentLetter.object}</span>
+                </div>
+              </div>
 
-      {/* Main Content */}
-      <main className="p-4">
-        {/* Letter Display */}
-        <div className="bg-black/40 backdrop-blur-sm rounded-xl shadow-xl p-6 mb-4 border-2 border-gray-700">
-          <div className="text-center mb-4">
-            <span className="text-6xl font-bold text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.5)]">{currentLetter.char}</span>
-          </div>
-          <div className="text-center mb-2">
-            <span className="text-3xl filter drop-shadow-md">{currentLetter.objectEmoji}</span>
-            <span className="ml-3 text-gray-200 font-medium">{currentLetter.char} is for {currentLetter.object}</span>
-          </div>
-        </div>
+              {/* Tracing Area - Updated handlePathComplete to use markCorrect */}
+              <div className="bg-black/40 backdrop-blur-sm rounded-xl shadow-xl p-6 border-2 border-gray-700">
+                <div className="relative aspect-square max-w-[400px] mx-auto">
+                  <svg
+                    ref={svgRef}
+                    viewBox={currentLetter.viewBox}
+                    className="w-full h-full touch-none select-none"
+                    style={{ touchAction: 'none' }}
+                    onPointerDown={handlePointerDown}
+                    onPointerMove={handlePointerMove}
+                    onPointerUp={handlePointerUp}
+                    onPointerLeave={handlePointerUp}
+                    onPointerCancel={handlePointerUp}
+                  >
+                    {/* Background decoration */}
+                    <circle cx="100" cy="100" r="80" fill="rgba(255, 255, 255, 0.03)" />
+                    
+                    {currentLetter.paths.map((path, index) => (
+                      <g key={path.id}>
+                        {/* Background path */}
+                        <path
+                          d={path.d}
+                          fill="none"
+                          stroke="rgba(255, 255, 255, 0.2)"
+                          strokeWidth="28"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
 
-        {/* Tracing Area */}
-        <div className="bg-black/40 backdrop-blur-sm rounded-xl shadow-xl p-6 border-2 border-gray-700">
-          <div className="relative aspect-square max-w-[400px] mx-auto">
-            <svg
-              ref={svgRef}
-              viewBox={currentLetter.viewBox}
-              className="w-full h-full touch-none select-none"
-              style={{ touchAction: 'none' }}
-              onPointerDown={handlePointerDown}
-              onPointerMove={handlePointerMove}
-              onPointerUp={handlePointerUp}
-              onPointerLeave={handlePointerUp}
-              onPointerCancel={handlePointerUp}
-            >
-              {/* Background decoration */}
-              <circle cx="100" cy="100" r="80" fill="rgba(255, 255, 255, 0.03)" />
-              
-              {currentLetter.paths.map((path, index) => (
-                <g key={path.id}>
-                  {/* Background path */}
-                  <path
-                    d={path.d}
-                    fill="none"
-                    stroke="rgba(255, 255, 255, 0.2)"
-                    strokeWidth="28"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
+                        {/* Active or completed path */}
+                        {(index === currentPathIndex || filledPaths.includes(path.id)) && (
+                          <path
+                            ref={index === currentPathIndex ? pathRef : null}
+                            d={path.d}
+                            fill="none"
+                            stroke="#3B82F6"
+                            strokeWidth="28"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeDasharray={pathLengths[path.id] || 1000}
+                            strokeDashoffset={
+                              index === currentPathIndex
+                                ? (pathLengths[path.id] || 1000) * (1 - progress)
+                                : 0
+                            }
+                            className="drop-shadow-[0_0_8px_rgba(59,130,246,0.5)]"
+                          />
+                        )}
+                      </g>
+                    ))}
 
-                  {/* Active or completed path */}
-                  {(index === currentPathIndex || filledPaths.includes(path.id)) && (
-                    <path
-                      ref={index === currentPathIndex ? pathRef : null}
-                      d={path.d}
-                      fill="none"
-                      stroke="#3B82F6"
-                      strokeWidth="28"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeDasharray={pathLengths[path.id] || 1000}
-                      strokeDashoffset={
-                        index === currentPathIndex
-                          ? (pathLengths[path.id] || 1000) * (1 - progress)
-                          : 0
-                      }
-                      className="drop-shadow-[0_0_8px_rgba(59,130,246,0.5)]"
-                    />
-                  )}
-                </g>
-              ))}
+                    {/* Start point indicator */}
+                    {!filledPaths.includes(currentPath.id) && (
+                      <circle
+                        ref={el => {
+                          if (el && pathRef.current) {
+                            const point = pathRef.current.getPointAtLength(0);
+                            el.setAttribute('cx', point.x.toString());
+                            el.setAttribute('cy', point.y.toString());
+                          }
+                        }}
+                        r="12"
+                        fill="#3B82F6"
+                        className="animate-pulse drop-shadow-[0_0_8px_rgba(59,130,246,0.5)]"
+                      />
+                    )}
+                  </svg>
 
-              {/* Start point indicator */}
-              {!filledPaths.includes(currentPath.id) && (
-                <circle
-                  ref={el => {
-                    if (el && pathRef.current) {
-                      const point = pathRef.current.getPointAtLength(0);
-                      el.setAttribute('cx', point.x.toString());
-                      el.setAttribute('cy', point.y.toString());
-                    }
-                  }}
-                  r="12"
-                  fill="#3B82F6"
-                  className="animate-pulse drop-shadow-[0_0_8px_rgba(59,130,246,0.5)]"
-                />
+                  {/* Instructions */}
+                  <div className="mt-4 text-center text-sm text-gray-200 font-medium">
+                    Follow the starlit path with your finger or mouse to trace each part of the letter
+                  </div>
+
+                  {/* Navigation and Try Again Buttons - Updated to include reset */}
+                  <div className="mt-6 flex items-center justify-center gap-4">
+                    <button
+                      onClick={handlePrevLetter}
+                      disabled={currentLetterIndex === 0}
+                      className="w-12 h-12 rounded-full bg-black/50 text-gray-200 text-xl font-medium hover:bg-black/70 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center border border-gray-700"
+                      aria-label="Previous Letter"
+                    >
+                      ⬅️
+                    </button>
+                    <button
+                      onClick={() => {
+                        handleTryAgain();
+                        reset(); // Reset WorksheetTracker state when trying again
+                      }}
+                      className="w-12 h-12 rounded-full bg-blue-600/50 text-white text-xl font-medium hover:bg-blue-600/70 flex items-center justify-center border border-blue-500/50"
+                      aria-label="Try Again"
+                    >
+                      🔄
+                    </button>
+                    <button
+                      onClick={handleNextLetter}
+                      disabled={currentLetterIndex === LETTERS.length - 1}
+                      className="w-12 h-12 rounded-full bg-black/50 text-gray-200 text-xl font-medium hover:bg-black/70 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center border border-gray-700"
+                      aria-label="Next Letter"
+                    >
+                      ➡️
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </main>
+
+            {/* Success Animation */}
+            <AnimatePresence>
+              {showSuccess && (
+                <>
+                  {/* Space particles */}
+                  {confetti.map((item) => (
+                    <motion.div
+                      key={item.id}
+                      initial={{
+                        x: `${item.x}vw`,
+                        y: `${item.y}vh`,
+                        rotate: item.rotation,
+                        scale: item.scale,
+                      }}
+                      animate={{
+                        y: '120vh',
+                        rotate: item.rotation + (Math.random() > 0.5 ? 360 : -360),
+                        x: `${item.x + (Math.random() * 10 - 5)}vw`,
+                      }}
+                      transition={{
+                        duration: 2.5 + Math.random() * 1.5,
+                        ease: [0.1, 0.4, 0.8, 0.9],
+                        delay: item.id * 0.04,
+                      }}
+                      className="fixed pointer-events-none z-50"
+                      style={{
+                        color: item.type === 'emoji' ? 'inherit' : 
+                               `hsl(${210 + Math.random() * 40}, ${70 + Math.random() * 20}%, ${65 + Math.random() * 15}%)`,
+                        textShadow: '0 0 8px rgba(59, 130, 246, 0.5)',
+                        fontSize: item.type === 'emoji' ? '2.5rem' : '2rem',
+                        fontWeight: 'bold',
+                      }}
+                    >
+                      {item.type === 'emoji' ? 
+                        [currentLetter.objectEmoji, '🚀', '⭐', '🛸', '👨‍🚀'][Math.floor(Math.random() * 5)] : 
+                        currentLetter.char}
+                    </motion.div>
+                  ))}
+                </>
               )}
-            </svg>
-
-            {/* Instructions */}
-            <div className="mt-4 text-center text-sm text-gray-200 font-medium">
-              Follow the starlit path with your finger or mouse to trace each part of the letter
-            </div>
-
-            {/* Navigation and Try Again Buttons */}
-            <div className="mt-6 flex items-center justify-center gap-4">
-              <button
-                onClick={handlePrevLetter}
-                disabled={currentLetterIndex === 0}
-                className="w-12 h-12 rounded-full bg-black/50 text-gray-200 text-xl font-medium hover:bg-black/70 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center border border-gray-700"
-                aria-label="Previous Letter"
-              >
-                ⬅️
-              </button>
-              <button
-                onClick={handleTryAgain}
-                className="w-12 h-12 rounded-full bg-blue-600/50 text-white text-xl font-medium hover:bg-blue-600/70 flex items-center justify-center border border-blue-500/50"
-                aria-label="Try Again"
-              >
-                🔄
-              </button>
-              <button
-                onClick={handleNextLetter}
-                disabled={currentLetterIndex === LETTERS.length - 1}
-                className="w-12 h-12 rounded-full bg-black/50 text-gray-200 text-xl font-medium hover:bg-black/70 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center border border-gray-700"
-                aria-label="Next Letter"
-              >
-                ➡️
-              </button>
-            </div>
+            </AnimatePresence>
           </div>
-        </div>
-
-        {/* Success Animation */}
-        <AnimatePresence>
-          {showSuccess && (
-            <>
-              {/* Space particles */}
-              {confetti.map((item) => (
-                <motion.div
-                  key={item.id}
-                  initial={{
-                    x: `${item.x}vw`,
-                    y: `${item.y}vh`,
-                    rotate: item.rotation,
-                    scale: item.scale,
-                  }}
-                  animate={{
-                    y: '120vh',
-                    rotate: item.rotation + (Math.random() > 0.5 ? 360 : -360),
-                    x: `${item.x + (Math.random() * 10 - 5)}vw`,
-                  }}
-                  transition={{
-                    duration: 2.5 + Math.random() * 1.5,
-                    ease: [0.1, 0.4, 0.8, 0.9],
-                    delay: item.id * 0.04,
-                  }}
-                  className="fixed pointer-events-none z-50"
-                  style={{
-                    color: item.type === 'emoji' ? 'inherit' : 
-                           `hsl(${210 + Math.random() * 40}, ${70 + Math.random() * 20}%, ${65 + Math.random() * 15}%)`,
-                    textShadow: '0 0 8px rgba(59, 130, 246, 0.5)',
-                    fontSize: item.type === 'emoji' ? '2.5rem' : '2rem',
-                    fontWeight: 'bold',
-                  }}
-                >
-                  {item.type === 'emoji' ? 
-                    [currentLetter.objectEmoji, '🚀', '⭐', '🛸', '👨‍🚀'][Math.floor(Math.random() * 5)] : 
-                    currentLetter.char}
-                </motion.div>
-              ))}
-            </>
-          )}
-        </AnimatePresence>
-      </main>
-    </div>
+        );
+      }}
+    </WorksheetTracker>
   );
 };
 
