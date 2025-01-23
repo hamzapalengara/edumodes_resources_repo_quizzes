@@ -1,10 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { DndProvider, useDrag, useDrop } from 'react-dnd';
 import { TouchBackend } from 'react-dnd-touch-backend';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import type { DragSourceMonitor, DropTargetMonitor } from 'react-dnd';
 import WorksheetHeader from '../../../components/shared/layout/Header/WorksheetHeader';
 import TouchContainer from '../../../components/shared/layout/Container/TouchContainer';
+import WorksheetTracker, { WorksheetSummary } from '../../../components/shared/WorksheetTracker';
 
 // Types for our items and categories
 interface Item {
@@ -155,11 +156,11 @@ const speak = (text: string) => {
 // Main worksheet component
 const SortingWorksheet = () => {
   const [level, setLevel] = useState(1);
-  const [score, setScore] = useState(0);
   const [items, setItems] = useState<Item[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [showSuccess, setShowSuccess] = useState(false);
   const [matchedItemsMap, setMatchedItemsMap] = useState<Record<string, Item[]>>({});
+  const markCorrectRef = useRef<(() => void) | null>(null);
 
   // Initialize level data
   useEffect(() => {
@@ -212,7 +213,11 @@ const SortingWorksheet = () => {
       // Play success feedback and update score
       playSuccessSound();
       speak("Great job! That's correct!");
-      setScore(prev => prev + 10); // Add 10 points for each correct match
+      
+      // Use WorksheetTracker's markCorrect
+      if (markCorrectRef.current) {
+        markCorrectRef.current();
+      }
 
       // Check if level is complete
       const isLevelComplete = updatedItems.every(item => {
@@ -242,83 +247,98 @@ const SortingWorksheet = () => {
   const isTouchDevice = 'ontouchstart' in window;
 
   return (
-    <DndProvider backend={isTouchDevice ? TouchBackend : HTML5Backend}>
-      <div className="min-h-screen bg-gradient-to-br from-violet-50 via-fuchsia-50 to-pink-50">
-        <WorksheetHeader />
+    <WorksheetTracker 
+      totalQuestions={12} // 4 items per level * 3 levels
+      pointsPerQuestion={10}
+      onSummaryGenerated={(summary: WorksheetSummary) => {
+        console.log('Sorting Game Summary:', summary);
+      }}
+    >
+      {({ score, maxScore, markCorrect }) => {
+        // Store markCorrect function in ref for use in callbacks
+        markCorrectRef.current = markCorrect;
         
-        <TouchContainer>
-          <div className="w-full md:max-w-5xl md:mx-auto p-4 md:p-6">
-            <div className="bg-white/90 backdrop-blur-xl rounded-2xl border border-violet-100 p-6 shadow-lg">
-              {/* Title Section */}
-              <div className="text-center mb-8">
-                <h1 className="text-3xl font-bold text-violet-800 mb-2">
-                  Fun Toy Sorting and Matching Game
-                </h1>
-                <p className="text-violet-600 text-lg">
-                  Let's sort and match toys by their {level === 1 ? 'colors' : level === 2 ? 'shapes' : 'sizes'}!
-                </p>
-              </div>
+        return (
+          <DndProvider backend={isTouchDevice ? TouchBackend : HTML5Backend}>
+            <div className="min-h-screen bg-gradient-to-br from-violet-50 via-fuchsia-50 to-pink-50">
+              <WorksheetHeader />
+              
+              <TouchContainer>
+                <div className="w-full md:max-w-5xl md:mx-auto p-4 md:p-6">
+                  <div className="bg-white/90 backdrop-blur-xl rounded-2xl border border-violet-100 p-6 shadow-lg">
+                    {/* Title Section */}
+                    <div className="text-center mb-8">
+                      <h1 className="text-3xl font-bold text-violet-800 mb-2">
+                        Fun Toy Sorting and Matching Game
+                      </h1>
+                      <p className="text-violet-600 text-lg">
+                        Let's sort and match toys by their {level === 1 ? 'colors' : level === 2 ? 'shapes' : 'sizes'}!
+                      </p>
+                    </div>
 
-              {/* Level and Score */}
-              <div className="flex items-center justify-between mb-6">
-                <div className="text-xl font-bold text-violet-900 px-5 py-2 rounded-lg bg-violet-50 border border-violet-200">
-                  Level {level}
+                    {/* Level and Score */}
+                    <div className="flex items-center justify-between mb-6">
+                      <div className="text-xl font-bold text-violet-900 px-5 py-2 rounded-lg bg-violet-50 border border-violet-200">
+                        Level {level}
+                      </div>
+                      <div className="text-xl font-bold text-emerald-900 px-5 py-2 rounded-lg bg-emerald-50 border border-emerald-200">
+                        Score: {score} / {maxScore}
+                      </div>
+                    </div>
+
+                    {/* Instructions */}
+                    <div className="text-center text-lg font-semibold mb-6 p-4 rounded-xl bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white shadow-md">
+                      {level === 1 && "Drag and sort by colors! 🎨"}
+                      {level === 2 && "Match the shapes! ⭕"}
+                      {level === 3 && "Group by size! 🐘"}
+                    </div>
+
+                    {/* Items to sort - At the top */}
+                    <div className="bg-gradient-to-b from-violet-50 to-fuchsia-50 p-6 rounded-xl border border-violet-100 mb-8">
+                      <div className="flex flex-wrap gap-4 justify-center">
+                        {items.map(item => (
+                          <DraggableItem
+                            key={item.id}
+                            item={item}
+                            isMatched={item.categoryId !== undefined}
+                            onClick={() => {}}
+                          />
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Categories - At the bottom */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      {categories.map(category => (
+                        <CategoryBox
+                          key={category.id}
+                          category={category}
+                          onDrop={(itemId) => handleDrop(itemId, category.id)}
+                          matchedItems={matchedItemsMap[category.id] || []}
+                        />
+                      ))}
+                    </div>
+                  </div>
                 </div>
-                <div className="text-xl font-bold text-emerald-900 px-5 py-2 rounded-lg bg-emerald-50 border border-emerald-200">
-                  Score: {score}
+              </TouchContainer>
+
+              {/* Success overlay */}
+              {showSuccess && (
+                <div className="fixed inset-0 bg-black/30 backdrop-blur-md flex items-center justify-center">
+                  <div className="bg-white/90 backdrop-blur-xl p-8 rounded-2xl text-center transform scale-110 animate-bounce-in 
+                                border border-violet-200 shadow-xl">
+                    <div className="text-5xl mb-4">🎉</div>
+                    <div className="text-2xl font-bold text-violet-900">
+                      {level < 3 ? "Ready for the next challenge?" : "You're a sorting superstar! 🏆"}
+                    </div>
+                  </div>
                 </div>
-              </div>
-
-              {/* Instructions */}
-              <div className="text-center text-lg font-semibold mb-6 p-4 rounded-xl bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white shadow-md">
-                {level === 1 && "Drag and sort by colors! 🎨"}
-                {level === 2 && "Match the shapes! ⭕"}
-                {level === 3 && "Group by size! 🐘"}
-              </div>
-
-              {/* Items to sort - At the top */}
-              <div className="bg-gradient-to-b from-violet-50 to-fuchsia-50 p-6 rounded-xl border border-violet-100 mb-8">
-                <div className="flex flex-wrap gap-4 justify-center">
-                  {items.map(item => (
-                    <DraggableItem
-                      key={item.id}
-                      item={item}
-                      isMatched={item.categoryId !== undefined}
-                      onClick={() => {}}
-                    />
-                  ))}
-                </div>
-              </div>
-
-              {/* Categories - At the bottom */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {categories.map(category => (
-                  <CategoryBox
-                    key={category.id}
-                    category={category}
-                    onDrop={(itemId) => handleDrop(itemId, category.id)}
-                    matchedItems={matchedItemsMap[category.id] || []}
-                  />
-                ))}
-              </div>
+              )}
             </div>
-          </div>
-        </TouchContainer>
-
-        {/* Success overlay */}
-        {showSuccess && (
-          <div className="fixed inset-0 bg-black/30 backdrop-blur-md flex items-center justify-center">
-            <div className="bg-white/90 backdrop-blur-xl p-8 rounded-2xl text-center transform scale-110 animate-bounce-in 
-                          border border-violet-200 shadow-xl">
-              <div className="text-5xl mb-4">🎉</div>
-              <div className="text-2xl font-bold text-violet-900">
-                {level < 3 ? "Ready for the next challenge?" : "You're a sorting superstar! 🏆"}
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
-    </DndProvider>
+          </DndProvider>
+        );
+      }}
+    </WorksheetTracker>
   );
 };
 
