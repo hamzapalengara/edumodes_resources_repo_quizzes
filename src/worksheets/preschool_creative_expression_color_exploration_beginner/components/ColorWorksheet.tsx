@@ -1,6 +1,8 @@
 import React, { useState, useCallback } from 'react';
 import WorksheetHeader from '../../../components/shared/layout/Header/WorksheetHeader';
 import confetti from 'canvas-confetti/dist/confetti.module.mjs';
+import WorksheetTracker, { WorksheetSummary } from '../../../components/shared/WorksheetTracker';
+import ScoreDisplay from '../../../components/shared/ScoreDisplay';
 
 interface ColorButton {
   name: string;
@@ -81,7 +83,6 @@ const colors: ColorButton[] = [
 const ColorWorksheet: React.FC = () => {
   const [selectedColor, setSelectedColor] = useState<string | null>(null);
   const [currentQuestion, setCurrentQuestion] = useState(0);
-  const [score, setScore] = useState(0);
   const [showAnswer, setShowAnswer] = useState(false);
   const [isProcessingAnswer, setIsProcessingAnswer] = useState(false);
 
@@ -152,66 +153,6 @@ const ColorWorksheet: React.FC = () => {
     }
   }, [speakColor, triggerConfetti]);
 
-  const handleAnswerClick = useCallback((selectedAnswer: ColorButton, event: React.MouseEvent<HTMLButtonElement>) => {
-    if (isProcessingAnswer) return;
-    setIsProcessingAnswer(true);
-    
-    const isCorrect = selectedAnswer.name === questions[currentQuestion].correctColor.name;
-    setShowAnswer(true);
-    
-    if (isCorrect) {
-      setScore(prev => prev + 1);
-      
-      const button = event.currentTarget;
-      const rect = button.getBoundingClientRect();
-      const x = (rect.left + rect.width / 2) / window.innerWidth;
-      const y = (rect.top + rect.height / 2) / window.innerHeight;
-      
-      triggerConfetti(selectedAnswer.color, { x, y });
-      
-      // First say "Correct!"
-      const correctUtterance = new SpeechSynthesisUtterance("Correct!");
-      correctUtterance.rate = 0.8;
-      correctUtterance.pitch = 1.2;
-      
-      // Then say the color name after a short delay
-      const colorUtterance = new SpeechSynthesisUtterance(`This is ${selectedAnswer.name}`);
-      colorUtterance.rate = 0.8;
-      colorUtterance.pitch = 1.2;
-      
-      window.speechSynthesis.speak(correctUtterance);
-      setTimeout(() => {
-        window.speechSynthesis.speak(colorUtterance);
-      }, 1000);
-    } else {
-      speakColor('Try again!');
-    }
-
-    setTimeout(() => {
-      setShowAnswer(false);
-      setIsProcessingAnswer(false);
-      if (isCorrect) {
-        if (currentQuestion < questions.length - 1) {
-          setCurrentQuestion(prev => prev + 1);
-        } else {
-          // Game completed!
-          const completionUtterance = new SpeechSynthesisUtterance("Congratulations! You've completed the color game!");
-          completionUtterance.rate = 0.8;
-          completionUtterance.pitch = 1.2;
-          window.speechSynthesis.speak(completionUtterance);
-          
-          // Trigger multi-color confetti celebration
-          const colors = ['#FF0000', '#FF7F00', '#FFFF00', '#00FF00', '#0000FF', '#4B0082', '#8F00FF'];
-          colors.forEach((color, index) => {
-            setTimeout(() => {
-              triggerConfetti(color, { x: 0.5, y: 0.5 });
-            }, index * 300);
-          });
-        }
-      }
-    }, 2000);
-  }, [currentQuestion, questions, triggerConfetti, speakColor, isProcessingAnswer]);
-
   const renderActivity1 = () => (
     <>
       <h1 className="text-4xl font-bold text-center mb-4">
@@ -279,63 +220,67 @@ const ColorWorksheet: React.FC = () => {
     </>
   );
 
-  const renderActivity2 = () => {
+  const renderActivity2 = ({ handleAnswerClick, currentQuestion, showAnswer, questions, score }: {
+    handleAnswerClick: (selectedAnswer: ColorButton, event: React.MouseEvent<HTMLButtonElement>) => void;
+    currentQuestion: number;
+    showAnswer: boolean;
+    questions: { correctColor: ColorButton; options: ColorButton[] }[];
+    score: number;
+  }) => {
     const currentQ = questions[currentQuestion];
     return (
       <>
-        <h1 className="text-4xl font-bold text-center mb-4">
-          Color Detective Game 🔍
-        </h1>
+        <h2 className="text-3xl font-bold text-center mb-6">
+          Color Recognition Challenge! 🎯
+        </h2>
 
-        <div className="bg-blue-50 rounded-xl p-6 mb-8 shadow-inner">
-          <h2 className="text-2xl font-bold text-blue-800 mb-3">
-            How to Play 🎯
-          </h2>
-          <ul className="text-lg text-blue-700 space-y-2">
-            <li>1. Look at the color emoji shown below 👀</li>
-            <li>2. Find its matching color from the choices 🎨</li>
-            <li>3. Click the correct color to score points! 🎯</li>
-            <li>4. Listen for the color name when you're right! 🔊</li>
-          </ul>
+        <div className="bg-purple-50 rounded-xl p-6 mb-8 shadow-inner">
+          <h3 className="text-2xl font-bold text-purple-800 mb-3">
+            Find the Color! 🔍
+          </h3>
+          <p className="text-lg text-purple-700">
+            Look at the example and click the matching color below!
+          </p>
         </div>
 
-        <div className="bg-white rounded-3xl p-8 shadow-lg">
-          <div className="text-center mb-6">
-            <div className="text-9xl mb-4 animate-bounce">
-              {currentQ.correctColor.emoji}
-            </div>
-            <p className="text-2xl text-gray-600">
-              What color matches this? 🤔
+        <div className="bg-white rounded-xl p-6 shadow-lg border-2 border-purple-100">
+          {/* Current color to find */}
+          <div className="mb-8 text-center">
+            <div className="text-6xl mb-4">{currentQ.correctColor.emoji}</div>
+            <p className="text-xl text-purple-800">
+              Which color matches this {currentQ.correctColor.examples[0]}?
             </p>
           </div>
 
+          {/* Color options */}
           <div className="grid grid-cols-2 gap-4">
             {currentQ.options.map((option, index) => (
               <button
                 key={index}
-                className={`
-                  p-6 rounded-2xl shadow-lg
-                  transition-all duration-300
-                  ${option.bgClass} ${option.hoverClass}
-                  transform hover:scale-105
-                  disabled:opacity-50 disabled:cursor-not-allowed
-                  flex items-center justify-center
-                `}
                 onClick={(e) => handleAnswerClick(option, e)}
-                disabled={showAnswer || isProcessingAnswer}
+                className={`
+                  p-6 rounded-xl text-white font-bold text-xl
+                  transition-all duration-300 transform
+                  ${option.bgClass} ${option.hoverClass}
+                  ${showAnswer && option.name === currentQ.correctColor.name ? 'ring-4 ring-green-400 scale-105' : ''}
+                  ${showAnswer && option.name !== currentQ.correctColor.name ? 'opacity-50' : ''}
+                  active:scale-95
+                `}
+                disabled={showAnswer}
               >
-                <span className="text-2xl font-bold text-white drop-shadow-lg">
-                  {option.name}
-                </span>
+                <div className="flex flex-col items-center space-y-2">
+                  <span className="text-4xl">{option.emoji}</span>
+                  <span>{option.name}</span>
+                </div>
               </button>
             ))}
           </div>
 
           <div className="mt-8 text-center">
-            <p className="text-2xl font-bold text-blue-800">
-              Score: {score} / {questions.length} ⭐
-            </p>
-            {currentQuestion === questions.length - 1 && score === questions.length && (
+            <div className="text-2xl font-bold text-blue-800">
+              Progress: {currentQuestion + 1} / {questions.length} 🎯
+            </div>
+            {currentQuestion === questions.length - 1 && score === questions.length * 10 && (
               <div className="mt-4 p-4 bg-green-100 rounded-xl">
                 <p className="text-2xl font-bold text-green-800">
                   🎉 Congratulations! You've completed the color game! 🎉
@@ -349,23 +294,94 @@ const ColorWorksheet: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white">
-      <WorksheetHeader />
-      
-      <main className="container mx-auto px-4 py-8">
-        <div className="max-w-4xl mx-auto space-y-16">
-          {/* Activity 1 */}
-          <section>
-            {renderActivity1()}
-          </section>
+    <WorksheetTracker
+      totalQuestions={questions.length}
+      pointsPerQuestion={10}
+      onSummaryGenerated={(summary: WorksheetSummary) => {
+        console.log('Color Worksheet Summary:', summary);
+      }}
+    >
+      {({ score, markCorrect, markIncorrect, markAttempted }) => {
+        const handleAnswerClick = useCallback((selectedAnswer: ColorButton, event: React.MouseEvent<HTMLButtonElement>) => {
+          if (isProcessingAnswer) return;
+          setIsProcessingAnswer(true);
+          
+          markAttempted();
+          
+          const isCorrect = selectedAnswer.name === questions[currentQuestion].correctColor.name;
+          setShowAnswer(true);
+          
+          if (isCorrect) {
+            markCorrect();
+            
+            const button = event.currentTarget;
+            const rect = button.getBoundingClientRect();
+            const x = (rect.left + rect.width / 2) / window.innerWidth;
+            const y = (rect.top + rect.height / 2) / window.innerHeight;
+            
+            triggerConfetti(selectedAnswer.color, { x, y });
+            
+            // First say "Correct!"
+            const correctUtterance = new SpeechSynthesisUtterance("Correct!");
+            correctUtterance.rate = 0.8;
+            correctUtterance.pitch = 1.2;
+            
+            // Then say the color name after a short delay
+            const colorUtterance = new SpeechSynthesisUtterance(`This is ${selectedAnswer.name}`);
+            colorUtterance.rate = 0.8;
+            colorUtterance.pitch = 1.2;
+            
+            window.speechSynthesis.speak(correctUtterance);
+            setTimeout(() => {
+              window.speechSynthesis.speak(colorUtterance);
+            }, 1000);
+          } else {
+            markIncorrect();
+            speakColor('Try again!');
+          }
 
-          {/* Activity 2 */}
-          <section>
-            {renderActivity2()}
-          </section>
-        </div>
-      </main>
-    </div>
+          setTimeout(() => {
+            setShowAnswer(false);
+            setIsProcessingAnswer(false);
+            if (isCorrect) {
+              if (currentQuestion < questions.length - 1) {
+                setCurrentQuestion(prev => prev + 1);
+              } else {
+                // Game completed!
+                const completionUtterance = new SpeechSynthesisUtterance("Congratulations! You've completed the color game!");
+                completionUtterance.rate = 0.8;
+                completionUtterance.pitch = 1.2;
+                window.speechSynthesis.speak(completionUtterance);
+                
+                // Trigger multi-color confetti celebration
+                const colors = ['#FF0000', '#FF7F00', '#FFFF00', '#00FF00', '#0000FF', '#4B0082', '#8F00FF'];
+                colors.forEach((color, index) => {
+                  setTimeout(() => {
+                    triggerConfetti(color, { x: 0.5, y: 0.5 });
+                  }, index * 300);
+                });
+              }
+            }
+          }, 2000);
+        }, [currentQuestion, questions, triggerConfetti, speakColor, isProcessingAnswer, markAttempted, markCorrect, markIncorrect]);
+
+        return (
+          <div className="min-h-screen bg-white">
+            <WorksheetHeader />
+            <div className="container mx-auto px-4 py-8">
+              {/* Score Display */}
+              <div className="mb-8">
+                <ScoreDisplay score={score/10} totalQuestions={questions.length} />
+              </div>
+              
+              {/* Rest of your existing UI components */}
+              {renderActivity1()}
+              {renderActivity2({ handleAnswerClick, currentQuestion, showAnswer, questions, score })}
+            </div>
+          </div>
+        );
+      }}
+    </WorksheetTracker>
   );
 };
 
