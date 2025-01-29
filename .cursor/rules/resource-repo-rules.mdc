@@ -1,0 +1,162 @@
+---
+description: 
+globs: 
+---
+
+# Your rule content
+
+- You can @ files here
+- You can use markdown but dont have to
+Lets create a new worksheet
+
+# Worksheet Set Creation Request, Mobile first design approach, No horizontal margins/padding and no horizontal 
+scrolling should be there
+
+Wait for the following information
+1. Grade level (e.g., grade2, preschool)
+2. Subject (e.g., mathematics, art)
+3. Topic (e.g., multiplication, color_mixing)
+4. Difficulty level (beginner, intermediate, advanced)
+5. Learning objectives and key features
+
+# Development Steps
+
+1. Create folder structure:
+   [grade]_[subject]_[topic]_[difficulty]/
+
+2. File Structure:
+   [grade]_[subject]_[topic]_[difficulty]/
+   ├── components/
+   │   ├── [Prefix]Worksheet.tsx
+   │   ├── [Prefix]AnswerKey.tsx
+   │   ├── [Prefix]Tips.tsx
+   │   └── [Prefix]Thumbnail.tsx
+   ├── entries/
+   │   └── index.tsx
+   ├── title.txt
+   └── description.txt
+
+2. Create and implement components in this order:
+   a. Main Worksheet ([Prefix]Worksheet.tsx)
+      - Mobile first design approach, No horizontal margins/padding on root containers
+      - Core interactive learning content
+      - Student input and feedback mechanisms
+      - Score tracking
+      - Visual aids and examples
+      
+
+   **Important**: After creating the worksheet component, verify and proceed after confirmation:
+      - All interactive features work as expected
+      - Score tracking is accurate
+      - Feedback mechanisms are clear
+      - Visual aids are appropriate
+      - Content matches learning objectives
+   Only proceed to other components after confirming worksheet functionality.
+
+   b. Answer Key ([Prefix]AnswerKey.tsx)
+      - Mobile first design approach, No horizontal margins/padding on root containers
+      - Solutions with explanations
+      - Step-by-step guidance
+      - Visual demonstrations
+
+   c. Tips ([Prefix]Tips.tsx)
+      - Mobile first design approach, No horizontal margins/padding on root containers
+      - Specific strategies for this worksheet
+      - Problem-solving guidance
+      - Quick reference aids
+
+   d. Title and Description
+      - title.txt (max 6 words, clear and descriptive)
+      - description.txt (clear summary of content and objectives)
+
+   e. Thumbnail ([Prefix]Thumbnail.tsx)
+      - Outer container: 500x375px (4:3 ratio)
+      - Inner container: 420x240px (centered)
+      - Background: gradient from pink to yellow
+      - Inner content: white container with shadow
+      - System font stack
+
+3. Create entry point (entries/index.tsx):
+   ```typescript
+   import '../../../index.css';
+   import { lazy, Suspense } from 'react';
+   import { createRoot } from 'react-dom/client';
+
+   // Lazy load components
+   const Worksheet = lazy(() => import('../components/[Prefix]Worksheet'));
+   const AnswerKey = lazy(() => import('../components/[Prefix]AnswerKey'));
+   const Tips = lazy(() => import('../components/[Prefix]Tips'));
+   const Thumbnail = lazy(() => import('../components/[Prefix]Thumbnail'));
+
+   // Required type declaration for worksheet view
+   declare global {
+     interface Window {
+       WORKSHEET_VIEW: 'worksheet' | 'answer_key' | 'tips' | 'thumbnail';
+       WORKSHEET_METADATA: {
+         id: string;
+         title: string;
+         description: string;
+         metadata: {
+           grade: string;
+           subject: string;
+           topic: string;
+           difficulty: string;
+         };
+       };
+     }
+   }
+
+   const view = window.WORKSHEET_VIEW || 'worksheet';
+
+   const App = () => {
+     const getComponent = () => {
+       switch (view) {
+         case 'worksheet': return <Worksheet />;
+         case 'answer_key': return <AnswerKey />;
+         case 'tips': return <Tips />;
+         case 'thumbnail': return <Thumbnail />;
+         default: return <Worksheet />;
+       }
+     };
+
+     return (
+       <Suspense fallback={<div>Loading...</div>}>
+         {getComponent()}
+       </Suspense>
+     );
+   };
+
+   // Initialize React
+   const rootElement = document.getElementById('root');
+   if (rootElement) {
+     const root = createRoot(rootElement);
+     root.render(<App />);
+   }
+   ```
+   - React initialization and view switching
+   - Component lazy loading
+   - Global type declarations for WORKSHEET_VIEW and WORKSHEET_METADATA
+   - Proper error boundaries with Suspense
+   - Default view fallback to worksheet
+   - No manual HTML file creation needed (auto-generated during build)
+
+
+
+4. Build and Verify:
+   ```powershell
+   $env:WORKSHEET_ID="[grade]_[subject]_[topic]_[difficulty]"; npm run build
+   ```
+   - Verify all HTML files load correctly
+   - Check all interactive features
+   - Test responsive design
+   - Validate thumbnail generation
+
+# Technical Requirements
+
+- Use Tailwind CSS for styling
+- Implement lazy loading
+- Follow TypeScript best practices
+- Ensure mobile responsiveness
+- Include proper error handling
+- Add loading states
+- Implement proper accessibility
