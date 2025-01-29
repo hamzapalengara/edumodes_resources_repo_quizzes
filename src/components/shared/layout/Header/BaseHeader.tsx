@@ -4,15 +4,42 @@ interface BaseHeaderProps {
   gradient?: string;  // Tailwind gradient classes
   children?: React.ReactNode;
   themeColor?: string; // Theme color for meta tag
+  size?: 'small' | 'default' | 'large';
 }
+
+const sizeClasses = {
+  small: {
+    e: 'text-xl',
+    du: 'text-lg',
+    modes: 'text-lg'
+  },
+  default: {
+    e: 'text-3xl',
+    du: 'text-2xl',
+    modes: 'text-2xl'
+  },
+  large: {
+    e: 'text-4xl',
+    du: 'text-3xl',
+    modes: 'text-3xl'
+  }
+};
 
 const BaseHeader: React.FC<BaseHeaderProps> = ({ 
   gradient = '', 
   children,
-  themeColor = '#EC4899' // Default pink theme
+  themeColor = '#EC4899', // Default pink theme
+  size = 'small'
 }) => {
   // Update theme color meta tag
   React.useEffect(() => {
+    // Add Fredoka One font
+    const link = document.createElement('link');
+    link.href = 'https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap';
+    link.rel = 'stylesheet';
+    document.head.appendChild(link);
+
+    // Add theme color
     const metaThemeColor = document.querySelector('meta[name="theme-color"]');
     if (metaThemeColor) {
       metaThemeColor.setAttribute('content', themeColor);
@@ -22,6 +49,11 @@ const BaseHeader: React.FC<BaseHeaderProps> = ({
       meta.content = themeColor;
       document.head.appendChild(meta);
     }
+
+    // Cleanup
+    return () => {
+      document.head.removeChild(link);
+    };
   }, [themeColor]);
 
   return (
@@ -31,15 +63,39 @@ const BaseHeader: React.FC<BaseHeaderProps> = ({
           <div className="flex items-center justify-between">
             {/* Logo Section - Always visible */}
             <div className="flex flex-col min-w-0">
-              <div className="flex items-baseline leading-none">
-                <span className="text-lg sm:text-xl font-black text-[#EC4899]">E</span>
-                <span className="text-base sm:text-lg font-black text-sky-500 -ml-0.5">d</span>
-                <span className="text-base sm:text-lg font-black text-indigo-500">u</span>
-                <span className="text-lg sm:text-xl font-black text-[#EAB308] ml-0.5">M</span>
-                <span className="text-base sm:text-lg font-black text-emerald-500 -ml-0.5">o</span>
-                <span className="text-base sm:text-lg font-black text-teal-500">d</span>
-                <span className="text-base sm:text-lg font-black text-green-500">e</span>
-                <span className="text-base sm:text-lg font-black text-teal-500">s</span>
+              <div className="flex items-baseline group">
+                {/* E */}
+                <div className="inline-block transform-origin-center">
+                  <span 
+                    className={`${sizeClasses[size].e} font-['Fredoka_One'] tracking-[0.5px] text-primary-500
+                    [-webkit-text-stroke:1.5px_#2C3E50] [paint-order:stroke_fill]
+                    group-hover:scale-105 transition-all duration-300 ease-out hover:-rotate-6`}
+                  >
+                    E
+                  </span>
+                </div>
+                
+                {/* du */}
+                <div className="inline-block transform-origin-center">
+                  <span 
+                    className={`${sizeClasses[size].du} font-['Fredoka_One'] tracking-[0.5px] text-primary-500
+                    [-webkit-text-stroke:1.5px_#2C3E50] [paint-order:stroke_fill]
+                    group-hover:scale-105 transition-all duration-300 ease-out hover:rotate-3`}
+                  >
+                    du
+                  </span>
+                </div>
+                
+                {/* Modes */}
+                <div className="inline-block transform-origin-center ml-0.5">
+                  <span 
+                    className={`${sizeClasses[size].modes} font-['Fredoka_One'] tracking-[0.5px] text-secondary-500
+                    [-webkit-text-stroke:1.5px_#2C3E50] [paint-order:stroke_fill]
+                    group-hover:scale-105 transition-all duration-300 ease-out hover:rotate-6`}
+                  >
+                    Modes
+                  </span>
+                </div>
               </div>
               <a 
                 href="https://www.edumodes.com" 
