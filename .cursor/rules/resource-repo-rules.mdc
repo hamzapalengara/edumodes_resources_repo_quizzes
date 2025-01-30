@@ -3,10 +3,6 @@ description:
 globs: 
 ---
 
-# Your rule content
-
-- You can @ files here
-- You can use markdown but dont have to
 Lets create a new worksheet
 
 # Worksheet Set Creation Request, Mobile first design approach, No horizontal margins/padding and no horizontal 
