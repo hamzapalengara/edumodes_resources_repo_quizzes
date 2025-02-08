@@ -6,6 +6,10 @@ globs:
 description: 
 globs: 
 ---
+---
+description: 
+globs: 
+---
 
 Lets create a new worksheet
 
@@ -35,6 +39,75 @@ Wait for the following information
    │   └── index.tsx
    ├── title.txt
    └── description.txt
+
+# Technical Requirements
+
+- Use Tailwind CSS for styling
+- Implement lazy loading
+- Follow TypeScript best practices
+- Ensure mobile responsiveness
+- Include proper error handling
+- Add loading states
+- Implement proper accessibility
+
+# Score Tracking Integration Guidelines
+
+1. WorksheetTracker Integration:
+   - Import both WorksheetTracker and WorksheetSummary type:
+     ```typescript
+     import WorksheetTracker, { WorksheetSummary } from '../../../components/shared/WorksheetTracker';
+     ```
+   - Wrap entire worksheet content in WorksheetTracker:
+     ```typescript
+     <WorksheetTracker
+       totalQuestions={number_of_questions}
+       pointsPerQuestion={points_per_question}
+       onSummaryGenerated={handleSummaryGenerated}
+     >
+       {({ addPoints, markCorrect, markAttempted, markIncorrect, score }) => (
+         // Worksheet content
+       )}
+     </WorksheetTracker>
+     ```
+   - Implement summary handler:
+     ```typescript
+     const handleSummaryGenerated = (summary: WorksheetSummary) => {
+       console.log('Worksheet Summary:', summary);
+     };
+     ```
+   - Use tracker functions appropriately:
+     - `markAttempted()`: When user attempts a question
+     - `markCorrect()`: When answer is correct
+     - `markIncorrect()`: When answer is wrong
+     - `addPoints()`: When points should be awarded
+     - Use `score` from tracker for display
+
+2. ScoreDisplay Integration:
+   - Import ScoreDisplay:
+     ```typescript
+     import ScoreDisplay from '../../../components/shared/ScoreDisplay';
+     ```
+   - Place at top of worksheet content:
+     ```typescript
+     <div className="bg-blue-50 p-4 shadow-md mb-4">
+       <div className="max-w-4xl mx-auto">
+         <ScoreDisplay 
+           score={score}
+           totalQuestions={total_possible_score}
+         />
+       </div>
+     </div>
+     ```
+   - Score display should match WorksheetTracker configuration:
+     - If pointsPerQuestion is 10, totalQuestions in ScoreDisplay should be (number_of_questions * 10)
+     - Use raw score from WorksheetTracker, don't multiply it
+
+3. Important Considerations:
+   - Always use WorksheetTracker's score state, don't maintain separate score state
+   - Call markAttempted() before checking if answer is correct
+   - Call both addPoints() and markCorrect() when answer is correct
+   - Ensure totalQuestions and pointsPerQuestion align with desired total score
+   - Test score tracking thoroughly before proceeding to other components
 
 2. Create and implement components in this order:
    a. Main Worksheet ([Prefix]Worksheet.tsx)
@@ -150,13 +223,3 @@ Wait for the following information
    - Check all interactive features
    - Test responsive design
    - Validate thumbnail generation
-
-# Technical Requirements
-
-- Use Tailwind CSS for styling
-- Implement lazy loading
-- Follow TypeScript best practices
-- Ensure mobile responsiveness
-- Include proper error handling
-- Add loading states
-- Implement proper accessibility
