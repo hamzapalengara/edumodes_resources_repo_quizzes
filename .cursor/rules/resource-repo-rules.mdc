@@ -12,6 +12,22 @@ Lets create a new worksheet
 # Worksheet Set Creation Request, Mobile first design approach, No horizontal margins/padding and no horizontal 
 scrolling should be there
 
+# CRITICAL MOBILE DESIGN REQUIREMENTS
+1. Full Width Utilization (MANDATORY):
+   - Root containers MUST use full available width (px-0)
+   - NO horizontal margins/padding on mobile views
+   - NO horizontal scrolling allowed
+   - Grid cells MUST use w-full and aspect-square
+   - Content MUST scale to fit screen width
+   - Use responsive classes: p-2 md:p-4, gap-0.5 md:gap-1, etc.
+
+2. Mobile-First Implementation:
+   - Start with mobile layout first
+   - Add desktop improvements with md: prefix
+   - Test on smallest supported screen first
+   - Ensure touch targets are adequately sized
+   - Optimize spacing for small screens
+
 Wait for the following information
 1. Grade level (e.g., grade2, preschool)
 2. Subject (e.g., mathematics, art)
@@ -45,6 +61,43 @@ Wait for the following information
 - Include proper error handling
 - Add loading states
 - Implement proper accessibility
+
+# Mobile Layout Guidelines (CRITICAL)
+1. Root Container Rules:
+   ```typescript
+   // ❌ WRONG - Has horizontal margins
+   <div className="p-4 max-w-4xl mx-auto">
+   
+   // ✅ CORRECT - No horizontal margins on mobile
+   <div className="px-0 md:p-4 max-w-4xl mx-auto">
+   ```
+
+2. Grid Layout Rules:
+   ```typescript
+   // ❌ WRONG - Fixed width cells
+   <div className="w-10 h-10">
+   
+   // ✅ CORRECT - Responsive cells
+   <div className="w-full aspect-square">
+   ```
+
+3. Spacing Rules:
+   ```typescript
+   // ❌ WRONG - Large gaps on mobile
+   <div className="gap-4 grid-cols-8">
+   
+   // ✅ CORRECT - Responsive gaps
+   <div className="gap-0.5 md:gap-4 grid-cols-8">
+   ```
+
+4. Content Container Rules:
+   ```typescript
+   // ❌ WRONG - Fixed padding
+   <div className="p-6 bg-white">
+   
+   // ✅ CORRECT - Responsive padding
+   <div className="p-2 md:p-6 bg-white">
+   ```
 
 # Score Tracking Integration Guidelines
 

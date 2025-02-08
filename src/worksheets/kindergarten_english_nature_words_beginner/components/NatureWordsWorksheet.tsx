@@ -7,40 +7,40 @@ import confetti from 'canvas-confetti';
 // Word colors for found words
 const WORD_COLORS = [
   'bg-green-200',   // Light green
-  'bg-blue-200',    // Light blue
-  'bg-purple-200',  // Light purple
-  'bg-pink-200',    // Light pink
-  'bg-yellow-200',  // Light yellow
-  'bg-orange-200',  // Light orange
-  'bg-red-200',     // Light red
-  'bg-indigo-200',  // Light indigo
+  'bg-emerald-200', // Light emerald
   'bg-teal-200',    // Light teal
-  'bg-cyan-200'     // Light cyan
+  'bg-lime-200',    // Light lime
+  'bg-cyan-200',    // Light cyan
+  'bg-sky-200',     // Light sky
+  'bg-blue-200',    // Light blue
+  'bg-indigo-200',  // Light indigo
+  'bg-violet-200',  // Light violet
+  'bg-purple-200'   // Light purple
 ];
 
-// Word search puzzle data
+// Word search puzzle data with nature theme
 const PUZZLE_DATA = {
   grid: [
-    ['T', 'H', 'E', 'Y', 'S', 'W', 'M', 'P'],
-    ['G', 'O', 'N', 'I', 'L', 'B', 'A', 'L'],
-    ['I', 'X', 'T', 'H', 'I', 'S', 'K', 'A'],
-    ['F', 'P', 'W', 'A', 'N', 'T', 'E', 'Y'],
-    ['T', 'N', 'H', 'V', 'E', 'O', 'P', 'R'],
-    ['S', 'A', 'A', 'E', 'C', 'O', 'M', 'E'],
-    ['H', 'E', 'T', 'R', 'E', 'E', 'N', 'D'],
-    ['C', 'A', 'R', 'R', 'O', 'T', 'O', 'W']
+    ['T', 'R', 'E', 'E', 'S', 'W', 'B', 'P'],
+    ['G', 'R', 'O', 'W', 'L', 'B', 'I', 'L'],
+    ['L', 'X', 'B', 'I', 'R', 'D', 'K', 'A'],
+    ['F', 'P', 'L', 'N', 'S', 'T', 'E', 'N'],
+    ['L', 'E', 'A', 'F', 'E', 'W', 'P', 'T'],
+    ['O', 'A', 'N', 'E', 'E', 'D', 'M', 'S'],
+    ['W', 'K', 'T', 'S', 'T', 'E', 'M', 'D'],
+    ['S', 'E', 'E', 'D', 'S', 'T', 'O', 'W']
   ],
   words: [
-    { word: 'THEY', image: '👥', hint: 'More than one person' },
-    { word: 'THIS', image: '👆', hint: 'Pointing to something near' },
-    { word: 'WANT', image: '🙏', hint: 'To wish for something' },
-    { word: 'COME', image: '🚶', hint: 'To move towards someone' },
-    { word: 'HAVE', image: '✋', hint: 'To own or possess' },
-    { word: 'PLAY', image: '🎮', hint: 'To have fun with toys or games' },
-    { word: 'MAKE', image: '🛠️', hint: 'To create something' },
-    { word: 'TREE', image: '🌳', hint: 'A tall plant with leaves' },
-    { word: 'GIFT', image: '🎁', hint: 'Something you receive on special days' },
-    { word: 'NOW', image: '⌚', hint: 'At this moment' }
+    { word: 'TREES', image: '🌳', hint: 'Tall plants with leaves' },
+    { word: 'GROW', image: '🌱', hint: 'To get bigger' },
+    { word: 'BIRD', image: '🐦', hint: 'A flying animal' },
+    { word: 'LEAF', image: '🍃', hint: 'A green part of a plant' },
+    { word: 'SEED', image: '🌰', hint: 'Plants grow from this' },
+    { word: 'FLOW', image: '💧', hint: 'How water moves' },
+    { word: 'NEED', image: '❤️', hint: 'Must have something' },
+    { word: 'PLANT', image: '🌿', hint: 'A living thing that grows' },
+    { word: 'DEW', image: '💦', hint: 'Morning water drops' },
+    { word: 'STEM', image: '🎋', hint: 'Part of a plant that holds it up' }
   ]
 };
 
@@ -48,7 +48,7 @@ interface Cell {
   letter: string;
   selected: boolean;
   isPartOfWord: boolean;
-  wordIndex?: number; // Add wordIndex to track which word the cell belongs to
+  wordIndex?: number;
 }
 
 interface Position {
@@ -56,21 +56,19 @@ interface Position {
   col: number;
 }
 
-// Add this utility function at the top
+// Speech synthesis utility
 const speak = (text: string) => {
-  // Cancel any ongoing speech
   if ('speechSynthesis' in window) {
     window.speechSynthesis.cancel();
   }
   
-  // Create and speak new utterance
   const utterance = new SpeechSynthesisUtterance(text);
   utterance.rate = 1.0;
   utterance.pitch = 1.0;
   window.speechSynthesis.speak(utterance);
 };
 
-const SightWordsWorksheet: React.FC = () => {
+const NatureWordsWorksheet: React.FC = () => {
   const [grid, setGrid] = useState<Cell[][]>([]);
   const [selectedCells, setSelectedCells] = useState<Position[]>([]);
   const [foundWords, setFoundWords] = useState<Set<string>>(new Set());
@@ -92,11 +90,14 @@ const SightWordsWorksheet: React.FC = () => {
     );
     setGrid(initialGrid);
 
-    // Add touch-action: none to the container
     if (gridContainerRef.current) {
       gridContainerRef.current.style.touchAction = 'none';
     }
   }, []);
+
+  const handleSummaryGenerated = (summary: WorksheetSummary) => {
+    console.log('Worksheet Summary:', summary);
+  };
 
   const getCellPosition = (event: React.TouchEvent | React.MouseEvent): Position | null => {
     const element = event.target as HTMLElement;
@@ -122,7 +123,6 @@ const SightWordsWorksheet: React.FC = () => {
     setSelectedCells([position]);
     setCurrentWord(grid[row][col].letter);
 
-    // Prevent scrolling on touch devices
     if ('touches' in event) {
       event.preventDefault();
     }
@@ -134,7 +134,6 @@ const SightWordsWorksheet: React.FC = () => {
     let position: Position | null = null;
 
     if ('touches' in event) {
-      // Touch event
       const touch = event.touches[0];
       const element = document.elementFromPoint(touch.clientX, touch.clientY);
       if (element) {
@@ -148,7 +147,6 @@ const SightWordsWorksheet: React.FC = () => {
       }
       event.preventDefault();
     } else {
-      // Mouse event
       position = getCellPosition(event);
     }
 
@@ -170,10 +168,6 @@ const SightWordsWorksheet: React.FC = () => {
     setCurrentWord(word);
   };
 
-  const handleSummaryGenerated = (summary: WorksheetSummary) => {
-    console.log('Worksheet Summary:', summary);
-  };
-
   return (
     <WorksheetTracker
       totalQuestions={10}
@@ -181,10 +175,10 @@ const SightWordsWorksheet: React.FC = () => {
       onSummaryGenerated={handleSummaryGenerated}
     >
       {({ markCorrect, markAttempted, score }) => (
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-gradient-to-b from-green-50 to-emerald-100">
           <WorksheetHeader />
           
-          <div className="bg-blue-50 p-4 shadow-md mb-4">
+          <div className="bg-green-50 p-4 shadow-md mb-4">
             <div className="max-w-4xl mx-auto">
               <ScoreDisplay 
                 score={score}
@@ -195,8 +189,8 @@ const SightWordsWorksheet: React.FC = () => {
           
           <div className="px-0 md:p-4 max-w-4xl mx-auto">
             <div className="bg-white rounded-lg shadow-lg p-2 md:p-6">
-              <h1 className="text-2xl font-bold text-center mb-4 md:mb-6 text-blue-600">
-                Find the Sight Words
+              <h1 className="text-2xl font-bold text-center mb-4 md:mb-6 text-emerald-600">
+                Find Nature Words
               </h1>
 
               <div className="flex flex-col md:flex-row gap-4 md:gap-8">
@@ -204,7 +198,7 @@ const SightWordsWorksheet: React.FC = () => {
                 <div className="flex-1">
                   <div 
                     ref={gridContainerRef}
-                    className="grid grid-cols-8 gap-0.5 md:gap-1 bg-blue-50 p-2 md:p-4 rounded-lg select-none"
+                    className="grid grid-cols-8 gap-0.5 md:gap-1 bg-emerald-50 p-2 md:p-4 rounded-lg select-none"
                   >
                     {grid.map((row, rowIndex) => (
                       <React.Fragment key={rowIndex}>
@@ -217,7 +211,7 @@ const SightWordsWorksheet: React.FC = () => {
                               w-full aspect-square flex items-center justify-center
                               text-base md:text-lg font-bold rounded cursor-pointer
                               ${cell.isPartOfWord ? WORD_COLORS[cell.wordIndex!] : cell.selected ? 'bg-yellow-100' : 'bg-white'}
-                              border md:border-2 border-blue-200 transition-colors
+                              border md:border-2 border-emerald-200 transition-colors
                               select-none
                             `}
                             onMouseDown={handleStart}
@@ -247,11 +241,12 @@ const SightWordsWorksheet: React.FC = () => {
                                 // Mark as correct (this will add points)
                                 markCorrect();
                                 
-                                // Trigger confetti for each found word
+                                // Trigger confetti with nature colors
                                 confetti({
                                   particleCount: 100,
                                   spread: 70,
-                                  origin: { y: 0.6 }
+                                  origin: { y: 0.6 },
+                                  colors: ['#059669', '#10B981', '#34D399', '#6EE7B7', '#A7F3D0']
                                 });
 
                                 // Speak the word and its hint
@@ -300,11 +295,12 @@ const SightWordsWorksheet: React.FC = () => {
                                 // Mark as correct (this will add points)
                                 markCorrect();
                                 
-                                // Trigger confetti for each found word
+                                // Trigger confetti with nature colors
                                 confetti({
                                   particleCount: 100,
                                   spread: 70,
-                                  origin: { y: 0.6 }
+                                  origin: { y: 0.6 },
+                                  colors: ['#059669', '#10B981', '#34D399', '#6EE7B7', '#A7F3D0']
                                 });
 
                                 // Speak the word and its hint
@@ -337,9 +333,9 @@ const SightWordsWorksheet: React.FC = () => {
 
                 {/* Word List */}
                 <div className="md:w-64">
-                  <div className="bg-gray-50 p-4 rounded-lg">
-                    <h2 className="text-lg font-semibold mb-4 text-gray-700">
-                      Words to Find:
+                  <div className="bg-emerald-50 p-4 rounded-lg">
+                    <h2 className="text-lg font-semibold mb-4 text-emerald-700">
+                      Nature Words to Find:
                     </h2>
                     <div className="space-y-4">
                       {PUZZLE_DATA.words.map(({ word, image, hint }, index) => (
@@ -355,7 +351,7 @@ const SightWordsWorksheet: React.FC = () => {
                             <div className={`font-bold ${foundWords.has(word) ? 'line-through' : ''}`}>
                               {word}
                             </div>
-                            <div className="text-sm text-gray-600">{hint}</div>
+                            <div className="text-sm text-emerald-600">{hint}</div>
                           </div>
                         </div>
                       ))}
@@ -366,8 +362,8 @@ const SightWordsWorksheet: React.FC = () => {
 
               {foundWords.size === PUZZLE_DATA.words.length && (
                 <div className="mt-8 text-center">
-                  <h2 className="text-2xl font-bold text-green-600">
-                    🎉 Congratulations! You've found all the words! 🎉
+                  <h2 className="text-2xl font-bold text-emerald-600">
+                    🌿 Congratulations! You've found all the nature words! 🌱
                   </h2>
                 </div>
               )}
@@ -379,4 +375,4 @@ const SightWordsWorksheet: React.FC = () => {
   );
 };
 
-export default SightWordsWorksheet; 
+export default NatureWordsWorksheet; 
