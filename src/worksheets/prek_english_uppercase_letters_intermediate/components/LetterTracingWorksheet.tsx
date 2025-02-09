@@ -129,19 +129,6 @@ export const LETTERS: Letter[] = [
   }
 ];
 
-interface WorksheetTrackerRenderProps {
-  score: number;
-  maxScore: number;
-  addPoints: (points?: number) => void;
-  markAttempted: () => void;
-  markCorrect: () => void;
-  markIncorrect: () => void;
-  questionsAttempted: number;
-  correctAnswers: number;
-  incorrectAnswers: number;
-  reset: () => void;
-}
-
 const LetterTracingWorksheet: React.FC = () => {
   const [currentLetterIndex, setCurrentLetterIndex] = useState(0);
   const [currentPathIndex, setCurrentPathIndex] = useState(0);
@@ -195,7 +182,7 @@ const LetterTracingWorksheet: React.FC = () => {
   // Modified handleLetterComplete to use WorksheetTracker
   const handleLetterComplete = useCallback((markCorrect: () => void) => {
     setShowSuccess(true);
-    markCorrect(); // Use WorksheetTracker's markCorrect instead of local score
+    markCorrect(); // Use WorksheetTracker's markCorrect
     
     // Generate confetti items
     const items: ConfettiItem[] = [];
@@ -214,13 +201,8 @@ const LetterTracingWorksheet: React.FC = () => {
     setTimeout(() => {
       setShowSuccess(false);
       setConfetti([]);
-      if (currentLetterIndex < LETTERS.length - 1) {
-        setCurrentLetterIndex(prev => prev + 1);
-        setCurrentPathIndex(0);
-        setFilledPaths([]);
-      }
     }, 3000);
-  }, [currentLetterIndex]);
+  }, []);
 
   // Modified handlePathComplete to use WorksheetTracker's markCorrect
   const handlePathComplete = useCallback((markCorrect: () => void) => {
@@ -334,6 +316,7 @@ const LetterTracingWorksheet: React.FC = () => {
     setIsDrawing(false);
   };
 
+  // Add navigation functions
   const handlePrevLetter = () => {
     if (currentLetterIndex > 0) {
       setCurrentLetterIndex(prev => prev - 1);
@@ -341,7 +324,6 @@ const LetterTracingWorksheet: React.FC = () => {
       setFilledPaths([]);
       setProgress(0);
       setLastPoint(0);
-      setPathLengths({});
     }
   };
 
@@ -352,7 +334,6 @@ const LetterTracingWorksheet: React.FC = () => {
       setFilledPaths([]);
       setProgress(0);
       setLastPoint(0);
-      setPathLengths({});
     }
   };
 
@@ -361,8 +342,6 @@ const LetterTracingWorksheet: React.FC = () => {
     setFilledPaths([]);
     setProgress(0);
     setLastPoint(0);
-    setPathLengths({});
-    speak(`Let's try the letter ${currentLetter.char} again`);
   };
 
   return (
@@ -370,17 +349,17 @@ const LetterTracingWorksheet: React.FC = () => {
       totalQuestions={LETTERS.length}
       pointsPerQuestion={10}
       onSummaryGenerated={(summary: WorksheetSummary) => {
-        console.log('Ocean Letter Adventure Summary:', summary);
+        console.log('Letter Tracing Adventure Summary:', summary);
       }}
     >
-      {({ score, maxScore, markCorrect, reset }: WorksheetTrackerRenderProps) => {
-        // Store markCorrect in ref
+      {({ score, maxScore, markCorrect }) => {
+        // Store markCorrect function in ref for use in callbacks
         markCorrectRef.current = markCorrect;
-
+        
         return (
-          <div className="min-h-screen bg-gradient-to-b from-[#0B486B] via-[#1B8B9C] to-[#0B486B] bg-[url('/ocean-bg.png')] bg-cover bg-center bg-blend-soft-light">
+          <div className="min-h-screen bg-gradient-to-b from-blue-50 via-blue-100 to-cyan-200 bg-[url('/ocean-bg.png')] bg-cover bg-center bg-blend-soft-light">
             {/* Header */}
-            <header className="bg-gradient-to-b from-blue-800/90 to-blue-700/90 shadow-lg backdrop-blur-sm">
+            <header className="bg-gradient-to-b from-cyan-800/90 to-cyan-700/90 shadow-lg backdrop-blur-sm">
               <div className="py-4 px-4">
                 <div className="flex items-center justify-between">
                   {/* Edumodes Logo */}
@@ -399,8 +378,8 @@ const LetterTracingWorksheet: React.FC = () => {
                   </div>
                   <div className="flex items-center space-x-2">
                     <div className="flex items-center mr-4">
-                      <span className="text-yellow-300 text-lg">⭐</span>
-                      <span className="text-white ml-1">Score: {score}/{maxScore}</span>
+                      <span className="text-yellow-300 text-lg">🌟</span>
+                      <span className="text-white ml-1">Score: {score} / {maxScore}</span>
                     </div>
                     <div className="flex items-center">
                       <span className="text-white">Letter {currentLetterIndex + 1} of {LETTERS.length}</span>
@@ -413,27 +392,35 @@ const LetterTracingWorksheet: React.FC = () => {
 
             {/* Title Section */}
             <div className="bg-white/80 backdrop-blur-sm shadow-md">
-              <h1 className="text-2xl md:text-3xl font-bold text-blue-800 text-center py-3">
-                Letter Tracing Adventure
+              <h1 className="text-2xl md:text-3xl font-bold text-cyan-800 text-center py-3">
+                Letter Tracing Adventure: Ocean Friends
               </h1>
             </div>
 
             {/* Main Content */}
             <main className="p-4">
               {/* Letter Display */}
-              <div className="bg-white/90 backdrop-blur-sm rounded-xl shadow-xl p-6 mb-4 border-2 border-blue-100/50">
+              <div className="bg-white/90 backdrop-blur-sm rounded-xl shadow-xl p-6 mb-4 border-2 border-cyan-100/50">
                 <div className="text-center mb-4">
-                  <span className="text-6xl font-bold text-blue-800">{currentLetter.char}</span>
+                  <span className="text-6xl font-bold text-cyan-800">{currentLetter.char}</span>
                 </div>
                 <div className="text-center mb-2">
                   <span className="text-3xl filter drop-shadow-md">{currentLetter.objectEmoji}</span>
-                  <span className="ml-3 text-blue-800 font-medium">{currentLetter.char} is for {currentLetter.object}</span>
+                  <span className="ml-3 text-cyan-800 font-medium">{currentLetter.char} is for {currentLetter.object}</span>
                 </div>
               </div>
 
               {/* Tracing Area */}
-              <div className="bg-white/90 backdrop-blur-sm rounded-xl shadow-xl p-6 border-2 border-blue-100/50">
+              <div className="bg-white/90 backdrop-blur-sm rounded-xl shadow-xl p-6 border-2 border-cyan-100/50">
                 <div className="relative aspect-square max-w-[400px] mx-auto">
+                  {/* Try Again button */}
+                  <button
+                    onClick={handleTryAgain}
+                    className="absolute -top-2 -right-2 z-10 bg-white rounded-full w-12 h-12 flex items-center justify-center shadow-md border border-cyan-100 text-2xl text-cyan-600 hover:bg-cyan-50 active:bg-cyan-100"
+                  >
+                    🔄
+                  </button>
+
                   <svg
                     ref={svgRef}
                     viewBox={currentLetter.viewBox}
@@ -503,33 +490,27 @@ const LetterTracingWorksheet: React.FC = () => {
                     Follow the gray lines with your finger or mouse to trace each part of the letter
                   </div>
 
-                  {/* Navigation and Try Again Buttons */}
-                  <div className="mt-6 flex items-center justify-center gap-4">
+                  {/* Navigation Buttons */}
+                  <div className="flex justify-center gap-4 mt-6">
                     <button
                       onClick={handlePrevLetter}
                       disabled={currentLetterIndex === 0}
-                      className="w-12 h-12 rounded-full bg-black/50 text-gray-200 text-xl font-medium hover:bg-black/70 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center border border-teal-700"
-                      aria-label="Previous Letter"
+                      className={`px-6 py-3 rounded-lg shadow-md font-semibold text-white transition-colors
+                        ${currentLetterIndex === 0 
+                          ? 'bg-gray-400 cursor-not-allowed' 
+                          : 'bg-cyan-600 hover:bg-cyan-700 active:bg-cyan-800'}`}
                     >
-                      ⬅️
-                    </button>
-                    <button
-                      onClick={() => {
-                        handleTryAgain();
-                        reset(); // Reset WorksheetTracker state when trying again
-                      }}
-                      className="w-12 h-12 rounded-full bg-teal-600/50 text-white text-xl font-medium hover:bg-teal-600/70 flex items-center justify-center border border-teal-500/50"
-                      aria-label="Try Again"
-                    >
-                      🔄
+                      ← Previous Letter
                     </button>
                     <button
                       onClick={handleNextLetter}
                       disabled={currentLetterIndex === LETTERS.length - 1}
-                      className="w-12 h-12 rounded-full bg-black/50 text-gray-200 text-xl font-medium hover:bg-black/70 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center border border-teal-700"
-                      aria-label="Next Letter"
+                      className={`px-6 py-3 rounded-lg shadow-md font-semibold text-white transition-colors
+                        ${currentLetterIndex === LETTERS.length - 1 
+                          ? 'bg-gray-400 cursor-not-allowed' 
+                          : 'bg-cyan-600 hover:bg-cyan-700 active:bg-cyan-800'}`}
                     >
-                      ➡️
+                      Next Letter →
                     </button>
                   </div>
                 </div>
