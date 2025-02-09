@@ -202,6 +202,49 @@ Wait for the following information
       - Inner content: white container with shadow
       - System font stack
 
+# Title, Description, and Thumbnail Guidelines
+
+1. Title Guidelines:
+   - Maximum 6 words
+   - Must clearly indicate the content range (e.g., "Match Numbers 1-5 with Fruits")
+   - Focus on the actual learning content
+   - DO NOT include grade level or difficulty
+   - Avoid generic excitement words (e.g., "fun", "exciting")
+   - Examples:
+     ```
+     ❌ WRONG - "Fun PreK Number Matching Game"
+     ❌ WRONG - "Beginner Fruit Counting Activity"
+     ✅ CORRECT - "Match Numbers 1-5 with Fruits"
+     ✅ CORRECT - "Count and Add Numbers 1-10"
+     ```
+
+2. Description Guidelines:
+   - Clear summary of content and learning objectives
+   - Specify the exact number/content range being covered
+   - Focus on what the child will learn/practice
+   - DO NOT mention grade level or difficulty
+   - Examples:
+     ```
+     ❌ WRONG - "A fun PreK level game for learning numbers"
+     ✅ CORRECT - "Match numbers 1-5 with their corresponding fruit quantities. Practice counting, number recognition, and one-to-one correspondence through interactive matching."
+     ```
+
+3. Thumbnail Guidelines:
+   - Show actual content range (e.g., "1 → 5")
+   - Display example of the activity
+   - Use clear, descriptive heading
+   - Include visual preview of learning elements
+   - DO NOT include grade/difficulty level
+   - Examples:
+     ```typescript
+     // ❌ WRONG
+     <h1>PreK Number Matching</h1>
+     
+     // ✅ CORRECT
+     <h1>Numbers 1-5 Matching</h1>
+     <div>1 → 5</div>
+     ```
+
 3. Create entry point (entries/index.tsx):
    ```typescript
    import '../../../index.css';
