@@ -42,8 +42,7 @@ const NumberOrderingWorksheet: React.FC = () => {
   }, [speak]);
 
   // Handle drag start
-  const handleDragStart = useCallback((number: number, markAttempted: () => void) => {
-    markAttempted();
+  const handleDragStart = useCallback((number: number) => {
     speak(number.toString());
     setSelectedNumber(number);
   }, [speak]);
@@ -66,6 +65,7 @@ const NumberOrderingWorksheet: React.FC = () => {
   const handleDragEnd = useCallback((
     number: number,
     markCorrect: () => void,
+    markAttempted: () => void,
     _: MouseEvent | TouchEvent | PointerEvent,
     info: { point: { x: number, y: number } }
   ) => {
@@ -74,6 +74,9 @@ const NumberOrderingWorksheet: React.FC = () => {
     // Check each target box
     targetRefs.current.forEach((ref, index) => {
       if (ref && !placedNumbers[index] && isCloseToTarget(x, y, ref)) {
+        // Mark attempt only when actually placing a number
+        markAttempted();
+        
         // Place number in this box
         const newPlacedNumbers = [...placedNumbers];
         newPlacedNumbers[index] = number;
@@ -174,8 +177,8 @@ const NumberOrderingWorksheet: React.FC = () => {
                         key={num}
                         drag={!gameCompleted && !placedNumbers.includes(num)}
                         dragSnapToOrigin
-                        onDragStart={() => handleDragStart(num, markAttempted)}
-                        onDragEnd={(e, info) => handleDragEnd(num, markCorrect, e, info)}
+                        onDragStart={() => handleDragStart(num)}
+                        onDragEnd={(e, info) => handleDragEnd(num, markCorrect, markAttempted, e, info)}
                         className={`w-20 h-20 rounded-xl shadow-md flex items-center justify-center
                           bg-white border-2 border-purple-200
                           ${!gameCompleted && !placedNumbers.includes(num) ? 'cursor-grab active:cursor-grabbing' : ''}
