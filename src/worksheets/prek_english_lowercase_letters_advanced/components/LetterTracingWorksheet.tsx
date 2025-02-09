@@ -49,7 +49,10 @@ export const LETTERS: Letter[] = [
     objectEmoji: '🍪',
     viewBox: '0 0 240 200',
     paths: [
-      { id: 'diagonal', d: 'M40 40L60 140L100 60L140 140L160 40', order: 1 }
+      { id: 'first_down', d: 'M40 40L60 140', order: 1 },
+      { id: 'first_up', d: 'M60 140L100 60', order: 2 },
+      { id: 'second_down', d: 'M100 60L140 140', order: 3 },
+      { id: 'second_up', d: 'M140 140L160 40', order: 4 }
     ]
   },
   {
