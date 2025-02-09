@@ -89,19 +89,6 @@ export const LETTERS: Letter[] = [
   }
 ];
 
-interface WorksheetTrackerRenderProps {
-  score: number;
-  maxScore: number;
-  addPoints: (points?: number) => void;
-  markAttempted: () => void;
-  markCorrect: () => void;
-  markIncorrect: () => void;
-  questionsAttempted: number;
-  correctAnswers: number;
-  incorrectAnswers: number;
-  reset: () => void;
-}
-
 const LetterTracingWorksheet: React.FC = () => {
   const [currentLetterIndex, setCurrentLetterIndex] = useState(0);
   const [currentPathIndex, setCurrentPathIndex] = useState(0);
@@ -204,9 +191,9 @@ const LetterTracingWorksheet: React.FC = () => {
   // Modified handleLetterComplete to use WorksheetTracker
   const handleLetterComplete = useCallback((markCorrect: () => void) => {
     setShowSuccess(true);
-    markCorrect(); // Use WorksheetTracker's markCorrect instead of local score
+    markCorrect(); // Use WorksheetTracker's markCorrect
     
-    // Generate more confetti items with varied speeds and sizes
+    // Generate confetti items with varied speeds and sizes
     const items: ConfettiItem[] = [];
     for (let i = 0; i < 40; i++) {
       items.push({
@@ -220,16 +207,12 @@ const LetterTracingWorksheet: React.FC = () => {
     }
     setConfetti(items);
 
+    // Remove auto-progression
     setTimeout(() => {
       setShowSuccess(false);
       setConfetti([]);
-      if (currentLetterIndex < LETTERS.length - 1) {
-        setCurrentLetterIndex(prev => prev + 1);
-        setCurrentPathIndex(0);
-        setFilledPaths([]);
-      }
     }, 3000);
-  }, [currentLetterIndex]);
+  }, []);
 
   // Modified handlePathComplete to use WorksheetTracker's markCorrect
   const handlePathComplete = useCallback((markCorrect: () => void) => {
@@ -305,6 +288,7 @@ const LetterTracingWorksheet: React.FC = () => {
     speak(`Let's trace the letter ${currentLetter.char}`);
   }, [currentLetterIndex]);
 
+  // Add navigation functions
   const handlePrevLetter = () => {
     if (currentLetterIndex > 0) {
       setCurrentLetterIndex(prev => prev - 1);
@@ -312,7 +296,8 @@ const LetterTracingWorksheet: React.FC = () => {
       setFilledPaths([]);
       setProgress(0);
       setLastPoint(0);
-      setPathLengths({});
+      setShowSuccess(false);
+      setConfetti([]);
     }
   };
 
@@ -323,7 +308,8 @@ const LetterTracingWorksheet: React.FC = () => {
       setFilledPaths([]);
       setProgress(0);
       setLastPoint(0);
-      setPathLengths({});
+      setShowSuccess(false);
+      setConfetti([]);
     }
   };
 
@@ -332,26 +318,25 @@ const LetterTracingWorksheet: React.FC = () => {
     setFilledPaths([]);
     setProgress(0);
     setLastPoint(0);
-    setPathLengths({});
-    speak(`Let's try the letter ${currentLetter.char} again`);
+    setShowSuccess(false);
+    setConfetti([]);
   };
 
   return (
-    <WorksheetTracker 
+    <WorksheetTracker
       totalQuestions={LETTERS.length}
       pointsPerQuestion={10}
       onSummaryGenerated={(summary: WorksheetSummary) => {
         console.log('Space Letter Adventure Summary:', summary);
       }}
     >
-      {({ score, maxScore, markCorrect, reset }: WorksheetTrackerRenderProps) => {
-        // Store markCorrect in ref
+      {({ score, maxScore, markCorrect }) => {
         markCorrectRef.current = markCorrect;
-
+        
         return (
-          <div className="min-h-screen bg-gradient-to-b from-[#0B1C48] via-[#1B3B8C] to-[#0B1C48] bg-[url('/space-bg.png')] bg-cover bg-center bg-blend-soft-light">
+          <div className="min-h-screen bg-gradient-to-b from-indigo-900 via-purple-900 to-black bg-[url('/space-bg.png')] bg-cover bg-center bg-blend-soft-light">
             {/* Header */}
-            <header className="bg-gradient-to-b from-black/80 to-gray-900/80 shadow-lg backdrop-blur-sm border-b border-gray-700">
+            <header className="bg-gradient-to-b from-indigo-900/90 to-purple-900/90 shadow-lg backdrop-blur-sm">
               <div className="py-4 px-4">
                 <div className="flex items-center justify-between">
                   {/* Edumodes Logo */}
@@ -366,51 +351,53 @@ const LetterTracingWorksheet: React.FC = () => {
                       <span className="text-base sm:text-lg font-black text-green-500">e</span>
                       <span className="text-base sm:text-lg font-black text-teal-500">s</span>
                     </div>
-                    <a href="https://www.edumodes.com" target="_blank" className="text-[9px] sm:text-[10px] text-gray-400 hover:text-white leading-tight truncate">www.edumodes.com</a>
+                    <a href="https://www.edumodes.com" target="_blank" className="text-[9px] sm:text-[10px] text-gray-300 hover:text-white leading-tight truncate">www.edumodes.com</a>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <div className="flex items-center mr-4">
+                      <span className="text-yellow-300 text-lg">⭐</span>
+                      <span className="text-white ml-1">Score: {score} / {maxScore}</span>
+                    </div>
+                    <div className="flex items-center">
+                      <span className="text-white">Letter {currentLetterIndex + 1} of {LETTERS.length}</span>
+                      <span className="text-lg ml-1">🚀</span>
+                    </div>
                   </div>
                 </div>
               </div>
             </header>
 
             {/* Title Section */}
-            <div className="bg-black/50 backdrop-blur-sm shadow-lg border-b border-gray-700">
-              <h1 className="text-2xl md:text-3xl font-bold text-white text-center py-3 flex items-center justify-center gap-3">
-                <span>🛸</span>
-                <span>Space Letter Adventure</span>
-                <span>👨‍🚀</span>
+            <div className="bg-black/30 backdrop-blur-sm shadow-md">
+              <h1 className="text-2xl md:text-3xl font-bold text-white text-center py-3">
+                Space Letter Adventure: U to Z
               </h1>
-            </div>
-
-            {/* Score and Progress Section - Updated to use WorksheetTracker score */}
-            <div className="bg-black/30 backdrop-blur-sm border-b border-gray-700">
-              <div className="container mx-auto px-4 py-2 flex flex-col sm:flex-row items-center justify-center gap-3">
-                <div className="flex items-center gap-2 bg-black/30 px-4 py-2 rounded-full border border-gray-700">
-                  <span className="text-yellow-300 text-lg">⭐</span>
-                  <span className="text-white font-medium">Score: {score}/{maxScore}</span>
-                </div>
-                <div className="flex items-center gap-2 bg-black/30 px-4 py-2 rounded-full border border-gray-700">
-                  <span className="text-white font-medium">Letter {currentLetterIndex + 1} of {LETTERS.length}</span>
-                  <span className="text-lg">🚀</span>
-                </div>
-              </div>
             </div>
 
             {/* Main Content */}
             <main className="p-4">
               {/* Letter Display */}
-              <div className="bg-black/40 backdrop-blur-sm rounded-xl shadow-xl p-6 mb-4 border-2 border-gray-700">
+              <div className="bg-black/40 backdrop-blur-sm rounded-xl shadow-xl p-6 mb-4 border-2 border-purple-500/20">
                 <div className="text-center mb-4">
-                  <span className="text-6xl font-bold text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.5)]">{currentLetter.char}</span>
+                  <span className="text-6xl font-bold text-white">{currentLetter.char}</span>
                 </div>
                 <div className="text-center mb-2">
                   <span className="text-3xl filter drop-shadow-md">{currentLetter.objectEmoji}</span>
-                  <span className="ml-3 text-gray-200 font-medium">{currentLetter.char} is for {currentLetter.object}</span>
+                  <span className="ml-3 text-white font-medium">{currentLetter.char} is for {currentLetter.object}</span>
                 </div>
               </div>
 
-              {/* Tracing Area - Updated handlePathComplete to use markCorrect */}
-              <div className="bg-black/40 backdrop-blur-sm rounded-xl shadow-xl p-6 border-2 border-gray-700">
+              {/* Tracing Area */}
+              <div className="bg-black/40 backdrop-blur-sm rounded-xl shadow-xl p-6 border-2 border-purple-500/20">
                 <div className="relative aspect-square max-w-[400px] mx-auto">
+                  {/* Try Again button */}
+                  <button
+                    onClick={handleTryAgain}
+                    className="absolute -top-2 -right-2 z-10 bg-indigo-900 rounded-full w-12 h-12 flex items-center justify-center shadow-md border border-purple-500/50 text-2xl text-white hover:bg-indigo-800 active:bg-indigo-700"
+                  >
+                    🔄
+                  </button>
+
                   <svg
                     ref={svgRef}
                     viewBox={currentLetter.viewBox}
@@ -423,7 +410,7 @@ const LetterTracingWorksheet: React.FC = () => {
                     onPointerCancel={handlePointerUp}
                   >
                     {/* Background decoration */}
-                    <circle cx="100" cy="100" r="80" fill="rgba(255, 255, 255, 0.03)" />
+                    <circle cx="100" cy="100" r="80" fill="rgba(167, 139, 250, 0.1)" />
                     
                     {currentLetter.paths.map((path, index) => (
                       <g key={path.id}>
@@ -431,8 +418,8 @@ const LetterTracingWorksheet: React.FC = () => {
                         <path
                           d={path.d}
                           fill="none"
-                          stroke="rgba(255, 255, 255, 0.2)"
-                          strokeWidth="28"
+                          stroke="rgba(139, 92, 246, 0.3)"
+                          strokeWidth="24"
                           strokeLinecap="round"
                           strokeLinejoin="round"
                         />
@@ -443,8 +430,8 @@ const LetterTracingWorksheet: React.FC = () => {
                             ref={index === currentPathIndex ? pathRef : null}
                             d={path.d}
                             fill="none"
-                            stroke="#3B82F6"
-                            strokeWidth="28"
+                            stroke="#8B5CF6"
+                            strokeWidth="24"
                             strokeLinecap="round"
                             strokeLinejoin="round"
                             strokeDasharray={pathLengths[path.id] || 1000}
@@ -453,7 +440,6 @@ const LetterTracingWorksheet: React.FC = () => {
                                 ? (pathLengths[path.id] || 1000) * (1 - progress)
                                 : 0
                             }
-                            className="drop-shadow-[0_0_8px_rgba(59,130,246,0.5)]"
                           />
                         )}
                       </g>
@@ -469,92 +455,86 @@ const LetterTracingWorksheet: React.FC = () => {
                             el.setAttribute('cy', point.y.toString());
                           }
                         }}
-                        r="12"
-                        fill="#3B82F6"
-                        className="animate-pulse drop-shadow-[0_0_8px_rgba(59,130,246,0.5)]"
+                        r="10"
+                        fill="#8B5CF6"
+                        className="animate-pulse"
                       />
                     )}
                   </svg>
 
                   {/* Instructions */}
-                  <div className="mt-4 text-center text-sm text-gray-200 font-medium">
-                    Follow the starlit path with your finger or mouse to trace each part of the letter
+                  <div className="mt-4 text-center text-sm text-purple-300 font-medium">
+                    Follow the glowing paths with your finger or mouse to trace each part of the letter
                   </div>
 
-                  {/* Navigation and Try Again Buttons - Updated to include reset */}
-                  <div className="mt-6 flex items-center justify-center gap-4">
+                  {/* Navigation Buttons */}
+                  <div className="flex justify-center gap-4 mt-6">
                     <button
                       onClick={handlePrevLetter}
                       disabled={currentLetterIndex === 0}
-                      className="w-12 h-12 rounded-full bg-black/50 text-gray-200 text-xl font-medium hover:bg-black/70 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center border border-gray-700"
-                      aria-label="Previous Letter"
+                      className={`px-6 py-3 rounded-lg shadow-md font-semibold text-white transition-colors
+                        ${currentLetterIndex === 0 
+                          ? 'bg-gray-600 cursor-not-allowed' 
+                          : 'bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800'}`}
                     >
-                      ⬅️
-                    </button>
-                    <button
-                      onClick={() => {
-                        handleTryAgain();
-                        reset(); // Reset WorksheetTracker state when trying again
-                      }}
-                      className="w-12 h-12 rounded-full bg-blue-600/50 text-white text-xl font-medium hover:bg-blue-600/70 flex items-center justify-center border border-blue-500/50"
-                      aria-label="Try Again"
-                    >
-                      🔄
+                      ← Previous Letter
                     </button>
                     <button
                       onClick={handleNextLetter}
                       disabled={currentLetterIndex === LETTERS.length - 1}
-                      className="w-12 h-12 rounded-full bg-black/50 text-gray-200 text-xl font-medium hover:bg-black/70 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center border border-gray-700"
-                      aria-label="Next Letter"
+                      className={`px-6 py-3 rounded-lg shadow-md font-semibold text-white transition-colors
+                        ${currentLetterIndex === LETTERS.length - 1 
+                          ? 'bg-gray-600 cursor-not-allowed' 
+                          : 'bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800'}`}
                     >
-                      ➡️
+                      Next Letter →
                     </button>
                   </div>
                 </div>
               </div>
-            </main>
 
-            {/* Success Animation */}
-            <AnimatePresence>
-              {showSuccess && (
-                <>
-                  {/* Space particles */}
-                  {confetti.map((item) => (
-                    <motion.div
-                      key={item.id}
-                      initial={{
-                        x: `${item.x}vw`,
-                        y: `${item.y}vh`,
-                        rotate: item.rotation,
-                        scale: item.scale,
-                      }}
-                      animate={{
-                        y: '120vh',
-                        rotate: item.rotation + (Math.random() > 0.5 ? 360 : -360),
-                        x: `${item.x + (Math.random() * 10 - 5)}vw`,
-                      }}
-                      transition={{
-                        duration: 2.5 + Math.random() * 1.5,
-                        ease: [0.1, 0.4, 0.8, 0.9],
-                        delay: item.id * 0.04,
-                      }}
-                      className="fixed pointer-events-none z-50"
-                      style={{
-                        color: item.type === 'emoji' ? 'inherit' : 
-                               `hsl(${210 + Math.random() * 40}, ${70 + Math.random() * 20}%, ${65 + Math.random() * 15}%)`,
-                        textShadow: '0 0 8px rgba(59, 130, 246, 0.5)',
-                        fontSize: item.type === 'emoji' ? '2.5rem' : '2rem',
-                        fontWeight: 'bold',
-                      }}
-                    >
-                      {item.type === 'emoji' ? 
-                        [currentLetter.objectEmoji, '🚀', '⭐', '🛸', '👨‍🚀'][Math.floor(Math.random() * 5)] : 
-                        currentLetter.char}
-                    </motion.div>
-                  ))}
-                </>
-              )}
-            </AnimatePresence>
+              {/* Success Animation */}
+              <AnimatePresence>
+                {showSuccess && (
+                  <>
+                    {/* Space particles */}
+                    {confetti.map((item) => (
+                      <motion.div
+                        key={item.id}
+                        initial={{
+                          x: `${item.x}vw`,
+                          y: `${item.y}vh`,
+                          rotate: item.rotation,
+                          scale: item.scale,
+                        }}
+                        animate={{
+                          y: '120vh',
+                          rotate: item.rotation + (Math.random() > 0.5 ? 360 : -360),
+                          x: `${item.x + (Math.random() * 10 - 5)}vw`,
+                        }}
+                        transition={{
+                          duration: 2.5 + Math.random() * 1.5,
+                          ease: [0.1, 0.4, 0.8, 0.9],
+                          delay: item.id * 0.04,
+                        }}
+                        className="fixed pointer-events-none z-50"
+                        style={{
+                          color: item.type === 'emoji' ? 'inherit' : 
+                                 `hsl(${250 + Math.random() * 40}, ${70 + Math.random() * 20}%, ${45 + Math.random() * 15}%)`,
+                          textShadow: '0 0 5px rgba(0,0,0,0.2)',
+                          fontSize: item.type === 'emoji' ? '2.5rem' : '2rem',
+                          fontWeight: 'bold',
+                        }}
+                      >
+                        {item.type === 'emoji' ? 
+                          currentLetter.objectEmoji : 
+                          Math.random() > 0.7 ? '✨' : currentLetter.char}
+                      </motion.div>
+                    ))}
+                  </>
+                )}
+              </AnimatePresence>
+            </main>
           </div>
         );
       }}
