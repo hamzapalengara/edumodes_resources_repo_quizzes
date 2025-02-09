@@ -105,24 +105,31 @@ const AntonymWorksheet: React.FC = () => {
   const [selectedCells, setSelectedCells] = useState<Position[]>([]);
   const [foundWords, setFoundWords] = useState<Set<string>>(new Set());
   const [isDragging, setIsDragging] = useState(false);
+  const [lastTouchPosition, setLastTouchPosition] = useState<Position | null>(null);
 
   // Add ref for touch container
   const gridContainerRef = React.useRef<HTMLDivElement>(null);
 
   // Initialize grid and add touch-action style
   useEffect(() => {
-    setGrid(PUZZLE_DATA.grid.map(row =>
-      row.map(letter => ({
-        letter,
-        selected: false,
-        isPartOfWord: false
-      }))
-    ));
-
     if (gridContainerRef.current) {
       gridContainerRef.current.style.touchAction = 'none';
     }
-  }, []);
+
+    // Add document-level touch end handler
+    const handleDocumentTouchEnd = () => {
+      if (isDragging) {
+        const word = selectedCells.map(cell => grid[cell.row][cell.col].letter).join('');
+        checkWord(word);
+        resetSelection();
+      }
+    };
+
+    document.addEventListener('touchend', handleDocumentTouchEnd);
+    return () => {
+      document.removeEventListener('touchend', handleDocumentTouchEnd);
+    };
+  }, [isDragging, selectedCells, grid]);
 
   const handleSummaryGenerated = (summary: WorksheetSummary) => {
     console.log('Worksheet Summary:', summary);
@@ -144,6 +151,7 @@ const AntonymWorksheet: React.FC = () => {
 
     const { row, col } = position;
     setIsDragging(true);
+    setLastTouchPosition(position);
 
     const newGrid = [...grid];
     newGrid[row][col].selected = true;
@@ -161,6 +169,7 @@ const AntonymWorksheet: React.FC = () => {
     let position: Position | null = null;
 
     if ('touches' in event) {
+      event.preventDefault();
       const touch = event.touches[0];
       const element = document.elementFromPoint(touch.clientX, touch.clientY);
       if (element) {
@@ -172,28 +181,31 @@ const AntonymWorksheet: React.FC = () => {
           };
         }
       }
-      event.preventDefault();
     } else {
       position = getCellPosition(event);
     }
 
-    if (!position) {
+    if (!position || (lastTouchPosition?.row === position.row && lastTouchPosition?.col === position.col)) {
       return;
     }
 
+    setLastTouchPosition(position);
     const { row, col } = position;
 
-    const newGrid = [...grid];
-    newGrid[row][col].selected = true;
-    setGrid(newGrid);
-    
-    const newSelectedCells = [...selectedCells, position];
-    setSelectedCells(newSelectedCells);
-    
-    const word = newSelectedCells.map(cell => grid[cell.row][cell.col].letter).join('');
+    // Only add cell if it's not already selected
+    if (!selectedCells.some(cell => cell.row === row && cell.col === col)) {
+      const newGrid = [...grid];
+      newGrid[row][col].selected = true;
+      setGrid(newGrid);
+      
+      const newSelectedCells = [...selectedCells, position];
+      setSelectedCells(newSelectedCells);
+    }
+  };
 
+  const checkWord = (word: string) => {
     const wordPair = PUZZLE_DATA.antonymPairs.find(
-      pair => pair.opposite === word
+      pair => pair.opposite === word || pair.given === word
     );
     
     if (wordPair && !foundWords.has(word)) {
@@ -221,19 +233,22 @@ const AntonymWorksheet: React.FC = () => {
         colors: ['#8B5CF6', '#6366F1', '#3B82F6', '#10B981']
       });
     }
+  };
 
+  const resetSelection = () => {
     // Clear selection
-    const clearedGrid = [...grid];
+    const newGrid = [...grid];
     grid.forEach((row, i) => {
       row.forEach((_, j) => {
-        if (!clearedGrid[i][j].isPartOfWord) {
-          clearedGrid[i][j].selected = false;
+        if (!newGrid[i][j].isPartOfWord) {
+          newGrid[i][j].selected = false;
         }
       });
     });
-    setGrid(clearedGrid);
+    setGrid(newGrid);
     setSelectedCells([]);
     setIsDragging(false);
+    setLastTouchPosition(null);
   };
 
   return (
@@ -277,10 +292,15 @@ const AntonymWorksheet: React.FC = () => {
                                 `}
                                 onMouseDown={handleStart}
                                 onMouseEnter={handleMove}
-                                onMouseUp={handleMove}
+                                onMouseUp={() => {
+                                  if (isDragging) {
+                                    const word = selectedCells.map(cell => grid[cell.row][cell.col].letter).join('');
+                                    checkWord(word);
+                                    resetSelection();
+                                  }
+                                }}
                                 onTouchStart={handleStart}
                                 onTouchMove={handleMove}
-                                onTouchEnd={handleMove}
                               >
                                 {cell.letter}
                               </div>
