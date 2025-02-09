@@ -70,15 +70,13 @@ const WordUnscrambleWorksheet: React.FC = () => {
   const checkAnswer = useCallback((
     markAttempted: () => void,
     markCorrect: () => void,
-    markIncorrect: () => void,
-    addPoints: (points: number) => void
+    markIncorrect: () => void
   ) => {
     if (selectedLetters.length === targetWord.length) {
       markAttempted();
       const attempt = selectedLetters.map(sl => sl.letter).join('');
       if (attempt === targetWord) {
         markCorrect();
-        addPoints(POINTS_PER_QUESTION);
         setIsCorrect(true);
         
         // Play success sound
@@ -139,7 +137,7 @@ const WordUnscrambleWorksheet: React.FC = () => {
         pointsPerQuestion={POINTS_PER_QUESTION}
         onSummaryGenerated={handleSummaryGenerated}
       >
-        {({ addPoints, markCorrect, markAttempted, markIncorrect, score }) => (
+        {({ markCorrect, markAttempted, markIncorrect, score }) => (
           <div className="p-4">
             <div className="max-w-4xl mx-auto">
               {/* Score Display */}
@@ -228,7 +226,7 @@ const WordUnscrambleWorksheet: React.FC = () => {
                         Clear
                       </button>
                       <button
-                        onClick={() => checkAnswer(markAttempted, markCorrect, markIncorrect, addPoints)}
+                        onClick={() => checkAnswer(markAttempted, markCorrect, markIncorrect)}
                         className="px-6 py-3 bg-green-500 text-white rounded-lg text-lg font-bold hover:bg-green-600 active:scale-95 transition-all"
                       >
                         Check
