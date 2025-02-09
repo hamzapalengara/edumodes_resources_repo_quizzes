@@ -6,34 +6,45 @@ import TouchContainer from '../../../components/shared/layout/Container/TouchCon
 import WorksheetHeader from '../../../components/shared/layout/Header/WorksheetHeader';
 import confetti from 'canvas-confetti';
 
-interface FruitCard {
+interface OceanCard {
   id: string;
   number: number;
   emoji: string;
   isMatched: boolean;
+  matchColor?: string;
 }
 
-const FRUITS = ['🍎', '🍌', '🍊', '🍇', '🍓'];
+const OCEAN_ANIMALS = ['🐠', '🐋', '🐟', '🐡', '🦈'];
+const MATCH_COLORS = [
+  'bg-blue-100 border-blue-400',
+  'bg-teal-100 border-teal-400',
+  'bg-cyan-100 border-cyan-400',
+  'bg-sky-100 border-sky-400',
+  'bg-indigo-100 border-indigo-400'
+];
 
 const generateCards = () => {
-  const numbers = Array.from({ length: 5 }, (_, i) => i + 1); // Generate 5 numbers (1-5)
-  const cards: FruitCard[] = [];
+  const numbers = Array.from({ length: 5 }, (_, i) => i + 6); // Generate numbers 6-10
+  const cards: OceanCard[] = [];
   
-  numbers.forEach((num) => {
+  numbers.forEach((num, index) => {
+    const matchColor = MATCH_COLORS[index];
     // Create number card
     cards.push({
       id: `num-${num}`,
       number: num,
       emoji: '',
       isMatched: false,
+      matchColor
     });
     
-    // Create fruit card with same number
+    // Create animal card with same number
     cards.push({
-      id: `fruit-${num}`,
+      id: `animal-${num}`,
       number: num,
-      emoji: FRUITS[num - 1],
+      emoji: OCEAN_ANIMALS[index],
       isMatched: false,
+      matchColor
     });
   });
   
@@ -41,8 +52,8 @@ const generateCards = () => {
   return cards.sort(() => Math.random() - 0.5);
 };
 
-// Helper to render multiple fruits
-const renderFruits = (emoji: string, count: number) => {
+// Helper to render multiple animals
+const renderAnimals = (emoji: string, count: number) => {
   return (
     <div className="grid grid-cols-3 gap-0.5 place-items-center">
       {Array.from({ length: count }, (_, i) => (
@@ -55,8 +66,8 @@ const renderFruits = (emoji: string, count: number) => {
 };
 
 const NumberMatchingWorksheet: React.FC = () => {
-  const [cards, setCards] = useState<FruitCard[]>(generateCards());
-  const [selectedCard, setSelectedCard] = useState<FruitCard | null>(null);
+  const [cards, setCards] = useState<OceanCard[]>(generateCards());
+  const [selectedCard, setSelectedCard] = useState<OceanCard | null>(null);
   const [isChecking, setIsChecking] = useState(false);
   const [completedPairs, setCompletedPairs] = useState<number[]>([]);
 
@@ -76,18 +87,18 @@ const NumberMatchingWorksheet: React.FC = () => {
     setCards(generateCards());
     setSelectedCard(null);
     setCompletedPairs([]);
-    speak("Let's match numbers with fruits!");
+    speak("Let's match numbers with ocean animals!");
   }, [speak]);
 
   // Handle card selection
-  const handleCardClick = useCallback((card: FruitCard, markAttempted: () => void, markCorrect: () => void) => {
+  const handleCardClick = useCallback((card: OceanCard, markAttempted: () => void, markCorrect: () => void) => {
     if (isChecking || card.isMatched) return;
 
     markAttempted();
     
     if (!selectedCard) {
       setSelectedCard(card);
-      speak(card.emoji ? `${card.number} fruits` : `Number ${card.number}`);
+      speak(card.emoji ? `${card.number} animals` : `Number ${card.number}`);
     } else {
       setIsChecking(true);
       
@@ -102,11 +113,12 @@ const NumberMatchingWorksheet: React.FC = () => {
         ));
         setCompletedPairs(prev => [...prev, card.number]);
         
-        // Celebration for each match
+        // Ocean-themed celebration
         confetti({
           particleCount: 100,
           spread: 70,
-          origin: { y: 0.6 }
+          origin: { y: 0.6 },
+          colors: ['#60A5FA', '#2DD4BF', '#67E8F9']
         });
       } else {
         // Wrong match
@@ -127,7 +139,8 @@ const NumberMatchingWorksheet: React.FC = () => {
       confetti({
         particleCount: 200,
         spread: 90,
-        origin: { y: 0.6 }
+        origin: { y: 0.6 },
+        colors: ['#60A5FA', '#2DD4BF', '#67E8F9', '#818CF8']
       });
     }
   }, [completedPairs.length, speak]);
@@ -138,12 +151,12 @@ const NumberMatchingWorksheet: React.FC = () => {
       pointsPerQuestion={10}
     >
       {({ score, markCorrect, markAttempted }) => (
-        <div className="min-h-screen bg-gradient-to-b from-orange-100 to-yellow-100">
+        <div className="min-h-screen bg-gradient-to-b from-blue-100 to-cyan-100">
           {/* Standard Header */}
           <WorksheetHeader />
 
           {/* Score Display */}
-          <div className="bg-orange-100/80 p-4 shadow-md">
+          <div className="bg-blue-100/80 p-4 shadow-md">
             <div className="max-w-4xl mx-auto">
               <ScoreDisplay 
                 score={score}
@@ -156,14 +169,14 @@ const NumberMatchingWorksheet: React.FC = () => {
             <main className="px-0 md:px-4 py-8">
               <div className="max-w-2xl mx-auto">
                 <div className="bg-white rounded-xl shadow-lg p-4 md:p-6">
-                  <h1 className="text-2xl md:text-3xl font-bold text-orange-600 text-center mb-6">
-                    Match Numbers with Fruits! 🍎
+                  <h1 className="text-2xl md:text-3xl font-bold text-blue-600 text-center mb-6">
+                    Match Numbers with Ocean Animals! 🌊
                   </h1>
 
                   {/* Instructions */}
                   <div className="text-center mb-6">
-                    <p className="text-sm md:text-base text-gray-600 bg-orange-50 rounded-full px-4 py-2 inline-block">
-                      Match each number with its fruit group
+                    <p className="text-sm md:text-base text-gray-600 bg-blue-50 rounded-full px-4 py-2 inline-block">
+                      Match each number with its ocean animal group
                     </p>
                   </div>
 
@@ -174,11 +187,11 @@ const NumberMatchingWorksheet: React.FC = () => {
                         key={card.id}
                         onClick={() => handleCardClick(card, markAttempted, markCorrect)}
                         className={`aspect-square rounded-xl shadow-md flex items-center justify-center p-2
-                          ${card.isMatched ? 'bg-green-100' : 'bg-white'}
-                          ${selectedCard?.id === card.id ? 'ring-4 ring-orange-400' : ''}
-                          ${!card.isMatched && !isChecking ? 'hover:bg-orange-50 active:bg-orange-100' : ''}
+                          ${card.isMatched ? card.matchColor : 'bg-white'}
+                          ${selectedCard?.id === card.id ? 'ring-4 ring-blue-400' : ''}
+                          ${!card.isMatched && !isChecking ? 'hover:bg-blue-50 active:bg-blue-100' : ''}
                           transition-all duration-300 ease-in-out
-                          border-2 border-orange-200`}
+                          border-2 ${card.isMatched ? '' : 'border-blue-200'}`}
                         animate={{
                           scale: card.isMatched ? [1, 1.1, 1] : 1,
                           rotate: card.isMatched ? [0, 10, 0] : 0
@@ -186,9 +199,9 @@ const NumberMatchingWorksheet: React.FC = () => {
                         disabled={isChecking || card.isMatched}
                       >
                         {card.emoji ? (
-                          renderFruits(card.emoji, card.number)
+                          renderAnimals(card.emoji, card.number)
                         ) : (
-                          <span className="font-bold text-4xl md:text-5xl text-orange-600">
+                          <span className="font-bold text-4xl md:text-5xl text-blue-600">
                             {card.number}
                           </span>
                         )}
@@ -201,7 +214,7 @@ const NumberMatchingWorksheet: React.FC = () => {
                     <div className="mt-6 text-center">
                       <button
                         onClick={resetGame}
-                        className="px-6 py-2 bg-orange-500 text-white rounded-full hover:bg-orange-600 active:bg-orange-700 transition-colors"
+                        className="px-6 py-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 active:bg-blue-700 transition-colors"
                       >
                         Play Again 🔄
                       </button>
