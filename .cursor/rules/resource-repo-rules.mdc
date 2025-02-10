@@ -130,7 +130,7 @@ Wait for the following information
      ```
    - Use tracker functions appropriately:
      - `markAttempted()`: When user attempts a question
-     - `markCorrect()`: When answer is correct
+     - `markCorrect()`: When answer is correct (MUST check if not already marked correct)
      - `markIncorrect()`: When answer is wrong
      - `addPoints()`: When points should be awarded
      - Use `score` from tracker for display
@@ -151,16 +151,51 @@ Wait for the following information
        </div>
      </div>
      ```
-   - Score display should match WorksheetTracker configuration:
+   - Score display MUST follow these rules:
+     - Score (numerator) MUST NEVER exceed totalQuestions (denominator)
      - If pointsPerQuestion is 10, totalQuestions in ScoreDisplay should be (number_of_questions * 10)
      - Use raw score from WorksheetTracker, don't multiply it
+     - Maintain sync between WorksheetTracker and ScoreDisplay totalQuestions
+     - Track completed questions to prevent double-counting
 
-3. Important Considerations:
+3. Score Tracking Best Practices:
+   - ALWAYS maintain a state to track completed questions:
+     ```typescript
+     const [completedQuestions, setCompletedQuestions] = useState<boolean[]>([]);
+     ```
+   - NEVER call markCorrect() without checking if already completed:
+     ```typescript
+     // ❌ WRONG - No completion check
+     if (isCorrect) {
+       markCorrect();
+     }
+     
+     // ✅ CORRECT - Check completion first
+     if (isCorrect && !completedQuestions[questionIndex]) {
+       markCorrect();
+       const newCompleted = [...completedQuestions];
+       newCompleted[questionIndex] = true;
+       setCompletedQuestions(newCompleted);
+     }
+     ```
+   - ALWAYS call markAttempted() before checking correctness
+   - ENSURE score state matches completed questions count
+   - VALIDATE total questions matches actual question count
+   - TEST score tracking with edge cases:
+     - Multiple attempts on same question
+     - Rapid consecutive attempts
+     - All questions completed
+     - Reset/restart scenarios
+
+4. Important Considerations:
    - Always use WorksheetTracker's score state, don't maintain separate score state
    - Call markAttempted() before checking if answer is correct
    - Call both addPoints() and markCorrect() when answer is correct
    - Ensure totalQuestions and pointsPerQuestion align with desired total score
    - Test score tracking thoroughly before proceeding to other components
+   - Implement proper completion tracking to prevent double-counting
+   - Add safeguards against score exceeding maximum
+   - Handle edge cases and rapid interactions appropriately
 
 2. Create and implement components in this order:
    a. Main Worksheet ([Prefix]Worksheet.tsx)
