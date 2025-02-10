@@ -1,1 +1,0 @@
-A fun and interactive word search puzzle designed for Grade 1 students to learn and practice antonyms (opposite words). Students search for pairs of words with opposite meanings like BIG/SMALL and HOT/COLD. Features include colorful visual hints, audio feedback, and helpful tips. Perfect for building vocabulary and understanding word relationships. 

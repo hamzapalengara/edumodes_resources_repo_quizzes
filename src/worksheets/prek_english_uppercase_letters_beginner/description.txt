@@ -1,1 +1,0 @@
-An interactive letter tracing activity for Pre-K students to learn uppercase letters A through J. Features guided tracing paths, visual examples, and fun animations to make learning engaging. Each letter comes with an associated object and emoji to reinforce learning. 

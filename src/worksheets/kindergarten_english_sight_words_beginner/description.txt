@@ -1,1 +1,0 @@
-An interactive word search puzzle designed for kindergarten students to practice common sight words. Each word is accompanied by a helpful picture clue. Students can highlight words in the grid and receive immediate feedback. This activity helps develop word recognition, visual discrimination, and fine motor skills. 
