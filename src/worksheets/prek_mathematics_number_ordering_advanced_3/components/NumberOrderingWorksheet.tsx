@@ -92,13 +92,14 @@ const NumberOrderingWorksheet: React.FC = () => {
         // Check if correct
         const isCorrect = number === correctOrder[index];
         const newCompletedPositions = [...completedPositions];
-        newCompletedPositions[index] = isCorrect;
-        setCompletedPositions(newCompletedPositions);
-
-        if (isCorrect) {
+        
+        // Only mark correct if this position wasn't already completed
+        if (isCorrect && !completedPositions[index]) {
           speak("Correct!");
           markCorrect();
-          
+          newCompletedPositions[index] = true;
+          setCompletedPositions(newCompletedPositions);
+
           // Check if level completed
           if (newCompletedPositions.every(pos => pos)) {
             if (currentLevel < LEVELS.length - 1) {
@@ -127,12 +128,14 @@ const NumberOrderingWorksheet: React.FC = () => {
             }
           }
         } else {
-          speak("Try again!");
-          setTimeout(() => {
-            const clearedNumbers = [...newPlacedNumbers];
-            clearedNumbers[index] = null;
-            setPlacedNumbers(clearedNumbers);
-          }, 1000);
+          if (!isCorrect) {
+            speak("Try again!");
+            setTimeout(() => {
+              const clearedNumbers = [...newPlacedNumbers];
+              clearedNumbers[index] = null;
+              setPlacedNumbers(clearedNumbers);
+            }, 1000);
+          }
         }
       }
     });
