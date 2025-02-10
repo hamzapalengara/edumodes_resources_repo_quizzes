@@ -138,11 +138,11 @@ const WordUnscrambleWorksheet: React.FC = () => {
         onSummaryGenerated={handleSummaryGenerated}
       >
         {({ markCorrect, markAttempted, markIncorrect, score }) => (
-          <div className="p-4">
-            <div className="max-w-4xl mx-auto">
+          <div className="py-4">
+            <div>
               {/* Score Display */}
-              <div className="bg-blue-50 p-4 shadow-md mb-6">
-                <div className="max-w-4xl mx-auto">
+              <div className="bg-blue-50 py-4 shadow-md mb-6 border-y-2 border-blue-100">
+                <div>
                   <ScoreDisplay 
                     score={score}
                     totalQuestions={TOTAL_QUESTIONS * POINTS_PER_QUESTION}
@@ -159,7 +159,7 @@ const WordUnscrambleWorksheet: React.FC = () => {
               </div>
 
               {/* Game Area */}
-              <div className="bg-white rounded-xl shadow-md p-6">
+              <div className="bg-white shadow-md py-6 border-y-2 border-blue-100">
                 {isComplete ? (
                   <div className="text-center py-8">
                     <h2 className="text-3xl font-bold text-purple-600 mb-4">

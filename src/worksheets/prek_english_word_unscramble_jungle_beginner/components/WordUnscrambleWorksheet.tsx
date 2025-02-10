@@ -143,11 +143,11 @@ const WordUnscrambleWorksheet: React.FC = () => {
         onSummaryGenerated={handleSummaryGenerated}
       >
         {({ markCorrect, markAttempted, markIncorrect, score }) => (
-          <div className="p-4">
-            <div className="max-w-4xl mx-auto">
+          <div className="py-4">
+            <div>
               {/* Score Display */}
-              <div className="bg-green-50 p-4 shadow-md mb-6 rounded-xl border-2 border-green-100">
-                <div className="max-w-4xl mx-auto">
+              <div className="bg-green-50 py-4 shadow-md mb-6 border-y-2 border-green-100">
+                <div>
                   <ScoreDisplay 
                     score={score}
                     totalQuestions={TOTAL_QUESTIONS * POINTS_PER_QUESTION}
@@ -164,7 +164,7 @@ const WordUnscrambleWorksheet: React.FC = () => {
               </div>
 
               {/* Game Area */}
-              <div className="bg-white rounded-xl shadow-md p-6 border-2 border-green-100">
+              <div className="bg-white shadow-md py-6 border-y-2 border-green-100">
                 {isComplete ? (
                   <div className="text-center py-8">
                     <h2 className="text-3xl font-bold text-green-700 mb-4">
@@ -198,7 +198,7 @@ const WordUnscrambleWorksheet: React.FC = () => {
                         <motion.p
                           initial={{ opacity: 0, y: -10 }}
                           animate={{ opacity: 1, y: 0 }}
-                          className="mt-2 text-yellow-700"
+                          className="mt-2 text-yellow-700 px-4"
                         >
                           Hint: {currentWord.hint}
                         </motion.p>
@@ -206,12 +206,12 @@ const WordUnscrambleWorksheet: React.FC = () => {
                     </div>
 
                     {/* Letter Placement Area */}
-                    <div className="flex justify-center mb-8">
-                      <div className="flex gap-4">
+                    <div className="flex justify-center mb-8 overflow-x-auto">
+                      <div className="flex gap-2 px-2">
                         {targetWord.split('').map((_, index) => (
                           <motion.div
                             key={index}
-                            className={`w-16 h-16 rounded-lg flex items-center justify-center text-2xl font-bold border-4 
+                            className={`w-14 h-14 rounded-lg flex items-center justify-center text-xl font-bold border-4 
                               ${isCorrect ? 'bg-green-100 border-green-400' : 'bg-yellow-50 border-yellow-300'}`}
                             initial={{ scale: 1 }}
                             animate={{ scale: [1, 1.1, 1] }}
@@ -224,21 +224,23 @@ const WordUnscrambleWorksheet: React.FC = () => {
                     </div>
 
                     {/* Scrambled Letters */}
-                    <div className="flex justify-center gap-4 mb-8">
-                      {scrambledLetters.map((letter, index) => (
-                        <motion.button
-                          key={index}
-                          className={`w-16 h-16 rounded-lg bg-white shadow-lg border-4 border-green-300 
-                            text-2xl font-bold text-green-600 hover:bg-green-50 active:scale-95 transition-all
-                            ${selectedLetters.some(sl => sl.originalIndex === index) ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
-                          onClick={() => handleLetterClick(letter, index)}
-                          whileHover={{ scale: 1.1 }}
-                          whileTap={{ scale: 0.95 }}
-                          disabled={selectedLetters.some(sl => sl.originalIndex === index)}
-                        >
-                          {letter}
-                        </motion.button>
-                      ))}
+                    <div className="flex justify-center gap-2 mb-8 overflow-x-auto">
+                      <div className="flex gap-2 px-2">
+                        {scrambledLetters.map((letter, index) => (
+                          <motion.button
+                            key={index}
+                            className={`w-14 h-14 rounded-lg bg-white shadow-lg border-4 border-green-300 
+                              text-xl font-bold text-green-600 hover:bg-green-50 active:scale-95 transition-all
+                              ${selectedLetters.some(sl => sl.originalIndex === index) ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+                            onClick={() => handleLetterClick(letter, index)}
+                            whileHover={{ scale: 1.1 }}
+                            whileTap={{ scale: 0.95 }}
+                            disabled={selectedLetters.some(sl => sl.originalIndex === index)}
+                          >
+                            {letter}
+                          </motion.button>
+                        ))}
+                      </div>
                     </div>
 
                     {/* Action Buttons */}
