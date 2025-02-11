@@ -3,16 +3,16 @@ import WorksheetHeader from '../../../components/shared/layout/Header/WorksheetH
 
 const WordSearchAnswerKey: React.FC = () => {
   const wordList = [
-    { word: 'CORN', emoji: '🌽', hint: 'Yellow vegetable that grows on tall stalks' },
-    { word: 'PEAS', emoji: '🫛', hint: 'Small round green vegetables in a pod' },
-    { word: 'BEET', emoji: '🫒', hint: 'Red root vegetable that can stain' },
-    { word: 'KALE', emoji: '🥬', hint: 'Leafy green vegetable full of vitamins' },
-    { word: 'YAM', emoji: '🍠', hint: 'Sweet orange root vegetable' },
-    { word: 'BEAN', emoji: '🫘', hint: 'Grows in pods and can be many colors' },
-    { word: 'LEEK', emoji: '🧅', hint: 'Long green and white vegetable like a big green onion' },
-    { word: 'ONION', emoji: '🧅', hint: 'Makes you cry when you cut it' },
-    { word: 'MINT', emoji: '🌿', hint: 'Fresh herb with cool taste' },
-    { word: 'PEAR', emoji: '🍐', hint: 'Sweet green fruit shaped like a teardrop' },
+    { word: 'CARROT', emoji: '🥕', hint: 'Orange vegetable that helps you see in the dark' },
+    { word: 'POTATO', emoji: '🥔', hint: 'Brown on outside, white inside, great for mashing' },
+    { word: 'TOMATO', emoji: '🍅', hint: 'Red and round, perfect in salads' },
+    { word: 'ONION', emoji: '🧅', hint: 'Makes your eyes water when you cut it' },
+    { word: 'CABBAGE', emoji: '🥬', hint: 'Big round leaves that wrap together like a ball' },
+    { word: 'SPINACH', emoji: '🥬', hint: 'Green leafy vegetable that makes you strong' },
+    { word: 'BROCCOLI', emoji: '🥦', hint: 'Looks like a tiny green tree' },
+    { word: 'PUMPKIN', emoji: '🎃', hint: 'Big orange vegetable used for Halloween' },
+    { word: 'CUCUMBER', emoji: '🥒', hint: 'Long green vegetable that\'s cool and crunchy' },
+    { word: 'CORN', emoji: '🌽', hint: 'Yellow kernels grow on a tall stalk' },
   ];
 
   return (

@@ -72,20 +72,24 @@ const WordSearchTips: React.FC = () => {
           <div className="bg-white rounded-lg p-4">
             <ul className="space-y-3 text-gray-700">
               <li className="flex items-start space-x-2">
-                <span>🌽</span>
-                <p>Corn is actually a grain, not a vegetable! Each kernel is a seed.</p>
+                <span>🥕</span>
+                <p>Carrots help you see better, especially at night!</p>
               </li>
               <li className="flex items-start space-x-2">
-                <span>🧅</span>
-                <p>Onions make you cry because they release a special gas when cut!</p>
+                <span>🥔</span>
+                <p>Potatoes can be cooked in many ways: mashed, baked, or made into fries!</p>
               </li>
               <li className="flex items-start space-x-2">
-                <span>🥬</span>
-                <p>Kale is a superfood that helps make your bones strong!</p>
+                <span>🍅</span>
+                <p>Tomatoes are actually fruits, but we use them as vegetables!</p>
               </li>
               <li className="flex items-start space-x-2">
-                <span>🫘</span>
-                <p>Beans can grow into very tall plants, just like in Jack and the Beanstalk!</p>
+                <span>🥦</span>
+                <p>Broccoli looks like tiny trees and is full of vitamins!</p>
+              </li>
+              <li className="flex items-start space-x-2">
+                <span>🥒</span>
+                <p>Cucumbers are made of mostly water and help keep you cool!</p>
               </li>
             </ul>
           </div>

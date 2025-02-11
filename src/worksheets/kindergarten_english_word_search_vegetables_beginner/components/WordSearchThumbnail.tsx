@@ -3,10 +3,10 @@ import React from 'react';
 const WordSearchThumbnail: React.FC = () => {
   // Sample 4x4 grid for thumbnail preview
   const previewGrid = [
-    ['C', 'O', 'R', 'N'],
-    ['P', 'E', 'A', 'S'],
-    ['Y', 'A', 'M', 'S'],
-    ['B', 'E', 'E', 'T'],
+    ['C', 'A', 'R', 'R'],
+    ['O', 'N', 'I', 'O'],
+    ['R', 'T', 'O', 'N'],
+    ['N', 'O', 'M', 'A'],
   ];
 
   return (
@@ -16,7 +16,7 @@ const WordSearchThumbnail: React.FC = () => {
           Vegetable Word Search
         </h1>
         <p className="text-sm text-gray-600 text-center mb-4">
-          CORN → PEAS
+          CARROT → TOMATO
         </p>
         
         {/* Preview Grid */}
@@ -35,9 +35,10 @@ const WordSearchThumbnail: React.FC = () => {
 
         {/* Vegetable Emojis */}
         <div className="flex justify-center space-x-2">
-          <span className="text-2xl">🌽</span>
-          <span className="text-2xl">🥬</span>
-          <span className="text-2xl">🫘</span>
+          <span className="text-2xl">🥕</span>
+          <span className="text-2xl">🥔</span>
+          <span className="text-2xl">🍅</span>
+          <span className="text-2xl">🥦</span>
         </div>
       </div>
     </div>

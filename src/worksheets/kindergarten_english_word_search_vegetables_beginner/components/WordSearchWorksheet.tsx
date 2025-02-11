@@ -7,27 +7,26 @@ import ScoreDisplay from '../../../components/shared/ScoreDisplay';
 // Vegetable theme colors
 const WORD_COLORS = [
   { bg: 'bg-green-200', text: 'text-green-800' },
-  { bg: 'bg-emerald-200', text: 'text-emerald-800' },
-  { bg: 'bg-lime-200', text: 'text-lime-800' },
   { bg: 'bg-orange-200', text: 'text-orange-800' },
   { bg: 'bg-red-200', text: 'text-red-800' },
+  { bg: 'bg-yellow-200', text: 'text-yellow-800' },
+  { bg: 'bg-emerald-200', text: 'text-emerald-800' },
 ];
 
-// Using a 7x7 grid since our longest word is 6 letters (CARROT)
-const GRID_SIZE = 7;
+const GRID_SIZE = 8; // Increased grid size for longer words
 
-// Common vegetables with short names for kindergarten level
+// Common vegetables word list with correct emojis
 const WORD_LIST = [
-  { word: 'CORN', emoji: '🌽' },
-  { word: 'PEAS', emoji: '🫛' },
-  { word: 'BEET', emoji: '🫒' },
-  { word: 'KALE', emoji: '🥬' },
-  { word: 'YAM', emoji: '🍠' },
-  { word: 'BEAN', emoji: '🫘' },
-  { word: 'LEEK', emoji: '🧅' },
+  { word: 'CARROT', emoji: '🥕' },
+  { word: 'POTATO', emoji: '🥔' },
+  { word: 'TOMATO', emoji: '🍅' },
   { word: 'ONION', emoji: '🧅' },
-  { word: 'MINT', emoji: '🌿' },
-  { word: 'PEAR', emoji: '🍐' },
+  { word: 'CABBAGE', emoji: '🥬' },
+  { word: 'SPINACH', emoji: '🥬' },
+  { word: 'BROCCOLI', emoji: '🥦' },
+  { word: 'PUMPKIN', emoji: '🎃' },
+  { word: 'CUCUMBER', emoji: '🥒' },
+  { word: 'CORN', emoji: '🌽' },
 ];
 
 interface Cell {
@@ -147,15 +146,15 @@ const WordSearchWorksheet: React.FC = () => {
   const provideFeedback = (isCorrect: boolean, word?: string) => {
     if (isCorrect && word) {
       const phrases = [
-        `Yummy! You found ${word}! That's a healthy vegetable!`,
-        `Great job! You found ${word}! Keep growing strong!`,
-        `Amazing! You found ${word}! Vegetables are so good for you!`,
-        `Wonderful! You found ${word}! You're doing great!`,
-        `Super! You found ${word}! Keep picking those veggies!`
+        `Great job! You found ${word}! That's a healthy vegetable!`,
+        `Wonderful! ${word} is delicious and good for you!`,
+        `Amazing! ${word} helps you grow strong!`,
+        `You found ${word}! Keep eating your veggies!`,
+        `Excellent! ${word} is packed with vitamins!`
       ];
       speak(phrases[Math.floor(Math.random() * phrases.length)], 1.2, 1, 1);
     } else {
-      speak("Keep trying! You can do it!", 0.8, 1, 0.8);
+      speak("Try again! Look for healthy vegetables!", 0.8, 1, 0.8);
     }
   };
 
@@ -312,7 +311,7 @@ const WordSearchWorksheet: React.FC = () => {
                     <motion.div
                       key={word}
                       className={`flex items-center justify-center p-2 rounded-lg ${
-                        isFound ? WORD_COLORS[colorIndex].bg : 'bg-gray-200'
+                        isFound ? WORD_COLORS[colorIndex % WORD_COLORS.length].bg : 'bg-gray-200'
                       }`}
                       animate={{
                         scale: isFound ? [1.1, 1] : 1,
@@ -322,7 +321,7 @@ const WordSearchWorksheet: React.FC = () => {
                       <span className="text-xl mr-2">{emoji}</span>
                       <span className={`font-bold ${
                         isFound 
-                          ? `${WORD_COLORS[colorIndex].text} line-through decoration-2` 
+                          ? `${WORD_COLORS[colorIndex % WORD_COLORS.length].text} line-through decoration-2` 
                           : 'text-gray-500'
                       }`}>
                         {word}
@@ -348,7 +347,7 @@ const WordSearchWorksheet: React.FC = () => {
               onTouchMove={(e) => e.preventDefault()}
               style={{ touchAction: 'none' }}
             >
-              <div className="grid grid-cols-7 gap-0.5 md:gap-1">
+              <div className="grid grid-cols-8 gap-0.5 md:gap-1">
                 {grid.map((row, rowIndex) =>
                   row.map((cell, colIndex) => {
                     const wordPosition = wordPositions.find(wp =>
@@ -363,7 +362,7 @@ const WordSearchWorksheet: React.FC = () => {
                           w-full aspect-square rounded-lg flex items-center justify-center
                           text-lg md:text-xl font-bold select-none touch-none
                           ${cell.isSelected ? 'bg-green-300 text-green-800' : 
-                            wordPosition ? `${WORD_COLORS[colorIndex].bg} ${WORD_COLORS[colorIndex].text}` :
+                            wordPosition ? `${WORD_COLORS[colorIndex % WORD_COLORS.length].bg} ${WORD_COLORS[colorIndex % WORD_COLORS.length].text}` :
                             'bg-white text-gray-700'}
                           ${cell.isPartOfWord ? 'hover:bg-green-100' : ''}
                         `}
@@ -382,7 +381,12 @@ const WordSearchWorksheet: React.FC = () => {
                           transition: { duration: 0.1 }
                         }}
                       >
-                        {wordPosition ? wordPosition.emoji : cell.letter}
+                        {cell.letter}
+                        {wordPosition && (
+                          <span className="absolute text-sm opacity-50">
+                            {wordPosition.emoji}
+                          </span>
+                        )}
                       </motion.div>
                     );
                   })
@@ -397,7 +401,7 @@ const WordSearchWorksheet: React.FC = () => {
                 animate={{ opacity: 1, y: 0 }}
                 className="mt-4 p-4 bg-green-100 text-green-800 rounded-xl text-center"
               >
-                <h2 className="text-2xl font-bold mb-2">🥬 Amazing Job! 🥬</h2>
+                <h2 className="text-2xl font-bold mb-2">🎉 Congratulations! 🎉</h2>
                 <p>You've found all the healthy vegetables!</p>
               </motion.div>
             )}
