@@ -1,0 +1,1 @@
+Search for color words in this interactive word search grid. Each word lights up in its actual color when found! Learn about primary and secondary colors while practicing word recognition. Features common colors like RED, BLUE, GREEN, and YELLOW. 

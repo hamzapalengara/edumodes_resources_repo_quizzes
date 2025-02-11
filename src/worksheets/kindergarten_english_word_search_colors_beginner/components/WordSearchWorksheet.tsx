@@ -1,0 +1,463 @@
+import React, { useState, useEffect, useRef } from 'react';
+import { motion } from 'framer-motion';
+import WorksheetHeader from '../../../components/shared/layout/Header/WorksheetHeader';
+import WorksheetTracker, { WorksheetSummary } from '../../../components/shared/WorksheetTracker';
+import ScoreDisplay from '../../../components/shared/ScoreDisplay';
+
+// Color theme with actual color values
+const WORD_LIST = [
+  { 
+    word: 'RED', 
+    emoji: '🔴', 
+    bgColor: 'bg-red-400',
+    textColor: 'text-white',
+    borderColor: 'border-red-600'
+  },
+  { 
+    word: 'BLUE', 
+    emoji: '🔵', 
+    bgColor: 'bg-blue-400',
+    textColor: 'text-white',
+    borderColor: 'border-blue-600'
+  },
+  { 
+    word: 'GREEN', 
+    emoji: '🟢', 
+    bgColor: 'bg-green-400',
+    textColor: 'text-white',
+    borderColor: 'border-green-600'
+  },
+  { 
+    word: 'YELLOW', 
+    emoji: '💛', 
+    bgColor: 'bg-yellow-300',
+    textColor: 'text-yellow-800',
+    borderColor: 'border-yellow-400'
+  },
+  { 
+    word: 'PURPLE', 
+    emoji: '💜', 
+    bgColor: 'bg-purple-400',
+    textColor: 'text-white',
+    borderColor: 'border-purple-600'
+  },
+  { 
+    word: 'ORANGE', 
+    emoji: '🟧', 
+    bgColor: 'bg-orange-400',
+    textColor: 'text-white',
+    borderColor: 'border-orange-600'
+  },
+  { 
+    word: 'PINK', 
+    emoji: '💗', 
+    bgColor: 'bg-pink-400',
+    textColor: 'text-white',
+    borderColor: 'border-pink-600'
+  },
+  { 
+    word: 'BROWN', 
+    emoji: '🟫', 
+    bgColor: 'bg-amber-700',
+    textColor: 'text-white',
+    borderColor: 'border-amber-800'
+  },
+  { 
+    word: 'BLACK', 
+    emoji: '⚫', 
+    bgColor: 'bg-gray-800',
+    textColor: 'text-white',
+    borderColor: 'border-gray-900'
+  },
+  { 
+    word: 'WHITE', 
+    emoji: '⚪', 
+    bgColor: 'bg-white',
+    textColor: 'text-gray-800',
+    borderColor: 'border-gray-300'
+  },
+];
+
+const GRID_SIZE = 8;
+
+interface Cell {
+  letter: string;
+  isSelected: boolean;
+  isPartOfWord: boolean;
+  row: number;
+  col: number;
+  bgColor?: string;
+  textColor?: string;
+  borderColor?: string;
+}
+
+interface WordPosition {
+  word: string;
+  emoji: string;
+  found: boolean;
+  cells: { row: number; col: number; }[];
+  bgColor: string;
+  textColor: string;
+  borderColor: string;
+}
+
+const WordSearchWorksheet: React.FC = () => {
+  const [grid, setGrid] = useState<Cell[][]>([]);
+  const [wordPositions, setWordPositions] = useState<WordPosition[]>([]);
+  const [isSelecting, setIsSelecting] = useState(false);
+  const [selectedCells, setSelectedCells] = useState<Cell[]>([]);
+  const [foundWords, setFoundWords] = useState<string[]>([]);
+  const [isComplete, setIsComplete] = useState(false);
+  const speechRef = useRef<SpeechSynthesisUtterance | null>(null);
+
+  // Initialize grid and place words
+  useEffect(() => {
+    const newGrid: Cell[][] = Array(GRID_SIZE).fill(null).map((_, row) =>
+      Array(GRID_SIZE).fill(null).map((_, col) => ({
+        letter: '',
+        isSelected: false,
+        isPartOfWord: false,
+        row,
+        col,
+      }))
+    );
+
+    const positions: WordPosition[] = [];
+    const directions = [
+      { dx: 1, dy: 0 }, // horizontal
+      { dx: 0, dy: 1 }, // vertical
+    ];
+
+    // Place each word
+    WORD_LIST.forEach(({ word, emoji, bgColor, textColor, borderColor }) => {
+      let placed = false;
+      let attempts = 0;
+      const maxAttempts = 100;
+
+      while (!placed && attempts < maxAttempts) {
+        attempts++;
+        const direction = directions[Math.floor(Math.random() * directions.length)];
+        const startRow = Math.floor(Math.random() * (GRID_SIZE - (direction.dy * word.length)));
+        const startCol = Math.floor(Math.random() * (GRID_SIZE - (direction.dx * word.length)));
+
+        // Check if space is available
+        let canPlace = true;
+        const cells: { row: number; col: number }[] = [];
+        for (let i = 0; i < word.length; i++) {
+          const row = startRow + (direction.dy * i);
+          const col = startCol + (direction.dx * i);
+          if (newGrid[row][col].letter !== '' && newGrid[row][col].letter !== word[i]) {
+            canPlace = false;
+            break;
+          }
+          cells.push({ row, col });
+        }
+
+        if (canPlace) {
+          // Place the word
+          for (let i = 0; i < word.length; i++) {
+            const row = startRow + (direction.dy * i);
+            const col = startCol + (direction.dx * i);
+            newGrid[row][col].letter = word[i];
+            newGrid[row][col].isPartOfWord = true;
+          }
+          positions.push({ word, emoji, found: false, cells, bgColor, textColor, borderColor });
+          placed = true;
+        }
+      }
+
+      if (!placed) {
+        console.warn(`Could not place word: ${word}`);
+      }
+    });
+
+    // Fill remaining cells with random letters
+    for (let row = 0; row < GRID_SIZE; row++) {
+      for (let col = 0; col < GRID_SIZE; col++) {
+        if (newGrid[row][col].letter === '') {
+          newGrid[row][col].letter = String.fromCharCode(65 + Math.floor(Math.random() * 26));
+        }
+      }
+    }
+
+    setGrid(newGrid);
+    setWordPositions(positions);
+  }, []);
+
+  // Speech synthesis for feedback
+  const speak = (text: string, pitch = 1, rate = 1, volume = 1) => {
+    if ('speechSynthesis' in window) {
+      if (speechRef.current) {
+        window.speechSynthesis.cancel();
+      }
+      speechRef.current = new SpeechSynthesisUtterance(text);
+      speechRef.current.pitch = pitch;
+      speechRef.current.rate = rate;
+      speechRef.current.volume = volume;
+      window.speechSynthesis.speak(speechRef.current);
+    }
+  };
+
+  const provideFeedback = (isCorrect: boolean, word?: string) => {
+    if (isCorrect && word) {
+      const phrases = [
+        `Great job! You found the color ${word}!`,
+        `Beautiful! ${word} is a wonderful color!`,
+        `Amazing! ${word} is everywhere around us!`,
+        `You found ${word}! Look at how it lights up!`,
+        `Excellent! ${word} makes our world colorful!`
+      ];
+      speak(phrases[Math.floor(Math.random() * phrases.length)], 1.2, 1, 1);
+    } else {
+      speak("Try again! Look for color words!", 0.8, 1, 0.8);
+    }
+  };
+
+  const handleCellMouseDown = (cell: Cell) => {
+    setIsSelecting(true);
+    setSelectedCells([cell]);
+    const newGrid = [...grid];
+    newGrid[cell.row][cell.col].isSelected = true;
+    setGrid(newGrid);
+  };
+
+  const handleCellMouseEnter = (cell: Cell) => {
+    if (!isSelecting) return;
+
+    const lastCell = selectedCells[selectedCells.length - 1];
+    const isAdjacent = (
+      (Math.abs(cell.row - lastCell.row) === 1 && cell.col === lastCell.col) || // vertical
+      (Math.abs(cell.col - lastCell.col) === 1 && cell.row === lastCell.row)    // horizontal
+    );
+
+    if (isAdjacent && !selectedCells.some(c => c.row === cell.row && c.col === cell.col)) {
+      setSelectedCells([...selectedCells, cell]);
+      const newGrid = [...grid];
+      newGrid[cell.row][cell.col].isSelected = true;
+      setGrid(newGrid);
+    }
+  };
+
+  const handleCellMouseUp = (
+    { markCorrect, markIncorrect }: { markCorrect: () => void; markIncorrect: () => void }
+  ) => {
+    setIsSelecting(false);
+    const selectedWord = selectedCells.map(cell => cell.letter).join('');
+    
+    // Check if word exists and hasn't been found
+    const wordPosition = wordPositions.find(wp => 
+      wp.word === selectedWord && !wp.found &&
+      wp.cells.every((pos, index) => 
+        pos.row === selectedCells[index]?.row && 
+        pos.col === selectedCells[index]?.col
+      )
+    );
+
+    if (wordPosition) {
+      markCorrect();
+      provideFeedback(true, selectedWord);
+      setFoundWords([...foundWords, selectedWord]);
+      
+      // Update word position status and apply colors
+      setWordPositions(wordPositions.map(wp =>
+        wp.word === selectedWord ? { ...wp, found: true } : wp
+      ));
+
+      // Check if game is complete
+      if (foundWords.length + 1 === WORD_LIST.length) {
+        setIsComplete(true);
+        // Celebration feedback with delay
+        setTimeout(() => {
+          speak("Congratulations! You've found all the colors of the rainbow!", 1, 1.2, 1);
+        }, 1000);
+      }
+    } else {
+      markIncorrect();
+      provideFeedback(false);
+    }
+
+    // Clear selection
+    const newGrid = grid.map(row =>
+      row.map(cell => ({ ...cell, isSelected: false }))
+    );
+    setGrid(newGrid);
+    setSelectedCells([]);
+  };
+
+  const handleTouchStart = (cell: Cell) => {
+    setIsSelecting(true);
+    setSelectedCells([cell]);
+    const newGrid = [...grid];
+    newGrid[cell.row][cell.col].isSelected = true;
+    setGrid(newGrid);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    e.preventDefault();
+    
+    if (!isSelecting) return;
+
+    const touch = e.touches[0];
+    const element = document.elementFromPoint(touch.clientX, touch.clientY) as HTMLElement;
+    
+    if (!element?.dataset?.cell) return;
+
+    const cellData = element.dataset.cell;
+    const [row, col] = cellData.split(',').map(Number);
+    const cell = grid[row][col];
+    const lastCell = selectedCells[selectedCells.length - 1];
+
+    if (cell.row === lastCell.row && cell.col === lastCell.col) return;
+
+    const isAdjacent = (
+      (Math.abs(cell.row - lastCell.row) === 1 && cell.col === lastCell.col) || // vertical
+      (Math.abs(cell.col - lastCell.col) === 1 && cell.row === lastCell.row)    // horizontal
+    );
+
+    if (isAdjacent && !selectedCells.some(c => c.row === row && c.col === col)) {
+      setSelectedCells([...selectedCells, cell]);
+      const newGrid = [...grid];
+      newGrid[row][col].isSelected = true;
+      setGrid(newGrid);
+    }
+  };
+
+  const handleTouchEnd = (
+    { markCorrect, markIncorrect }: { markCorrect: () => void; markIncorrect: () => void }
+  ) => {
+    handleCellMouseUp({ markCorrect, markIncorrect });
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-purple-600 via-pink-500 to-yellow-500">
+      <WorksheetHeader />
+      
+      <WorksheetTracker
+        totalQuestions={WORD_LIST.length}
+        pointsPerQuestion={10}
+        onSummaryGenerated={(summary: WorksheetSummary) => {
+          console.log('Worksheet Summary:', summary);
+        }}
+      >
+        {({ markCorrect, markIncorrect, score }) => (
+          <div className="px-0 md:px-4 max-w-4xl mx-auto">
+            {/* Score Display */}
+            <div className="bg-white/20 backdrop-blur-sm rounded-xl p-4 mb-4">
+              <ScoreDisplay score={score} totalQuestions={WORD_LIST.length * 10} />
+            </div>
+
+            {/* Word List */}
+            <div className="bg-white/20 backdrop-blur-sm rounded-xl p-4 mb-4">
+              {/* Instructions */}
+              <div className="text-center mb-3">
+                <p className="text-white text-lg font-medium">
+                  Find these colors in the grid below! 🌈
+                </p>
+                <p className="text-white/80 text-sm mt-1">
+                  Words can go across ➡️ or down ⬇️
+                </p>
+              </div>
+
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2">
+                {WORD_LIST.map(({ word, emoji, bgColor, textColor, borderColor }) => {
+                  const isFound = wordPositions.find(wp => wp.word === word)?.found;
+                  return (
+                    <motion.div
+                      key={word}
+                      className={`flex items-center justify-center p-2 rounded-lg border-2 ${
+                        isFound ? `${bgColor} ${borderColor}` : 'bg-gray-200 border-gray-300'
+                      }`}
+                      animate={{
+                        scale: isFound ? [1.1, 1] : 1,
+                        transition: { duration: 0.3 }
+                      }}
+                    >
+                      <span className="text-xl mr-2">{emoji}</span>
+                      <span className={`font-bold ${
+                        isFound 
+                          ? `${textColor} line-through decoration-2` 
+                          : 'text-gray-500'
+                      }`}>
+                        {word}
+                      </span>
+                      {isFound && (
+                        <motion.span
+                          initial={{ opacity: 0, scale: 0 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          className="ml-1 text-white"
+                        >
+                          ✓
+                        </motion.span>
+                      )}
+                    </motion.div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Grid */}
+            <div 
+              className="bg-white/20 backdrop-blur-sm rounded-xl p-4"
+              onTouchMove={(e) => e.preventDefault()}
+              style={{ touchAction: 'none' }}
+            >
+              <div className="grid grid-cols-8 gap-0.5 md:gap-1">
+                {grid.map((row, rowIndex) =>
+                  row.map((cell, colIndex) => {
+                    const wordPosition = wordPositions.find(wp =>
+                      wp.found && wp.cells.some(pos => pos.row === rowIndex && pos.col === colIndex)
+                    );
+
+                    return (
+                      <motion.div
+                        key={`${rowIndex}-${colIndex}`}
+                        className={`
+                          w-full aspect-square rounded-lg flex items-center justify-center
+                          text-lg md:text-xl font-bold select-none touch-none border-2
+                          ${cell.isSelected ? 'bg-purple-300 text-purple-800 border-purple-400' : 
+                            wordPosition ? `${wordPosition.bgColor} ${wordPosition.textColor} ${wordPosition.borderColor}` :
+                            'bg-white text-gray-700 border-gray-200'}
+                          ${cell.isPartOfWord ? 'hover:bg-gray-100' : ''}
+                        `}
+                        data-cell={`${rowIndex},${colIndex}`}
+                        onMouseDown={() => handleCellMouseDown(cell)}
+                        onMouseEnter={() => handleCellMouseEnter(cell)}
+                        onMouseUp={() => handleCellMouseUp({ markCorrect, markIncorrect })}
+                        onTouchStart={(e) => {
+                          e.preventDefault();
+                          handleTouchStart(cell);
+                        }}
+                        onTouchMove={handleTouchMove}
+                        onTouchEnd={() => handleTouchEnd({ markCorrect, markIncorrect })}
+                        animate={{
+                          scale: cell.isSelected ? 0.95 : 1,
+                          transition: { duration: 0.1 }
+                        }}
+                      >
+                        {cell.letter}
+                      </motion.div>
+                    );
+                  })
+                )}
+              </div>
+            </div>
+
+            {/* Completion Message */}
+            {isComplete && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mt-4 p-4 bg-white/20 backdrop-blur-sm rounded-xl text-center"
+              >
+                <h2 className="text-2xl font-bold text-white mb-2">🌈 Rainbow Complete! 🌈</h2>
+                <p className="text-white">You've found all the colors!</p>
+              </motion.div>
+            )}
+          </div>
+        )}
+      </WorksheetTracker>
+    </div>
+  );
+};
+
+export default WordSearchWorksheet; 
