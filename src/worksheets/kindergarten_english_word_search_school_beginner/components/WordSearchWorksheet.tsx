@@ -325,9 +325,16 @@ const WordSearchWorksheet: React.FC = () => {
               />
             </div>
 
-            {/* Word List */}
+            {/* Instructions and Word List */}
             <div className="bg-white/20 backdrop-blur-sm rounded-xl p-2 md:p-4 mb-4">
-              <div className="grid grid-cols-5 gap-0.5 md:gap-2">
+              {/* Simple Instructions */}
+              <div className="text-white text-center mb-3">
+                <p className="text-lg font-medium">Find these school words in the grid! 🔍</p>
+                <p className="text-sm opacity-90">Swipe to connect the letters</p>
+              </div>
+
+              {/* Word List */}
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-1 md:gap-2">
                 {WORD_LIST.map(({ word, emoji }) => {
                   const foundWord = wordPositions.find(wp => wp.word === word && wp.found);
                   const colorIndex = foundWord?.colorIndex || 0;
@@ -335,13 +342,13 @@ const WordSearchWorksheet: React.FC = () => {
                     <div
                       key={word}
                       className={`
-                        flex items-center justify-center p-2 rounded-lg
+                        flex items-center justify-center p-1.5 md:p-2 rounded-lg
                         ${foundWord ? WORD_COLORS[colorIndex].bg : 'bg-white/50'}
                         transition-colors duration-300
                       `}
                     >
-                      <span className="text-xl mr-1">{emoji}</span>
-                      <span className={`font-bold ${foundWord ? `${WORD_COLORS[colorIndex].text} line-through` : 'text-purple-900'}`}>
+                      <span className="text-lg md:text-xl mr-1">{emoji}</span>
+                      <span className={`text-sm md:text-base font-bold ${foundWord ? `${WORD_COLORS[colorIndex].text} line-through` : 'text-purple-900'}`}>
                         {word}
                       </span>
                     </div>
