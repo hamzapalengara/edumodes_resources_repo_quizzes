@@ -13,16 +13,16 @@ interface WordCard {
 
 // Word pairs with food theme
 const WORD_PAIRS = [
-  { word1: 'delicious', word2: 'tasty', emoji1: '😋', emoji2: '🍽️' },
-  { word1: 'crisp', word2: 'crunchy', emoji1: '🍎', emoji2: '🥜' },
-  { word1: 'sweet', word2: 'sugary', emoji1: '🍯', emoji2: '🍬' },
-  { word1: 'fresh', word2: 'new', emoji1: '🥬', emoji2: '✨' },
-  { word1: 'hot', word2: 'warm', emoji1: '🔥', emoji2: '♨️' },
-  { word1: 'cold', word2: 'chilly', emoji1: '❄️', emoji2: '🧊' },
-  { word1: 'juicy', word2: 'succulent', emoji1: '🍊', emoji2: '💧' },
-  { word1: 'spicy', word2: 'hot', emoji1: '🌶️', emoji2: '🔥' },
-  { word1: 'salty', word2: 'briny', emoji1: '🧂', emoji2: '🌊' },
-  { word1: 'bitter', word2: 'sharp', emoji1: '☕', emoji2: '⚡' },
+  { word1: 'Delicious', word2: 'Tasty', emoji1: '😋', emoji2: '🍽️' },
+  { word1: 'Sour', word2: 'Tangy', emoji1: '🍋', emoji2: '🥝' },
+  { word1: 'Crisp', word2: 'Crunchy', emoji1: '🍎', emoji2: '🥜' },
+  { word1: 'Icy', word2: 'Chilled', emoji1: '🧊', emoji2: '❄️' },
+  { word1: 'Mild', word2: 'Light', emoji1: '🥛', emoji2: '🫖' },
+  { word1: 'Flavorful', word2: 'Savory', emoji1: '🌶️', emoji2: '🍖' },
+  { word1: 'Nutritious', word2: 'Healthy', emoji1: '🥗', emoji2: '🥬' },
+  { word1: 'Tender', word2: 'Soft', emoji1: '🥩', emoji2: '🍞' },
+  { word1: 'Yummy', word2: 'Appetizing', emoji1: '😊', emoji2: '🍽️' },
+  { word1: 'Smelly', word2: 'Fragrant', emoji1: '👃', emoji2: '🌺' },
 ];
 
 // Success messages with food theme
@@ -39,27 +39,13 @@ const WordSynonymsWorksheet: React.FC = () => {
   const [selectedCard, setSelectedCard] = useState<WordCard | null>(null);
   const [matchedPairs, setMatchedPairs] = useState<number[]>([]);
   const [isChecking, setIsChecking] = useState(false);
-  const speechSynthesis = window.speechSynthesis;
-  const currentUtterance = useRef<SpeechSynthesisUtterance | null>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const createShuffledCards = () => {
-    const allCards: WordCard[] = [];
-    WORD_PAIRS.forEach((pair, index) => {
-      allCards.push({
-        word: pair.word1,
-        emoji: pair.emoji1,
-        pairIndex: index,
-        isWord1: true,
-      });
-      allCards.push({
-        word: pair.word2,
-        emoji: pair.emoji2,
-        pairIndex: index,
-        isWord1: false,
-      });
-    });
-
-    // Shuffle cards
+    const allCards = WORD_PAIRS.flatMap((pair, index) => [
+      { word: pair.word1, emoji: pair.emoji1, pairIndex: index, isWord1: true },
+      { word: pair.word2, emoji: pair.emoji2, pairIndex: index, isWord1: false },
+    ]);
     return allCards.sort(() => Math.random() - 0.5);
   };
 
@@ -68,101 +54,92 @@ const WordSynonymsWorksheet: React.FC = () => {
   }, []);
 
   const stopCurrentSpeech = () => {
-    if (currentUtterance.current) {
-      speechSynthesis.cancel();
-    }
+    window.speechSynthesis.cancel();
   };
 
   const speak = (text: string) => {
     stopCurrentSpeech();
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.rate = 0.9;
-    currentUtterance.current = utterance;
-    speechSynthesis.speak(utterance);
+    window.speechSynthesis.speak(utterance);
   };
 
   const playFoodSound = (correct: boolean) => {
-    const audio = new Audio(
-      correct
+    if (audioRef.current) {
+      audioRef.current.src = correct
         ? '/sounds/correct_chime.mp3'
-        : '/sounds/incorrect_buzz.mp3'
-    );
-    audio.play();
+        : '/sounds/incorrect_buzz.mp3';
+      audioRef.current.play().catch(console.error);
+    }
   };
 
   const handleSummaryGenerated = (summary: WorksheetSummary) => {
     console.log('Worksheet Summary:', summary);
+    localStorage.setItem('food_synonyms_summary', JSON.stringify(summary));
   };
 
   const handleCardClick = (
     card: WordCard,
     {
+      markCorrect,
       markIncorrect,
+      markAttempted,
       speak,
       playSound,
     }: {
+      markCorrect: () => void;
       markIncorrect: () => void;
+      markAttempted: () => void;
       speak: (text: string) => void;
       playSound: (correct: boolean) => void;
     }
   ) => {
-    if (isChecking || matchedPairs.includes(card.pairIndex)) {
-      return;
-    }
+    if (isChecking || matchedPairs.includes(card.pairIndex)) return;
 
     if (!selectedCard) {
       setSelectedCard(card);
       speak(card.word);
     } else {
-      if (
-        selectedCard.pairIndex === card.pairIndex &&
-        selectedCard.isWord1 !== card.isWord1
-      ) {
-        // Correct match
+      if (selectedCard.pairIndex === card.pairIndex && selectedCard !== card) {
+        markAttempted();
+        markCorrect();
         setMatchedPairs([...matchedPairs, card.pairIndex]);
-        setSelectedCard(null);
         playSound(true);
-        speak(SUCCESS_MESSAGES[Math.floor(Math.random() * SUCCESS_MESSAGES.length)]);
+        speak(
+          SUCCESS_MESSAGES[Math.floor(Math.random() * SUCCESS_MESSAGES.length)]
+        );
       } else {
-        // Incorrect match
-        setIsChecking(true);
+        markAttempted();
         markIncorrect();
         playSound(false);
         speak('Try again!');
-        setTimeout(() => {
-          setSelectedCard(null);
-          setIsChecking(false);
-        }, 1000);
       }
+      setIsChecking(true);
+      setTimeout(() => {
+        setSelectedCard(null);
+        setIsChecking(false);
+      }, 1000);
     }
-  };
-
-  const handleReset = () => {
-    setCards(createShuffledCards());
-    setSelectedCard(null);
-    setMatchedPairs([]);
-    setIsChecking(false);
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-yellow-50 via-orange-50 to-red-50">
       <WorksheetHeader />
-      
-      <WorksheetTracker
-        totalQuestions={WORD_PAIRS.length}
-        pointsPerQuestion={10}
-        onSummaryGenerated={handleSummaryGenerated}
-      >
-        {({ addPoints, markIncorrect, score }) => (
-          <div className="px-0 md:px-4 max-w-4xl mx-auto">
-            <div className="bg-white rounded-xl shadow-lg p-2 md:p-6 mb-6">
-              <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mb-6 w-full">
-                <h1 className="text-2xl sm:text-3xl font-bold text-orange-600">
-                  Match Similar Food Words
-                </h1>
-                <div className="w-full sm:w-auto">
-                  <ScoreDisplay score={score} totalQuestions={WORD_PAIRS.length * 10} />
-                </div>
+      <audio ref={audioRef} />
+
+      <div className="px-0 md:px-4 max-w-4xl mx-auto">
+        <WorksheetTracker
+          totalQuestions={WORD_PAIRS.length}
+          pointsPerQuestion={10}
+          onSummaryGenerated={handleSummaryGenerated}
+        >
+          {({ markCorrect, markIncorrect, markAttempted, score }) => (
+            <>
+              <div className="bg-white/80 backdrop-blur-sm p-4 shadow-lg rounded-xl mb-4">
+                <ScoreDisplay
+                  score={score}
+                  totalQuestions={WORD_PAIRS.length * 10}
+                />
               </div>
 
               <div className="grid grid-cols-4 sm:grid-cols-5 gap-0.5 md:gap-4">
@@ -183,12 +160,11 @@ const WordSynonymsWorksheet: React.FC = () => {
                     `}
                     onClick={() =>
                       handleCardClick(card, {
+                        markCorrect,
                         markIncorrect,
+                        markAttempted,
                         speak,
                         playSound: (correct: boolean) => {
-                          if (correct) {
-                            addPoints(10);
-                          }
                           playFoodSound(correct);
                         },
                       })
@@ -203,28 +179,10 @@ const WordSynonymsWorksheet: React.FC = () => {
                   </motion.div>
                 ))}
               </div>
-
-              {matchedPairs.length === WORD_PAIRS.length && (
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="mt-6 text-center"
-                >
-                  <h2 className="text-xl font-bold text-green-600 mb-4">
-                    🎉 Congratulations! You've matched all the pairs! 🎉
-                  </h2>
-                  <button
-                    onClick={handleReset}
-                    className="bg-orange-500 text-white px-6 py-2 rounded-lg hover:bg-orange-600 transition-colors"
-                  >
-                    Play Again
-                  </button>
-                </motion.div>
-              )}
-            </div>
-          </div>
-        )}
-      </WorksheetTracker>
+            </>
+          )}
+        </WorksheetTracker>
+      </div>
     </div>
   );
 };

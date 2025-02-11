@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import WorksheetHeader from '../../../components/shared/layout/Header/WorksheetHeader';
 import WorksheetTracker, { WorksheetSummary } from '../../../components/shared/WorksheetTracker';
@@ -25,60 +25,38 @@ const WORD_PAIRS = [
   { word1: 'new', word2: 'old', emoji1: '🌠', emoji2: '🌘' },
 ];
 
-// Success messages with space theme
-const SUCCESS_MESSAGES = [
-  'Cosmic match! 🚀',
-  'Stellar pairing! ⭐',
-  'Galactic success! 🌌',
-  'Space victory! 🛸',
-  'Astronomical win! 🌠',
-];
+const createShuffledCards = () => {
+  const cards: WordCard[] = [];
+  WORD_PAIRS.forEach((pair, index) => {
+    cards.push({
+      word: pair.word1,
+      emoji: pair.emoji1,
+      pairIndex: index,
+      isWord1: true,
+    });
+    cards.push({
+      word: pair.word2,
+      emoji: pair.emoji2,
+      pairIndex: index,
+      isWord1: false,
+    });
+  });
+  return cards.sort(() => Math.random() - 0.5);
+};
 
 const WordOppositesWorksheet: React.FC = () => {
-  const [cards, setCards] = useState<WordCard[]>([]);
+  const [cards] = useState<WordCard[]>(createShuffledCards());
   const [selectedCard, setSelectedCard] = useState<WordCard | null>(null);
   const [matchedPairs, setMatchedPairs] = useState<number[]>([]);
-  const [isChecking, setIsChecking] = useState(false);
-  const speechSynthesis = window.speechSynthesis;
-  const currentUtterance = useRef<SpeechSynthesisUtterance | null>(null);
-
-  const createShuffledCards = () => {
-    const allCards: WordCard[] = [];
-    WORD_PAIRS.forEach((pair, index) => {
-      allCards.push({
-        word: pair.word1,
-        emoji: pair.emoji1,
-        pairIndex: index,
-        isWord1: true,
-      });
-      allCards.push({
-        word: pair.word2,
-        emoji: pair.emoji2,
-        pairIndex: index,
-        isWord1: false,
-      });
-    });
-
-    // Shuffle cards
-    return allCards.sort(() => Math.random() - 0.5);
-  };
-
-  useEffect(() => {
-    setCards(createShuffledCards());
-  }, []);
 
   const stopCurrentSpeech = () => {
-    if (currentUtterance.current) {
-      speechSynthesis.cancel();
-    }
+    window.speechSynthesis.cancel();
   };
 
   const speak = (text: string) => {
     stopCurrentSpeech();
     const utterance = new SpeechSynthesisUtterance(text);
-    utterance.rate = 0.9;
-    currentUtterance.current = utterance;
-    speechSynthesis.speak(utterance);
+    window.speechSynthesis.speak(utterance);
   };
 
   const playSpaceSound = (correct: boolean) => {
@@ -93,60 +71,61 @@ const WordOppositesWorksheet: React.FC = () => {
   const handleCardClick = (
     card: WordCard,
     {
+      markCorrect,
       markIncorrect,
+      markAttempted,
       speak,
       playSound,
     }: {
+      markCorrect: () => void;
       markIncorrect: () => void;
+      markAttempted: () => void;
       speak: (text: string) => void;
       playSound: (correct: boolean) => void;
     }
   ) => {
-    if (isChecking || matchedPairs.includes(card.pairIndex)) {
+    if (matchedPairs.includes(card.pairIndex)) {
       return;
     }
+
+    markAttempted();
 
     if (!selectedCard) {
       setSelectedCard(card);
       speak(card.word);
-    } else {
-      if (
-        selectedCard.pairIndex === card.pairIndex &&
-        selectedCard.isWord1 !== card.isWord1
-      ) {
-        // Correct match
-        setMatchedPairs([...matchedPairs, card.pairIndex]);
-        setSelectedCard(null);
-        playSound(true);
-        speak(SUCCESS_MESSAGES[Math.floor(Math.random() * SUCCESS_MESSAGES.length)]);
-      } else {
-        // Incorrect match
-        setIsChecking(true);
-        markIncorrect();
-        playSound(false);
-        speak('Try again!');
-        setTimeout(() => {
-          setSelectedCard(null);
-          setIsChecking(false);
-        }, 1000);
-      }
+      return;
     }
+
+    if (selectedCard.pairIndex === card.pairIndex && selectedCard !== card) {
+      markCorrect();
+      playSound(true);
+      setMatchedPairs([...matchedPairs, card.pairIndex]);
+      speak(`Correct! ${selectedCard.word} and ${card.word} are opposites.`);
+    } else {
+      markIncorrect();
+      playSound(false);
+      speak('Try again');
+    }
+
+    setSelectedCard(null);
+  };
+
+  const handleSummaryGenerated = (summary: WorksheetSummary) => {
+    console.log('Worksheet Summary:', summary);
+    // Store summary in localStorage for persistence
+    localStorage.setItem('space_opposites_summary', JSON.stringify(summary));
   };
 
   return (
-    <WorksheetTracker 
-      totalQuestions={WORD_PAIRS.length}
-      pointsPerQuestion={10}
-      onSummaryGenerated={(summary: WorksheetSummary) => {
-        console.log('Worksheet Summary:', summary);
-        // Store summary in localStorage for persistence
-        localStorage.setItem('space_opposites_summary', JSON.stringify(summary));
-      }}
-    >
-      {({ addPoints, markCorrect, markIncorrect, markAttempted, score }) => (
-        <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-blue-900">
-          <WorksheetHeader />
-          
+    <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-blue-900">
+      <WorksheetHeader />
+      
+      <WorksheetTracker
+        totalQuestions={WORD_PAIRS.length}
+        pointsPerQuestion={10}
+        onSummaryGenerated={handleSummaryGenerated}
+      >
+        {({ markCorrect, markIncorrect, markAttempted, score }) => (
           <div className="px-0 md:px-4 max-w-4xl mx-auto">
             {/* Score Display */}
             <div className="bg-black/30 backdrop-blur-sm rounded-xl p-2 md:p-4 mb-4">
@@ -175,18 +154,13 @@ const WordOppositesWorksheet: React.FC = () => {
                       transition-colors duration-300
                     `}
                     onClick={() => {
-                      if (!matchedPairs.includes(card.pairIndex) && !isChecking) {
-                        markAttempted();
+                      if (!matchedPairs.includes(card.pairIndex)) {
                         handleCardClick(card, {
+                          markCorrect,
                           markIncorrect,
+                          markAttempted,
                           speak,
-                          playSound: (correct: boolean) => {
-                            if (correct) {
-                              markCorrect();
-                              addPoints(10);
-                            }
-                            playSpaceSound(correct);
-                          },
+                          playSound: playSpaceSound,
                         });
                       }
                     }}
@@ -214,9 +188,9 @@ const WordOppositesWorksheet: React.FC = () => {
               )}
             </div>
           </div>
-        </div>
-      )}
-    </WorksheetTracker>
+        )}
+      </WorksheetTracker>
+    </div>
   );
 };
 
