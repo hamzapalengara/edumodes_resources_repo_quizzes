@@ -4,35 +4,35 @@ import WorksheetHeader from '../../../components/shared/layout/Header/WorksheetH
 import WorksheetTracker, { WorksheetSummary } from '../../../components/shared/WorksheetTracker';
 import ScoreDisplay from '../../../components/shared/ScoreDisplay';
 
-// Simple 3-letter words suitable for kindergarten
+// School-themed 3-4 letter words suitable for kindergarten
 const WORD_LIST = [
-  { word: 'CAT', emoji: '🐱' },
-  { word: 'DOG', emoji: '🐶' },
-  { word: 'SUN', emoji: '☀️' },
-  { word: 'HAT', emoji: '🎩' },
-  { word: 'BAG', emoji: '👜' },
-  { word: 'BED', emoji: '🛏️' },
-  { word: 'BUS', emoji: '🚌' },
+  { word: 'BOOK', emoji: '📚' },
+  { word: 'DESK', emoji: '🪑' },
   { word: 'PEN', emoji: '✏️' },
-  { word: 'CUP', emoji: '☕' },
-  { word: 'BOX', emoji: '📦' },
+  { word: 'BAG', emoji: '🎒' },
+  { word: 'READ', emoji: '📖' },
+  { word: 'DRAW', emoji: '🎨' },
+  { word: 'MAP', emoji: '🗺️' },
+  { word: 'ART', emoji: '🎭' },
+  { word: 'GYM', emoji: '🏃' },
+  { word: 'MATH', emoji: '🔢' },
 ];
 
-// Grid size (6x6 for better visibility on mobile)
-const GRID_SIZE = 6;
+// Grid size (7x7 for 4-letter words)
+const GRID_SIZE = 7;
 
-// Colors for found words (with background and text colors)
+// Educational theme colors (with background and text colors)
 const WORD_COLORS = [
-  { bg: 'bg-red-200', text: 'text-red-800' },
-  { bg: 'bg-blue-200', text: 'text-blue-800' },
-  { bg: 'bg-green-200', text: 'text-green-800' },
-  { bg: 'bg-yellow-200', text: 'text-yellow-800' },
-  { bg: 'bg-purple-200', text: 'text-purple-800' },
-  { bg: 'bg-pink-200', text: 'text-pink-800' },
-  { bg: 'bg-indigo-200', text: 'text-indigo-800' },
-  { bg: 'bg-orange-200', text: 'text-orange-800' },
-  { bg: 'bg-teal-200', text: 'text-teal-800' },
-  { bg: 'bg-cyan-200', text: 'text-cyan-800' },
+  { bg: 'bg-blue-200', text: 'text-blue-800' },    // Knowledge
+  { bg: 'bg-green-200', text: 'text-green-800' },  // Growth
+  { bg: 'bg-purple-200', text: 'text-purple-800' }, // Creativity
+  { bg: 'bg-red-200', text: 'text-red-800' },      // Energy
+  { bg: 'bg-yellow-200', text: 'text-yellow-800' }, // Intelligence
+  { bg: 'bg-teal-200', text: 'text-teal-800' },    // Wisdom
+  { bg: 'bg-indigo-200', text: 'text-indigo-800' }, // Learning
+  { bg: 'bg-orange-200', text: 'text-orange-800' }, // Enthusiasm
+  { bg: 'bg-cyan-200', text: 'text-cyan-800' },    // Focus
+  { bg: 'bg-rose-200', text: 'text-rose-800' },    // Achievement
 ];
 
 interface Cell {
@@ -48,7 +48,7 @@ interface WordPosition {
   emoji: string;
   found: boolean;
   cells: { row: number; col: number }[];
-  colorIndex?: number; // Add colorIndex to track which color to use
+  colorIndex?: number;
 }
 
 const WordSearchWorksheet: React.FC = () => {
@@ -117,7 +117,6 @@ const WordSearchWorksheet: React.FC = () => {
         }
       }
 
-      // If word couldn't be placed after max attempts, try next word
       if (!placed) {
         console.warn(`Could not place word: ${word}`);
       }
@@ -150,7 +149,6 @@ const WordSearchWorksheet: React.FC = () => {
     utterance.volume = volume;
     speechRef.current = utterance;
 
-    // Add error handling for speech
     try {
       window.speechSynthesis.speak(utterance);
     } catch (error) {
@@ -161,9 +159,9 @@ const WordSearchWorksheet: React.FC = () => {
   const provideFeedback = (correct: boolean) => {
     if (correct) {
       const selectedWord = selectedCells.map(cell => cell.letter).join('');
-      speak(`Great job! You found the word ${selectedWord}!`);
+      speak(`Excellent! You found the word ${selectedWord}!`);
     } else {
-      speak("Try again!");
+      speak("Keep trying! You can do it!");
     }
   };
 
@@ -309,7 +307,7 @@ const WordSearchWorksheet: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-400 to-purple-500">
+    <div className="min-h-screen bg-gradient-to-br from-indigo-400 to-purple-500">
       <WorksheetHeader />
       
       <WorksheetTracker
@@ -355,7 +353,7 @@ const WordSearchWorksheet: React.FC = () => {
             {/* Game Grid */}
             <div className="bg-white/20 backdrop-blur-sm rounded-xl p-2 md:p-4">
               <div 
-                className="word-search-grid grid grid-cols-6 gap-0.5 md:gap-1 touch-none"
+                className="word-search-grid grid grid-cols-7 gap-0.5 md:gap-1 touch-none"
                 onMouseLeave={() => {
                   if (isSelecting) {
                     handleCellMouseUp({ markCorrect, markIncorrect });
@@ -427,18 +425,18 @@ const WordSearchWorksheet: React.FC = () => {
                   animate={{ scale: 1, opacity: 1 }}
                   className="bg-white rounded-xl p-6 max-w-sm mx-4 text-center"
                 >
-                  <h2 className="text-2xl font-bold text-purple-600 mb-4">
-                    Amazing Job! 🎉
+                  <h2 className="text-2xl font-bold text-indigo-600 mb-4">
+                    Outstanding Work! 🎓
                   </h2>
                   <p className="text-gray-600 mb-6">
-                    You've found all the words!
+                    You've discovered all the school words!
                   </p>
                   <button
                     onClick={() => window.location.reload()}
-                    className="bg-purple-500 hover:bg-purple-400 text-white font-bold py-2 px-6 rounded-full
+                    className="bg-indigo-500 hover:bg-indigo-400 text-white font-bold py-2 px-6 rounded-full
                              transition-all duration-300 transform hover:scale-105"
                   >
-                    Play Again 🎮
+                    Play Again 📚
                   </button>
                 </motion.div>
               </div>
