@@ -1,1 +1,0 @@
-An interactive drag-and-drop game for practicing number ordering from 5 to 10. Features three challenging levels with different arrangements, immediate feedback, and audio support. Perfect for reinforcing number sequencing skills and number recognition in the 5-10 range. Includes comprehensive tips for parents and teachers, and a detailed answer key with learning extensions. 
