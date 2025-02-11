@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import WorksheetHeader from '../../../components/shared/layout/Header/WorksheetHeader';
 import WorksheetTracker, { WorksheetSummary } from '../../../components/shared/WorksheetTracker';
+import ScoreDisplay from '../../../components/shared/ScoreDisplay';
 
 interface WordCard {
   word: string;
@@ -76,13 +77,11 @@ const WordOppositesWorksheet: React.FC = () => {
   const handleCardClick = (
     card: WordCard,
     {
-      addPoints,
       markCorrect,
       markIncorrect,
       speak,
       playSound,
     }: {
-      addPoints: () => void;
       markCorrect: () => void;
       markIncorrect: () => void;
       speak: (text: string) => void;
@@ -98,7 +97,6 @@ const WordOppositesWorksheet: React.FC = () => {
     if (selectedCard.pairIndex === card.pairIndex && selectedCard !== card) {
       // Correct match
       markCorrect();
-      addPoints();
       playSound(true);
       setMatchedPairs(prev => [...prev, card.pairIndex]);
       speak(`Correct! ${selectedCard.word} and ${card.word} are opposites!`);
@@ -128,15 +126,14 @@ const WordOppositesWorksheet: React.FC = () => {
         pointsPerQuestion={10}
         onSummaryGenerated={handleSummaryGenerated}
       >
-        {({ addPoints, markCorrect, markAttempted, markIncorrect, score }) => (
+        {({ markCorrect, markAttempted, markIncorrect, score }) => (
           <div className="px-0 md:px-4 max-w-4xl mx-auto">
             {/* Score Display */}
             <div className="bg-black/30 backdrop-blur-sm rounded-xl p-4 mb-4">
-              <div className="text-center">
-                <span className="text-2xl font-bold text-blue-300">
-                  Score: {score}/{WORD_PAIRS.length * 10}
-                </span>
-              </div>
+              <ScoreDisplay 
+                score={score}
+                totalQuestions={WORD_PAIRS.length * 10}
+              />
             </div>
 
             {/* Game Grid */}
@@ -163,7 +160,6 @@ const WordOppositesWorksheet: React.FC = () => {
                         if (!isMatched && !isSelected && selectedCard !== card) {
                           markAttempted();
                           handleCardClick(card, {
-                            addPoints,
                             markCorrect,
                             markIncorrect,
                             speak,
