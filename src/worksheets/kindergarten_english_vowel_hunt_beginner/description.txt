@@ -1,0 +1,1 @@
+A fun and interactive game where children identify vowel letters in a colorful grid. Features text-to-speech guidance, instant feedback with colors and sounds, and a progress tracker. Perfect for learning to recognize the five vowels (a, e, i, o, u) through engaging gameplay. 
