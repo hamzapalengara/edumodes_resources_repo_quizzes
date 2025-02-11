@@ -1,0 +1,1 @@
+Search and find simple three-letter words in a colorful letter grid. Practice word recognition and letter patterns by swiping horizontally or vertically to connect letters. Features voice guidance, visual hints, and celebratory animations. 
