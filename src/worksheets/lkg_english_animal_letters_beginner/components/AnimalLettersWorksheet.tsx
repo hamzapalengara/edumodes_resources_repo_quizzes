@@ -52,9 +52,9 @@ const AnimalLettersWorksheet: React.FC = () => {
   const handleBoxClick = (index: number) => {
     setActiveIndex(index);
     const animal = ANIMALS[index];
-    speak(animal.name); // Say the animal name
+    speak(animal.name);
     setTimeout(() => {
-      speak(animal.sound, true); // Make the animal sound after the name
+      speak(animal.sound, true);
     }, 1000);
   };
 
@@ -96,6 +96,46 @@ const AnimalLettersWorksheet: React.FC = () => {
         }
         
         // Move to next empty box
+        const nextIndex = answers.findIndex((answer, i) => i > index && answer === '');
+        if (nextIndex !== -1) {
+          setTimeout(() => {
+            setActiveIndex(nextIndex);
+            speak(ANIMALS[nextIndex].name);
+          }, 2500);
+        }
+      } else {
+        markIncorrect();
+        speak("Try again! Listen to the animal name one more time.");
+        setTimeout(() => {
+          speak(currentAnimal.name);
+        }, 1500);
+      }
+    }
+  };
+
+  // Add input change handler for mobile
+  const handleInputChange = (
+    event: React.ChangeEvent<HTMLInputElement>,
+    index: number,
+    { markCorrect, markIncorrect }: { markCorrect: () => void; markIncorrect: () => void }
+  ) => {
+    const input = event.target.value.slice(-1).toUpperCase(); // Get the last character entered
+    if (/^[A-Z]$/.test(input)) {
+      const newAnswers = [...answers];
+      newAnswers[index] = input;
+      setAnswers(newAnswers);
+
+      const currentAnimal = ANIMALS[index];
+      if (input === currentAnimal.letter) {
+        if (!correctAnswers.has(index)) {
+          markCorrect();
+          setCorrectAnswers(prev => new Set([...prev, index]));
+          speak(getSuccessFeedback(currentAnimal));
+          setTimeout(() => {
+            speak(currentAnimal.sound, true);
+          }, 1500);
+        }
+        
         const nextIndex = answers.findIndex((answer, i) => i > index && answer === '');
         if (nextIndex !== -1) {
           setTimeout(() => {
@@ -169,15 +209,22 @@ const AnimalLettersWorksheet: React.FC = () => {
                   >
                     <input
                       type="text"
+                      inputMode="text"
+                      pattern="[A-Za-z]*"
                       value={answers[index]}
-                      onChange={() => {}} // Controlled input
+                      onChange={(e) => handleInputChange(e, index, { markCorrect, markIncorrect })}
                       onKeyDown={(e) => handleKeyPress(e, index, { markCorrect, markIncorrect })}
                       className={`
-                        w-full h-full text-center bg-transparent outline-none
+                        w-full h-full text-center bg-transparent outline-none select-none
                         ${answers[index] === animal.letter ? 'text-green-700' : 'text-gray-700'}
                       `}
                       maxLength={1}
+                      autoComplete="off"
+                      autoCorrect="off"
+                      spellCheck="false"
+                      autoCapitalize="characters"
                       autoFocus={activeIndex === index}
+                      style={{ caretColor: 'transparent' }}
                     />
                   </div>
                 </motion.div>
