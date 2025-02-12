@@ -53,9 +53,9 @@ const FruitLettersWorksheet: React.FC = () => {
   const handleBoxClick = (index: number) => {
     setActiveIndex(index);
     const fruit = FRUITS[index];
-    speak(fruit.name); // Say the fruit name
+    speak(fruit.name);
     setTimeout(() => {
-      speak(fruit.sound, true); // Describe the fruit after the name
+      speak(fruit.sound, true);
     }, 1000);
   };
 
@@ -69,6 +69,46 @@ const FruitLettersWorksheet: React.FC = () => {
       `Excellent! You know the ${fruit.name} starts with ${fruit.letter}!`
     ];
     return messages[Math.floor(Math.random() * messages.length)];
+  };
+
+  // Add input change handler for mobile
+  const handleInputChange = (
+    event: React.ChangeEvent<HTMLInputElement>,
+    index: number,
+    { markCorrect, markIncorrect }: { markCorrect: () => void; markIncorrect: () => void }
+  ) => {
+    const input = event.target.value.toUpperCase();
+    if (/^[A-Z]$/.test(input)) {
+      const newAnswers = [...answers];
+      newAnswers[index] = input;
+      setAnswers(newAnswers);
+
+      const currentFruit = FRUITS[index];
+      if (input === currentFruit.letter) {
+        if (!correctAnswers.has(index)) {
+          markCorrect();
+          setCorrectAnswers(prev => new Set([...prev, index]));
+          speak(getSuccessFeedback(currentFruit));
+          setTimeout(() => {
+            speak(currentFruit.sound, true);
+          }, 1500);
+        }
+        
+        const nextIndex = answers.findIndex((answer, i) => i > index && answer === '');
+        if (nextIndex !== -1) {
+          setTimeout(() => {
+            setActiveIndex(nextIndex);
+            speak(FRUITS[nextIndex].name);
+          }, 2500);
+        }
+      } else {
+        markIncorrect();
+        speak("Try again! Listen to the fruit name one more time.");
+        setTimeout(() => {
+          speak(currentFruit.name);
+        }, 1500);
+      }
+    }
   };
 
   // Handle key press with enhanced feedback
@@ -178,14 +218,20 @@ const FruitLettersWorksheet: React.FC = () => {
                   >
                     <input
                       type="text"
+                      inputMode="text"
+                      pattern="[A-Za-z]*"
                       value={answers[index]}
-                      onChange={() => {}} // Controlled input
+                      onChange={(e) => handleInputChange(e, index, { markCorrect, markIncorrect })}
                       onKeyDown={(e) => handleKeyPress(e, index, { markCorrect, markIncorrect })}
                       className={`
                         w-full h-full text-center bg-transparent outline-none
                         ${answers[index] === fruit.letter ? 'text-green-700' : 'text-gray-700'}
                       `}
                       maxLength={1}
+                      autoComplete="off"
+                      autoCorrect="off"
+                      spellCheck="false"
+                      autoCapitalize="characters"
                       autoFocus={activeIndex === index}
                     />
                   </div>
