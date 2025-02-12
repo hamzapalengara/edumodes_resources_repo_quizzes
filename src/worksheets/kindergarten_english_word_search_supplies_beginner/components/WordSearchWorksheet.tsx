@@ -193,10 +193,9 @@ const WordSearchWorksheet: React.FC = () => {
   };
 
   const handleCellMouseUp = (
-    { markCorrect, markIncorrect, addPoints }: { 
+    { markCorrect, markIncorrect }: { 
       markCorrect: () => void; 
       markIncorrect: () => void;
-      addPoints: (points: number) => void;
     }
   ) => {
     if (!isDragging) return; // Prevent handling if not dragging (touch event)
@@ -212,8 +211,7 @@ const WordSearchWorksheet: React.FC = () => {
             pos.word === wordPosition.word ? { ...pos, found: true } : pos
           )
         );
-        markCorrect();
-        addPoints(10);
+        markCorrect(); // This will add 10 points
         provideFeedback(true, wordPosition.word);
       } else {
         markIncorrect();
@@ -255,15 +253,14 @@ const WordSearchWorksheet: React.FC = () => {
 
   const handleTouchEnd = (
     e: React.TouchEvent,
-    { markCorrect, markIncorrect, addPoints }: { 
+    { markCorrect, markIncorrect }: { 
       markCorrect: () => void; 
       markIncorrect: () => void;
-      addPoints: (points: number) => void;
     }
   ) => {
     e.preventDefault(); // Prevent mouse events from firing
     if (!touchStartCell) return;
-    
+
     const selectedWord = getSelectedWord();
     const wordPosition = wordPositions.find(wp => !wp.found && wp.word === selectedWord);
 
@@ -275,8 +272,7 @@ const WordSearchWorksheet: React.FC = () => {
             pos.word === wordPosition.word ? { ...pos, found: true } : pos
           )
         );
-        markCorrect();
-        addPoints(10);
+        markCorrect(); // This will add 10 points
         provideFeedback(true, wordPosition.word);
       } else {
         markIncorrect();
@@ -287,8 +283,8 @@ const WordSearchWorksheet: React.FC = () => {
       provideFeedback(false);
     }
 
-    setSelectedCells([]);
     setTouchStartCell(null);
+    setSelectedCells([]);
   };
 
   // Helper functions
@@ -336,7 +332,7 @@ const WordSearchWorksheet: React.FC = () => {
         pointsPerQuestion={10}
         onSummaryGenerated={handleSummaryGenerated}
       >
-        {({ addPoints, markCorrect, markIncorrect, score }) => (
+        {({ markCorrect, markIncorrect, score }) => (
           <div className="px-0 md:px-4 max-w-4xl mx-auto">
             {/* Score Display */}
             <div className="bg-white/20 backdrop-blur-sm rounded-xl p-4 mb-4">
@@ -384,10 +380,10 @@ const WordSearchWorksheet: React.FC = () => {
                         data-col={colIndex}
                         onMouseDown={() => handleCellMouseDown(cell)}
                         onMouseEnter={() => handleCellMouseEnter(cell)}
-                        onMouseUp={() => handleCellMouseUp({ markCorrect, markIncorrect, addPoints })}
+                        onMouseUp={() => handleCellMouseUp({ markCorrect, markIncorrect })}
                         onTouchStart={(e) => handleTouchStart(e, cell)}
                         onTouchMove={handleTouchMove}
-                        onTouchEnd={(e) => handleTouchEnd(e, { markCorrect, markIncorrect, addPoints })}
+                        onTouchEnd={(e) => handleTouchEnd(e, { markCorrect, markIncorrect })}
                       >
                         {cell.letter}
                       </div>
