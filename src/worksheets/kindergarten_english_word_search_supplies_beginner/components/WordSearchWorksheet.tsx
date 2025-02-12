@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import WorksheetHeader from '../../../components/shared/layout/Header/WorksheetHeader';
 import WorksheetTracker, { WorksheetSummary } from '../../../components/shared/WorksheetTracker';
 import ScoreDisplay from '../../../components/shared/ScoreDisplay';
+import { motion } from 'framer-motion';
 
 // Theme colors for word highlights
 const WORD_COLORS = [
@@ -55,6 +56,7 @@ const WordSearchWorksheet: React.FC = () => {
   const [selectedCells, setSelectedCells] = useState<Cell[]>([]);
   const [isDragging, setIsDragging] = useState(false);
   const [touchStartCell, setTouchStartCell] = useState<Cell | null>(null);
+  const [isComplete, setIsComplete] = useState(false);
 
   // Initialize grid and place words
   useEffect(() => {
@@ -169,9 +171,10 @@ const WordSearchWorksheet: React.FC = () => {
     }
   };
 
-  // Add success message when all words are found
+  // Update the useEffect for completion check
   useEffect(() => {
-    if (wordPositions.every(pos => pos.found)) {
+    if (wordPositions.length > 0 && wordPositions.every(pos => pos.found)) {
+      setIsComplete(true);
       speak('Congratulations! You found all the school supplies!', 1, 0.9, 1);
     }
   }, [wordPositions]);
@@ -226,27 +229,31 @@ const WordSearchWorksheet: React.FC = () => {
     setSelectedCells([]);
   };
 
-  // Touch event handlers
+  // Touch event handlers with improved mobile control
   const handleTouchStart = (e: React.TouchEvent, cell: Cell) => {
-    e.preventDefault(); // Prevent mouse events from firing
+    e.preventDefault(); // Prevent mouse events and default touch behavior
     setTouchStartCell(cell);
     setSelectedCells([cell]);
+    setIsDragging(true);
   };
 
   const handleTouchMove = (e: React.TouchEvent) => {
-    e.preventDefault(); // Prevent mouse events from firing
-    if (!touchStartCell) return;
+    e.preventDefault(); // Prevent scrolling
+    if (!touchStartCell || !isDragging) return;
 
     const touch = e.touches[0];
     const element = document.elementFromPoint(touch.clientX, touch.clientY) as HTMLElement;
-    const row = parseInt(element?.dataset?.row || '0');
-    const col = parseInt(element?.dataset?.col || '0');
     
-    if (!isNaN(row) && !isNaN(col)) {
-      const cell = grid[row][col];
-      if (cell.row === touchStartCell.row || cell.col === touchStartCell.col) {
-        const newSelectedCells = getSelectedCells(touchStartCell, cell);
-        setSelectedCells(newSelectedCells);
+    if (element) {
+      const row = parseInt(element.getAttribute('data-row') || '-1');
+      const col = parseInt(element.getAttribute('data-col') || '-1');
+      
+      if (row >= 0 && col >= 0 && grid[row] && grid[row][col]) {
+        const targetCell = grid[row][col];
+        if (targetCell.row === touchStartCell.row || targetCell.col === touchStartCell.col) {
+          const newSelectedCells = getSelectedCells(touchStartCell, targetCell);
+          setSelectedCells(newSelectedCells);
+        }
       }
     }
   };
@@ -258,8 +265,8 @@ const WordSearchWorksheet: React.FC = () => {
       markIncorrect: () => void;
     }
   ) => {
-    e.preventDefault(); // Prevent mouse events from firing
-    if (!touchStartCell) return;
+    e.preventDefault(); // Prevent default touch behavior
+    if (!touchStartCell || !isDragging) return;
 
     const selectedWord = getSelectedWord();
     const wordPosition = wordPositions.find(wp => !wp.found && wp.word === selectedWord);
@@ -272,7 +279,7 @@ const WordSearchWorksheet: React.FC = () => {
             pos.word === wordPosition.word ? { ...pos, found: true } : pos
           )
         );
-        markCorrect(); // This will add 10 points
+        markCorrect();
         provideFeedback(true, wordPosition.word);
       } else {
         markIncorrect();
@@ -285,6 +292,7 @@ const WordSearchWorksheet: React.FC = () => {
 
     setTouchStartCell(null);
     setSelectedCells([]);
+    setIsDragging(false);
   };
 
   // Helper functions
@@ -343,24 +351,37 @@ const WordSearchWorksheet: React.FC = () => {
             </div>
 
             {/* Success Message */}
-            {wordPositions.every(pos => pos.found) && (
-              <div className="bg-green-500/20 backdrop-blur-sm rounded-xl p-4 mb-4 text-center">
+            {isComplete && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="bg-green-500/20 backdrop-blur-sm rounded-xl p-4 mb-4 text-center"
+              >
                 <h2 className="text-2xl font-bold text-white mb-2">
                   🎉 Congratulations! 🎉
                 </h2>
-                <p className="text-white">
+                <p className="text-white mb-4">
                   You found all the school supplies! Great job!
                 </p>
-              </div>
+                <button
+                  onClick={() => window.location.reload()}
+                  className="bg-green-500 text-white px-6 py-2 rounded-lg hover:bg-green-600 transition-colors"
+                >
+                  Play Again
+                </button>
+              </motion.div>
             )}
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {/* Word Search Grid */}
               <div className="md:col-span-2 bg-white/20 backdrop-blur-sm rounded-xl p-4">
-                <div className="grid grid-cols-8 gap-0.5 md:gap-1 aspect-square">
+                <div 
+                  className="grid grid-cols-8 gap-0.5 md:gap-1 aspect-square"
+                  style={{ touchAction: 'none' }} // Prevent all default touch actions
+                >
                   {grid.map((row, rowIndex) =>
                     row.map((cell, colIndex) => (
-                      <div
+                      <motion.div
                         key={`${rowIndex}-${colIndex}`}
                         className={`
                           w-full aspect-square rounded-sm md:rounded
@@ -384,9 +405,10 @@ const WordSearchWorksheet: React.FC = () => {
                         onTouchStart={(e) => handleTouchStart(e, cell)}
                         onTouchMove={handleTouchMove}
                         onTouchEnd={(e) => handleTouchEnd(e, { markCorrect, markIncorrect })}
+                        style={{ touchAction: 'none' }} // Prevent touch actions on individual cells
                       >
                         {cell.letter}
-                      </div>
+                      </motion.div>
                     ))
                   )}
                 </div>
