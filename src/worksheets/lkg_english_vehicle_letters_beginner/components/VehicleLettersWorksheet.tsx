@@ -21,7 +21,6 @@ const VEHICLES = [
 const VehicleLettersWorksheet: React.FC = () => {
   const [answers, setAnswers] = useState<string[]>(Array(VEHICLES.length).fill(''));
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
-  const [correctAnswers, setCorrectAnswers] = useState<Set<number>>(new Set());
   const speechRef = useRef<SpeechSynthesisUtterance | null>(null);
 
   // Enhanced speak function with different voice options
@@ -70,86 +69,66 @@ const VehicleLettersWorksheet: React.FC = () => {
     return messages[Math.floor(Math.random() * messages.length)];
   };
 
-  // Handle key press with enhanced feedback
-  const handleKeyPress = (
-    event: React.KeyboardEvent<HTMLInputElement>,
-    index: number,
-    { markCorrect, markIncorrect }: { markCorrect: () => void; markIncorrect: () => void }
-  ) => {
-    const input = event.key.toUpperCase();
-    if (/^[A-Z]$/.test(input)) {
-      const newAnswers = [...answers];
-      newAnswers[index] = input;
-      setAnswers(newAnswers);
+  // Add provideFeedback function
+  const provideFeedback = (isCorrect: boolean, vehicleName?: string) => {
+    if (isCorrect && vehicleName) {
+      setTimeout(() => {
+        const vehicle = VEHICLES.find(v => v.name === vehicleName);
+        if (vehicle) {
+          speak(`The ${vehicle.name.toLowerCase()} ${vehicle.sound}`, true);
+        }
+      }, 1500);
 
-      const currentVehicle = VEHICLES[index];
-      // Check if answer is correct
-      if (input === currentVehicle.letter) {
-        // Only mark correct and award points if this is the first time getting it right
-        if (!correctAnswers.has(index)) {
-          markCorrect();
-          setCorrectAnswers(prev => new Set([...prev, index]));
-          speak(getSuccessFeedback(currentVehicle));
-          setTimeout(() => {
-            speak(currentVehicle.sound, true);
-          }, 1500);
-        }
-        
-        // Move to next empty box
-        const nextIndex = answers.findIndex((answer, i) => i > index && answer === '');
-        if (nextIndex !== -1) {
-          setTimeout(() => {
-            setActiveIndex(nextIndex);
-            speak(VEHICLES[nextIndex].name);
-          }, 2500);
-        }
-      } else {
-        markIncorrect();
-        speak("Try again! Listen to the vehicle name one more time.");
+      // Move to next empty box
+      const currentIndex = activeIndex ?? 0;
+      const nextIndex = answers.findIndex((answer, i) => i > currentIndex && answer === '');
+      if (nextIndex !== -1) {
         setTimeout(() => {
-          speak(currentVehicle.name);
-        }, 1500);
+          setActiveIndex(nextIndex);
+          speak(VEHICLES[nextIndex].name);
+        }, 2500);
       }
     }
   };
 
-  // Add input change handler for mobile
+  // Update handleInputChange for better mobile support
   const handleInputChange = (
     event: React.ChangeEvent<HTMLInputElement>,
     index: number,
     { markCorrect, markIncorrect }: { markCorrect: () => void; markIncorrect: () => void }
   ) => {
-    const input = event.target.value.toUpperCase();
-    if (/^[A-Z]$/.test(input)) {
-      const newAnswers = [...answers];
-      newAnswers[index] = input;
-      setAnswers(newAnswers);
+    // Get the last character entered
+    const input = event.target.value.slice(-1).toUpperCase();
+    
+    // Allow empty input for backspace/delete
+    if (!input) {
+      setAnswers(prev => {
+        const newAnswers = [...prev];
+        newAnswers[index] = '';
+        return newAnswers;
+      });
+      return;
+    }
 
-      const currentVehicle = VEHICLES[index];
-      if (input === currentVehicle.letter) {
-        if (!correctAnswers.has(index)) {
-          markCorrect();
-          setCorrectAnswers(prev => new Set([...prev, index]));
-          speak(getSuccessFeedback(currentVehicle));
-          setTimeout(() => {
-            speak(currentVehicle.sound, true);
-          }, 1500);
-        }
-        
-        const nextIndex = answers.findIndex((answer, i) => i > index && answer === '');
-        if (nextIndex !== -1) {
-          setTimeout(() => {
-            setActiveIndex(nextIndex);
-            speak(VEHICLES[nextIndex].name);
-          }, 2500);
-        }
-      } else {
-        markIncorrect();
-        speak("Try again! Listen to the vehicle name one more time.");
-        setTimeout(() => {
-          speak(currentVehicle.name);
-        }, 1500);
-      }
+    // Only proceed if input is a letter
+    if (!/^[A-Z]$/.test(input)) return;
+
+    setAnswers(prev => {
+      const newAnswers = [...prev];
+      newAnswers[index] = input;
+      return newAnswers;
+    });
+
+    // Check if answer is correct
+    const isCorrect = input === VEHICLES[index].letter;
+    if (isCorrect) {
+      markCorrect();
+      provideFeedback(true, VEHICLES[index].name);
+      speak(getSuccessFeedback(VEHICLES[index]));
+    } else {
+      markIncorrect();
+      provideFeedback(false);
+      speak('Try again');
     }
   };
 
@@ -214,7 +193,6 @@ const VehicleLettersWorksheet: React.FC = () => {
                       pattern="[A-Za-z]*"
                       value={answers[index]}
                       onChange={(e) => handleInputChange(e, index, { markCorrect, markIncorrect })}
-                      onKeyDown={(e) => handleKeyPress(e, index, { markCorrect, markIncorrect })}
                       className={`
                         w-full h-full text-center bg-transparent outline-none
                         ${answers[index] === vehicle.letter ? 'text-green-700' : 'text-gray-700'}
