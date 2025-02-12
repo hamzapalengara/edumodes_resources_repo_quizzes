@@ -21,7 +21,6 @@ const ANIMALS = [
 const AnimalLettersWorksheet: React.FC = () => {
   const [answers, setAnswers] = useState<string[]>(Array(ANIMALS.length).fill(''));
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
-  const [correctAnswers, setCorrectAnswers] = useState<Set<number>>(new Set());
   const speechRef = useRef<SpeechSynthesisUtterance | null>(null);
 
   // Enhanced speak function with different voice options
@@ -70,86 +69,69 @@ const AnimalLettersWorksheet: React.FC = () => {
     return messages[Math.floor(Math.random() * messages.length)];
   };
 
-  // Handle key press with enhanced feedback
-  const handleKeyPress = (
-    event: React.KeyboardEvent<HTMLInputElement>,
-    index: number,
-    { markCorrect, markIncorrect }: { markCorrect: () => void; markIncorrect: () => void }
-  ) => {
-    const input = event.key.toUpperCase();
-    if (/^[A-Z]$/.test(input)) {
-      const newAnswers = [...answers];
-      newAnswers[index] = input;
-      setAnswers(newAnswers);
+  // Add provideFeedback function
+  const provideFeedback = (isCorrect: boolean, animalName?: string) => {
+    if (isCorrect && animalName) {
+      setTimeout(() => {
+        const animal = ANIMALS.find(a => a.name === animalName);
+        if (animal) {
+          speak(`The ${animal.name.toLowerCase()} ${animal.sound}`, true);
+        }
+      }, 1500);
 
-      const currentAnimal = ANIMALS[index];
-      // Check if answer is correct
-      if (input === currentAnimal.letter) {
-        // Only mark correct and award points if this is the first time getting it right
-        if (!correctAnswers.has(index)) {
-          markCorrect();
-          setCorrectAnswers(prev => new Set([...prev, index]));
-          speak(getSuccessFeedback(currentAnimal));
-          setTimeout(() => {
-            speak(currentAnimal.sound, true);
-          }, 1500);
-        }
-        
-        // Move to next empty box
-        const nextIndex = answers.findIndex((answer, i) => i > index && answer === '');
-        if (nextIndex !== -1) {
-          setTimeout(() => {
-            setActiveIndex(nextIndex);
-            speak(ANIMALS[nextIndex].name);
-          }, 2500);
-        }
-      } else {
-        markIncorrect();
-        speak("Try again! Listen to the animal name one more time.");
+      // Move to next empty box
+      const currentIndex = activeIndex ?? 0;
+      const nextIndex = answers.findIndex((answer, i) => i > currentIndex && answer === '');
+      if (nextIndex !== -1) {
         setTimeout(() => {
-          speak(currentAnimal.name);
-        }, 1500);
+          setActiveIndex(nextIndex);
+          speak(ANIMALS[nextIndex].name);
+        }, 2500);
       }
     }
   };
 
-  // Add input change handler for mobile
+  // Update handleInputChange for better mobile support
   const handleInputChange = (
     event: React.ChangeEvent<HTMLInputElement>,
     index: number,
     { markCorrect, markIncorrect }: { markCorrect: () => void; markIncorrect: () => void }
   ) => {
-    const input = event.target.value.slice(-1).toUpperCase(); // Get the last character entered
-    if (/^[A-Z]$/.test(input)) {
-      const newAnswers = [...answers];
-      newAnswers[index] = input;
-      setAnswers(newAnswers);
+    // Get the last character entered
+    const input = event.target.value.slice(-1).toUpperCase();
+    
+    // Allow empty input for backspace/delete
+    if (!input) {
+      setAnswers(prev => {
+        const newAnswers = [...prev];
+        newAnswers[index] = '';
+        return newAnswers;
+      });
+      return;
+    }
 
-      const currentAnimal = ANIMALS[index];
-      if (input === currentAnimal.letter) {
-        if (!correctAnswers.has(index)) {
-          markCorrect();
-          setCorrectAnswers(prev => new Set([...prev, index]));
-          speak(getSuccessFeedback(currentAnimal));
-          setTimeout(() => {
-            speak(currentAnimal.sound, true);
-          }, 1500);
-        }
-        
-        const nextIndex = answers.findIndex((answer, i) => i > index && answer === '');
-        if (nextIndex !== -1) {
-          setTimeout(() => {
-            setActiveIndex(nextIndex);
-            speak(ANIMALS[nextIndex].name);
-          }, 2500);
-        }
-      } else {
-        markIncorrect();
-        speak("Try again! Listen to the animal name one more time.");
-        setTimeout(() => {
-          speak(currentAnimal.name);
-        }, 1500);
-      }
+    // Only proceed if input is a letter
+    if (!/^[A-Z]$/.test(input)) return;
+
+    // Check if this answer was already correct
+    const wasCorrect = answers[index] === ANIMALS[index].letter;
+
+    setAnswers(prev => {
+      const newAnswers = [...prev];
+      newAnswers[index] = input;
+      return newAnswers;
+    });
+
+    // Check if answer is correct
+    const isCorrect = input === ANIMALS[index].letter;
+    if (isCorrect && !wasCorrect) { // Only mark correct if it wasn't already correct
+      markCorrect();
+      provideFeedback(true, ANIMALS[index].name);
+      speak(getSuccessFeedback(ANIMALS[index]));
+    } else if (!isCorrect) {
+      markIncorrect();
+      provideFeedback(false);
+      speak('Try again');
     }
   };
 
@@ -186,11 +168,12 @@ const AnimalLettersWorksheet: React.FC = () => {
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                 >
-                  {/* Animal Emoji */}
+                  {/* Animal Emoji with Animation */}
                   <motion.div
                     className="text-6xl mb-4 drop-shadow-lg"
                     animate={{ 
-                      scale: activeIndex === index ? [1, 1.1, 1] : 1 
+                      scale: activeIndex === index ? [1, 1.1, 1] : 1,
+                      rotate: activeIndex === index ? [0, -5, 5, 0] : 0
                     }}
                     transition={{ duration: 0.5 }}
                   >
@@ -213,9 +196,8 @@ const AnimalLettersWorksheet: React.FC = () => {
                       pattern="[A-Za-z]*"
                       value={answers[index]}
                       onChange={(e) => handleInputChange(e, index, { markCorrect, markIncorrect })}
-                      onKeyDown={(e) => handleKeyPress(e, index, { markCorrect, markIncorrect })}
                       className={`
-                        w-full h-full text-center bg-transparent outline-none select-none
+                        w-full h-full text-center bg-transparent outline-none
                         ${answers[index] === animal.letter ? 'text-green-700' : 'text-gray-700'}
                       `}
                       maxLength={1}
@@ -234,7 +216,7 @@ const AnimalLettersWorksheet: React.FC = () => {
             {/* Instructions */}
             <div className="bg-white/30 backdrop-blur-md rounded-xl p-4 mt-4 text-white text-center shadow-lg">
               <p className="text-lg">
-                👆 Touch a box to hear the animal name, then type the first letter!
+                👆 Touch an animal to hear its name, then type the first letter!
               </p>
             </div>
           </div>
