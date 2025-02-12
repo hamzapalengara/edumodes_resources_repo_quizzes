@@ -22,7 +22,6 @@ const FRUITS = [
 const FruitLettersWorksheet: React.FC = () => {
   const [answers, setAnswers] = useState<string[]>(Array(FRUITS.length).fill(''));
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
-  const [correctAnswers, setCorrectAnswers] = useState<Set<number>>(new Set());
   const speechRef = useRef<SpeechSynthesisUtterance | null>(null);
 
   // Enhanced speak function with different voice options
@@ -71,86 +70,69 @@ const FruitLettersWorksheet: React.FC = () => {
     return messages[Math.floor(Math.random() * messages.length)];
   };
 
-  // Add input change handler for mobile
+  // Add provideFeedback function
+  const provideFeedback = (isCorrect: boolean, fruitName?: string) => {
+    if (isCorrect && fruitName) {
+      setTimeout(() => {
+        const fruit = FRUITS.find(f => f.name === fruitName);
+        if (fruit) {
+          speak(`The ${fruit.name.toLowerCase()} ${fruit.sound}`, true);
+        }
+      }, 1500);
+
+      // Move to next empty box
+      const currentIndex = activeIndex ?? 0;
+      const nextIndex = answers.findIndex((answer, i) => i > currentIndex && answer === '');
+      if (nextIndex !== -1) {
+        setTimeout(() => {
+          setActiveIndex(nextIndex);
+          speak(FRUITS[nextIndex].name);
+        }, 2500);
+      }
+    }
+  };
+
+  // Update handleInputChange for better mobile support
   const handleInputChange = (
     event: React.ChangeEvent<HTMLInputElement>,
     index: number,
     { markCorrect, markIncorrect }: { markCorrect: () => void; markIncorrect: () => void }
   ) => {
-    const input = event.target.value.toUpperCase();
-    if (/^[A-Z]$/.test(input)) {
-      const newAnswers = [...answers];
-      newAnswers[index] = input;
-      setAnswers(newAnswers);
-
-      const currentFruit = FRUITS[index];
-      if (input === currentFruit.letter) {
-        if (!correctAnswers.has(index)) {
-          markCorrect();
-          setCorrectAnswers(prev => new Set([...prev, index]));
-          speak(getSuccessFeedback(currentFruit));
-          setTimeout(() => {
-            speak(currentFruit.sound, true);
-          }, 1500);
-        }
-        
-        const nextIndex = answers.findIndex((answer, i) => i > index && answer === '');
-        if (nextIndex !== -1) {
-          setTimeout(() => {
-            setActiveIndex(nextIndex);
-            speak(FRUITS[nextIndex].name);
-          }, 2500);
-        }
-      } else {
-        markIncorrect();
-        speak("Try again! Listen to the fruit name one more time.");
-        setTimeout(() => {
-          speak(currentFruit.name);
-        }, 1500);
-      }
+    // Get the last character entered
+    const input = event.target.value.slice(-1).toUpperCase();
+    
+    // Allow empty input for backspace/delete
+    if (!input) {
+      setAnswers(prev => {
+        const newAnswers = [...prev];
+        newAnswers[index] = '';
+        return newAnswers;
+      });
+      return;
     }
-  };
 
-  // Handle key press with enhanced feedback
-  const handleKeyPress = (
-    event: React.KeyboardEvent<HTMLInputElement>,
-    index: number,
-    { markCorrect, markIncorrect }: { markCorrect: () => void; markIncorrect: () => void }
-  ) => {
-    const input = event.key.toUpperCase();
-    if (/^[A-Z]$/.test(input)) {
-      const newAnswers = [...answers];
+    // Only proceed if input is a letter
+    if (!/^[A-Z]$/.test(input)) return;
+
+    // Check if this answer was already correct
+    const wasCorrect = answers[index] === FRUITS[index].letter;
+
+    setAnswers(prev => {
+      const newAnswers = [...prev];
       newAnswers[index] = input;
-      setAnswers(newAnswers);
+      return newAnswers;
+    });
 
-      const currentFruit = FRUITS[index];
-      // Check if answer is correct
-      if (input === currentFruit.letter) {
-        // Only mark correct and award points if this is the first time getting it right
-        if (!correctAnswers.has(index)) {
-          markCorrect();
-          setCorrectAnswers(prev => new Set([...prev, index]));
-          speak(getSuccessFeedback(currentFruit));
-          setTimeout(() => {
-            speak(currentFruit.sound, true);
-          }, 1500);
-        }
-        
-        // Move to next empty box
-        const nextIndex = answers.findIndex((answer, i) => i > index && answer === '');
-        if (nextIndex !== -1) {
-          setTimeout(() => {
-            setActiveIndex(nextIndex);
-            speak(FRUITS[nextIndex].name);
-          }, 2500);
-        }
-      } else {
-        markIncorrect();
-        speak("Try again! Listen to the fruit name one more time.");
-        setTimeout(() => {
-          speak(currentFruit.name);
-        }, 1500);
-      }
+    // Check if answer is correct
+    const isCorrect = input === FRUITS[index].letter;
+    if (isCorrect && !wasCorrect) { // Only mark correct if it wasn't already correct
+      markCorrect();
+      provideFeedback(true, FRUITS[index].name);
+      speak(getSuccessFeedback(FRUITS[index]));
+    } else if (!isCorrect) {
+      markIncorrect();
+      provideFeedback(false);
+      speak('Try again');
     }
   };
 
@@ -187,11 +169,12 @@ const FruitLettersWorksheet: React.FC = () => {
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                 >
-                  {/* Fruit Image/Emoji */}
+                  {/* Fruit Image/Emoji with Animation */}
                   <motion.div
                     className="text-6xl mb-4 drop-shadow-lg"
                     animate={{ 
-                      scale: activeIndex === index ? [1, 1.1, 1] : 1 
+                      scale: activeIndex === index ? [1, 1.1, 1] : 1,
+                      rotate: activeIndex === index ? [0, -5, 5, 0] : 0
                     }}
                     transition={{ duration: 0.5 }}
                   >
@@ -201,7 +184,7 @@ const FruitLettersWorksheet: React.FC = () => {
                       <img 
                         src={fruit.image} 
                         alt={fruit.name}
-                        className="w-20 h-20 object-contain"
+                        className="w-16 h-16 object-contain"
                       />
                     )}
                   </motion.div>
@@ -222,7 +205,6 @@ const FruitLettersWorksheet: React.FC = () => {
                       pattern="[A-Za-z]*"
                       value={answers[index]}
                       onChange={(e) => handleInputChange(e, index, { markCorrect, markIncorrect })}
-                      onKeyDown={(e) => handleKeyPress(e, index, { markCorrect, markIncorrect })}
                       className={`
                         w-full h-full text-center bg-transparent outline-none
                         ${answers[index] === fruit.letter ? 'text-green-700' : 'text-gray-700'}
@@ -242,7 +224,7 @@ const FruitLettersWorksheet: React.FC = () => {
             {/* Instructions */}
             <div className="bg-white/30 backdrop-blur-md rounded-xl p-4 mt-4 text-white text-center shadow-lg">
               <p className="text-lg">
-                👆 Touch a box to hear the fruit name, then type the first letter!
+                👆 Touch a fruit to hear its name, then type the first letter!
               </p>
             </div>
           </div>
