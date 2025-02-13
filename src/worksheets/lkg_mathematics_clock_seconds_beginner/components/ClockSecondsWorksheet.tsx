@@ -7,12 +7,44 @@ import ScoreDisplay from '../../../components/shared/ScoreDisplay';
 
 // Questions with different durations in seconds
 const TIME_QUESTIONS = [
-  { seconds: 3, options: ['2 seconds', '3 seconds', '4 seconds'] },
-  { seconds: 5, options: ['4 seconds', '5 seconds', '6 seconds'] },
-  { seconds: 8, options: ['7 seconds', '8 seconds', '9 seconds'] },
-  { seconds: 4, options: ['3 seconds', '4 seconds', '5 seconds'] },
-  { seconds: 6, options: ['5 seconds', '6 seconds', '7 seconds'] },
-  { seconds: 10, options: ['9 seconds', '10 seconds', '11 seconds'] }
+  { 
+    seconds: 3, 
+    options: ['2 seconds', '3 seconds', '4 seconds'],
+    funFact: "That's as quick as saying 'Mississippi' three times!"
+  },
+  { 
+    seconds: 5, 
+    options: ['4 seconds', '5 seconds', '6 seconds'],
+    funFact: "High five! ✋ That's how many seconds just passed!"
+  },
+  { 
+    seconds: 8, 
+    options: ['7 seconds', '8 seconds', '9 seconds'],
+    funFact: "You could do 8 jumping jacks in that time! 🏃‍♂️"
+  },
+  { 
+    seconds: 4, 
+    options: ['3 seconds', '4 seconds', '5 seconds'],
+    funFact: "That's the time it takes to say 'supercalifragilistic'!"
+  },
+  { 
+    seconds: 6, 
+    options: ['5 seconds', '6 seconds', '7 seconds'],
+    funFact: "Six seconds - like counting all your fingers! 👐"
+  },
+  { 
+    seconds: 10, 
+    options: ['9 seconds', '10 seconds', '11 seconds'],
+    funFact: "Ten seconds - that's like counting all your toes! 🦶"
+  }
+];
+
+const ENCOURAGEMENT_PHRASES = [
+  "You're doing great! 🌟",
+  "Keep watching carefully! 👀",
+  "Almost there! 🎯",
+  "You're a super counter! 🦸‍♂️",
+  "Time is fun with you! ⭐️"
 ];
 
 const ClockSecondsWorksheet: React.FC = () => {
@@ -65,10 +97,10 @@ const ClockSecondsWorksheet: React.FC = () => {
 
   const getSuccessFeedback = (seconds: number) => {
     const phrases = [
-      `Excellent! The seconds hand moved for ${seconds} seconds!`,
-      `Perfect! You counted ${seconds} seconds correctly!`,
-      `Amazing! That was exactly ${seconds} seconds!`,
-      `Great job! The clock ticked for ${seconds} seconds!`
+      `Excellent! The seconds hand moved for ${seconds} seconds! ${TIME_QUESTIONS[currentQuestion].funFact}`,
+      `Perfect! You counted ${seconds} seconds correctly! ${TIME_QUESTIONS[currentQuestion].funFact}`,
+      `Amazing! That was exactly ${seconds} seconds! ${TIME_QUESTIONS[currentQuestion].funFact}`,
+      `Great job! The clock ticked for ${seconds} seconds! ${TIME_QUESTIONS[currentQuestion].funFact}`
     ];
     return phrases[Math.floor(Math.random() * phrases.length)];
   };
@@ -76,6 +108,8 @@ const ClockSecondsWorksheet: React.FC = () => {
   const animate = (timestamp: number) => {
     if (!startTimeRef.current) {
       startTimeRef.current = timestamp;
+      // Speak an encouragement phrase at the start
+      speak(ENCOURAGEMENT_PHRASES[Math.floor(Math.random() * ENCOURAGEMENT_PHRASES.length)]);
     }
 
     const elapsed = timestamp - startTimeRef.current;
@@ -86,10 +120,17 @@ const ClockSecondsWorksheet: React.FC = () => {
 
     if (seconds <= TIME_QUESTIONS[currentQuestion].seconds) {
       setSecondsRotation(currentRotation);
+      // Play tick sound every second
+      if (currentRotation % 6 === 0) {
+        const tickSound = new Audio('/sounds/tick.mp3');
+        tickSound.volume = 0.3;
+        tickSound.play();
+      }
       animationRef.current = requestAnimationFrame(animate);
     } else {
       setIsAnimating(false);
       startTimeRef.current = null;
+      speak("Time's up! How many seconds was that?");
     }
   };
 
@@ -250,13 +291,18 @@ const ClockSecondsWorksheet: React.FC = () => {
       >
         {({ score, markCorrect, markIncorrect, markAttempted }) => (
           <div className="px-2 md:px-4 max-w-4xl mx-auto">
-            {/* Score Display */}
-            <div className="bg-white/50 backdrop-blur-sm p-4 rounded-xl shadow-lg mb-4">
+            {/* Score Display with Animation */}
+            <motion.div
+              className="bg-white/50 backdrop-blur-sm p-4 rounded-xl shadow-lg mb-4"
+              initial={{ scale: 0.95 }}
+              animate={{ scale: 1 }}
+              transition={{ duration: 0.2 }}
+            >
               <ScoreDisplay 
                 score={score}
                 totalQuestions={TIME_QUESTIONS.length * 10}
               />
-            </div>
+            </motion.div>
 
             {/* Current Task */}
             <motion.div
@@ -264,25 +310,64 @@ const ClockSecondsWorksheet: React.FC = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
             >
-              <h2 className="text-xl font-bold text-center text-transparent bg-clip-text bg-gradient-to-r from-orange-600 to-amber-600 mb-4">
+              <motion.h2 
+                className="text-xl font-bold text-center text-transparent bg-clip-text bg-gradient-to-r from-orange-600 to-amber-600 mb-4"
+                animate={{ scale: isAnimating ? [1, 1.05, 1] : 1 }}
+                transition={{ duration: 0.5, repeat: isAnimating ? Infinity : 0 }}
+              >
                 {isAnimating ? (
-                  "Count the seconds!"
+                  "Count the seconds! 🕐"
                 ) : (
                   selectedAnswer ? (
-                    "How many seconds did the hand move?"
+                    "How many seconds did the hand move? 🤔"
                   ) : (
-                    "Click Start to watch the seconds hand"
+                    "Click Start to watch the seconds hand! 👇"
                   )
                 )}
-              </h2>
+              </motion.h2>
 
-              {/* Clock Container */}
-              <div className="bg-white/70 backdrop-blur-sm rounded-xl p-4 shadow-lg border border-orange-100 mb-6">
+              {/* Progress Indicator */}
+              <div className="flex justify-center mb-4">
+                {[...Array(TIME_QUESTIONS.length)].map((_, index) => (
+                  <motion.div
+                    key={index}
+                    className={`w-3 h-3 rounded-full mx-1 ${
+                      index === currentQuestion 
+                        ? 'bg-orange-500' 
+                        : index < currentQuestion 
+                          ? 'bg-green-500' 
+                          : 'bg-gray-200'
+                    }`}
+                    initial={{ scale: 0.8 }}
+                    animate={{ scale: index === currentQuestion ? [0.8, 1.1, 0.8] : 0.8 }}
+                    transition={{ duration: 1, repeat: index === currentQuestion ? Infinity : 0 }}
+                  />
+                ))}
+              </div>
+
+              {/* Clock Container with Fun Background */}
+              <div className="bg-white/70 backdrop-blur-sm rounded-xl p-4 shadow-lg border border-orange-100 mb-6 relative overflow-hidden">
+                {/* Fun Background Pattern */}
+                <div className="absolute inset-0 opacity-5">
+                  {['⏰', '⌚️', '⏱️', '🕐'].map((emoji, i) => (
+                    <div
+                      key={i}
+                      className="absolute text-2xl"
+                      style={{
+                        top: `${Math.random() * 100}%`,
+                        left: `${Math.random() * 100}%`,
+                        transform: 'translate(-50%, -50%) rotate(45deg)'
+                      }}
+                    >
+                      {emoji}
+                    </div>
+                  ))}
+                </div>
                 {renderClock()}
               </div>
 
-              {/* Start Button or Options */}
-              <div className="flex flex-col items-center gap-4">
+              {/* Interactive Controls */}
+              <div className="flex flex-col items-center space-y-4">
                 {!isAnimating && !selectedAnswer && (
                   <motion.button
                     className="w-full sm:w-auto px-8 py-3 text-lg font-bold text-white rounded-full bg-gradient-to-r from-orange-500 to-amber-500 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all"
@@ -290,7 +375,7 @@ const ClockSecondsWorksheet: React.FC = () => {
                     whileTap={{ scale: 0.95 }}
                     onClick={startAnimation}
                   >
-                    Start
+                    Start Counting! 🎯
                   </motion.button>
                 )}
 
@@ -320,7 +405,6 @@ const ClockSecondsWorksheet: React.FC = () => {
                   </div>
                 )}
 
-                {/* Try Again Button */}
                 {selectedAnswer && selectedAnswer !== `${TIME_QUESTIONS[currentQuestion].seconds} seconds` && (
                   <motion.button
                     className="w-full sm:w-auto px-8 py-3 text-lg font-bold text-white rounded-full bg-gradient-to-r from-orange-500 to-amber-500 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all mt-4"
@@ -331,7 +415,7 @@ const ClockSecondsWorksheet: React.FC = () => {
                       startAnimation();
                     }}
                   >
-                    Try Again
+                    Try Again! 🔄
                   </motion.button>
                 )}
               </div>
@@ -340,20 +424,30 @@ const ClockSecondsWorksheet: React.FC = () => {
             {/* Celebration Animation */}
             <AnimatePresence>
               {showCelebration && (
-                <Confetti
-                  width={windowSize.width}
-                  height={windowSize.height}
-                  numberOfPieces={150}
-                  recycle={false}
-                  gravity={0.5}
-                  colors={[
-                    '#F97316',
-                    '#FB923C',
-                    '#FBBF24',
-                    '#FDE68A',
-                    '#FEF3C7',
-                  ]}
-                />
+                <>
+                  <Confetti
+                    width={windowSize.width}
+                    height={windowSize.height}
+                    numberOfPieces={150}
+                    recycle={false}
+                    gravity={0.5}
+                    colors={[
+                      '#F97316',
+                      '#FB923C',
+                      '#FBBF24',
+                      '#FDE68A',
+                      '#FEF3C7',
+                    ]}
+                  />
+                  <motion.div
+                    className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
+                    initial={{ scale: 0 }}
+                    animate={{ scale: [0, 1.2, 1] }}
+                    exit={{ scale: 0 }}
+                  >
+                    <div className="text-6xl">🎉</div>
+                  </motion.div>
+                </>
               )}
             </AnimatePresence>
           </div>

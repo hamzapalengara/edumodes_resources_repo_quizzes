@@ -10,13 +10,13 @@ const TIME_QUESTIONS = [
   {
     hours: 3,
     minutes: 30,
-    options: ['3:30', 'Half past 3', 'Quarter past 3'],
+    options: ['Quarter past 3', 'Half past 3', 'Quarter to 4'],
     correctAnswer: 'Half past 3'
   },
   {
     hours: 9,
     minutes: 15,
-    options: ['Quarter past 9', 'Half past 9', '9:30'],
+    options: ['Quarter past 9', 'Half past 9', 'Quarter to 10'],
     correctAnswer: 'Quarter past 9'
   },
   {
@@ -28,25 +28,25 @@ const TIME_QUESTIONS = [
   {
     hours: 12,
     minutes: 30,
-    options: ['Half past 12', 'Quarter past 12', '12:15'],
+    options: ['Half past 12', 'Quarter to 1', 'Quarter past 12'],
     correctAnswer: 'Half past 12'
   },
   {
     hours: 4,
     minutes: 15,
-    options: ['Quarter to 4', 'Quarter past 4', '4:30'],
+    options: ['Quarter to 5', 'Quarter past 4', 'Half past 4'],
     correctAnswer: 'Quarter past 4'
   },
   {
     hours: 8,
     minutes: 45,
-    options: ['Quarter to 9', 'Half past 8', '8:30'],
+    options: ['Quarter to 9', 'Half past 8', 'Quarter past 8'],
     correctAnswer: 'Quarter to 9'
   },
   {
     hours: 2,
     minutes: 30,
-    options: ['2:15', 'Half past 2', 'Quarter past 2'],
+    options: ['Quarter to 3', 'Half past 2', 'Quarter past 2'],
     correctAnswer: 'Half past 2'
   },
   {
