@@ -1,1 +1,0 @@
-A fun and interactive game where children identify lowercase vowels (a, e, i, o, u) in a colorful grid. Features voice guidance, instant feedback with colors and sounds, and a progress tracker. Perfect for kindergarteners learning to recognize vowels among other lowercase letters. 

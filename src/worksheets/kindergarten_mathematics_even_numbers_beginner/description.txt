@@ -1,1 +1,0 @@
-An engaging interactive game where children identify even numbers from 1 to 10. Features voice guidance, instant feedback, and visual cues to help students understand the concept of even numbers through hands-on practice. 
