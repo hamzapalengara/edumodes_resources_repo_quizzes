@@ -8,123 +8,107 @@ import ScoreDisplay from '../../../components/shared/ScoreDisplay';
 // Theme colors for different questions
 const THEMES = [
   {
-    name: 'Garden',
-    background: 'from-green-50 via-emerald-50 to-teal-50',
+    name: 'Ocean',
+    background: 'from-blue-50 via-cyan-50 to-teal-50',
+    accent: 'cyan',
+    containerBg: 'bg-cyan-50',
+    borderColor: 'border-cyan-200',
+    textColor: 'text-cyan-600'
+  },
+  {
+    name: 'Coral',
+    background: 'from-rose-50 via-pink-50 to-orange-50',
+    accent: 'rose',
+    containerBg: 'bg-rose-50',
+    borderColor: 'border-rose-200',
+    textColor: 'text-rose-600'
+  },
+  {
+    name: 'Seaweed',
+    background: 'from-emerald-50 via-green-50 to-teal-50',
     accent: 'emerald',
     containerBg: 'bg-emerald-50',
     borderColor: 'border-emerald-200',
     textColor: 'text-emerald-600'
-  },
-  {
-    name: 'Sky',
-    background: 'from-blue-50 via-sky-50 to-indigo-50',
-    accent: 'sky',
-    containerBg: 'bg-sky-50',
-    borderColor: 'border-sky-200',
-    textColor: 'text-sky-600'
-  },
-  {
-    name: 'Sunset',
-    background: 'from-orange-50 via-amber-50 to-yellow-50',
-    accent: 'amber',
-    containerBg: 'bg-amber-50',
-    borderColor: 'border-amber-200',
-    textColor: 'text-amber-600'
-  },
-  {
-    name: 'Berry',
-    background: 'from-pink-50 via-purple-50 to-fuchsia-50',
-    accent: 'purple',
-    containerBg: 'bg-purple-50',
-    borderColor: 'border-purple-200',
-    textColor: 'text-purple-600'
-  },
-  {
-    name: 'Ocean',
-    background: 'from-cyan-50 via-teal-50 to-blue-50',
-    accent: 'teal',
-    containerBg: 'bg-teal-50',
-    borderColor: 'border-teal-200',
-    textColor: 'text-teal-600'
   }
 ];
 
-// Division questions with visual objects and audio hints
+// Division questions with sea creatures
 const DIVISION_QUESTIONS = [
   {
     id: 1,
-    totalObjects: 20,
-    divisor: 4,
-    objectType: '🐰',
-    question: 'Help the bunnies form 4 equal groups!',
-    hint: 'Count how many bunnies should be in each group.',
+    totalObjects: 6,
+    divisor: 2,
+    objectType: '🐠',
+    question: 'Help the fish swim into 2 equal groups!',
+    hint: 'Count how many fish should be in each group.',
     audioHints: [
-      "Let's divide 20 bunnies into 4 groups.",
-      "Try putting one bunny in each group at a time.",
-      "Keep going until all bunnies are in groups!",
-      "Each group should have the same number of bunnies."
+      "Let's divide 6 fish into 2 groups.",
+      "Try putting one fish in each group at a time.",
+      "Keep going until all fish are in groups!",
+      "Each group should have the same number of fish."
     ],
     theme: THEMES[0]
   },
   {
     id: 2,
-    totalObjects: 12,
+    totalObjects: 9,
     divisor: 3,
-    objectType: '⭐️',
-    question: 'Sort the stars into 3 equal groups!',
-    hint: 'Make sure each group has the same number of stars.',
+    objectType: '🦀',
+    question: 'Sort the crabs into 3 equal groups!',
+    hint: 'Make sure each group has the same number of crabs.',
     audioHints: [
-      "We have 12 shining stars to divide into 3 groups.",
-      "Place the stars one by one into each group.",
+      "We have 9 crabs to divide into 3 groups.",
+      "Place the crabs one by one into each group.",
       "Count carefully to make sure each group is equal."
     ],
     theme: THEMES[1]
   },
   {
     id: 3,
-    totalObjects: 15,
-    divisor: 5,
-    objectType: '🌸',
-    question: 'Arrange the flowers into 5 equal groups!',
-    hint: 'Count carefully to make equal groups of flowers.',
+    totalObjects: 8,
+    divisor: 2,
+    objectType: '🐋',
+    question: 'Guide the whales into 2 equal groups!',
+    hint: 'Count carefully to make equal groups of whales.',
     audioHints: [
-      "Time to divide 15 beautiful flowers into 5 groups.",
-      "Put one flower in each group, then repeat.",
-      "Keep going until all flowers are arranged equally."
+      "Time to divide 8 whales into 2 groups.",
+      "Put one whale in each group, then repeat.",
+      "Keep going until all whales are arranged equally."
     ],
     theme: THEMES[2]
   },
   {
     id: 4,
-    totalObjects: 16,
-    divisor: 4,
-    objectType: '🎈',
-    question: 'Put the balloons into 4 equal groups!',
-    hint: 'Each group should have the same number of balloons.',
+    totalObjects: 10,
+    divisor: 5,
+    objectType: '🐢',
+    question: 'Help the turtles form 5 equal groups!',
+    hint: 'Each group should have the same number of turtles.',
     audioHints: [
-      "Let's divide 16 colorful balloons into 4 groups.",
-      "One balloon at a time, fill each group equally.",
-      "Make sure no group has more balloons than others."
+      "Let's divide 10 turtles into 5 groups.",
+      "One turtle at a time, fill each group equally.",
+      "Make sure no group has more turtles than others."
     ],
-    theme: THEMES[3]
+    theme: THEMES[0]
   },
   {
     id: 5,
-    totalObjects: 18,
-    divisor: 6,
-    objectType: '🍎',
-    question: 'Share the apples into 6 equal groups!',
-    hint: 'Make sure each group gets the same number of apples.',
+    totalObjects: 6,
+    divisor: 3,
+    objectType: '🐡',
+    question: 'Share the pufferfish into 3 equal groups!',
+    hint: 'Make sure each group gets the same number of pufferfish.',
     audioHints: [
-      "We have 18 apples to share among 6 groups.",
-      "Share the apples one by one with each group.",
+      "We have 6 pufferfish to share among 3 groups.",
+      "Share the pufferfish one by one with each group.",
       "Keep sharing until all groups have the same number."
     ],
-    theme: THEMES[4]
+    theme: THEMES[1]
   }
 ];
 
-const DivisionGroupsWorksheet: React.FC = () => {
+const DivisionSeaWorksheet: React.FC = () => {
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [userGroups, setUserGroups] = useState<number[][]>(Array(DIVISION_QUESTIONS[0].divisor).fill([]));
   const [showCelebration, setShowCelebration] = useState(false);
@@ -250,7 +234,7 @@ const DivisionGroupsWorksheet: React.FC = () => {
             } else {
               // Handle worksheet completion
               setIsComplete(true);
-              speakText("Congratulations! You've completed all the division questions!");
+              speakText("Congratulations! You've completed all the questions!");
             }
             setIsTransitioning(false);
             resolve();
@@ -320,7 +304,7 @@ const DivisionGroupsWorksheet: React.FC = () => {
               {/* Objects to be grouped */}
               <div className={`${currentTheme.containerBg} p-4 rounded-xl mb-6`}>
                 <h3 className={`text-lg font-semibold ${currentTheme.textColor} mb-2`}>
-                  Click objects to add them to groups:
+                  Click sea creatures to add them to groups:
                 </h3>
                 <div className="flex flex-wrap gap-2 justify-center">
                   {remainingObjects.map(obj => (
@@ -350,7 +334,7 @@ const DivisionGroupsWorksheet: React.FC = () => {
                     transition={{ duration: 0.3 }}
                   >
                     <div className={`text-sm font-semibold ${currentTheme.textColor} mb-2`}>
-                      Group {index + 1}
+                      Ocean Group {index + 1}
                     </div>
                     <div className="flex flex-wrap gap-2">
                       {group.map(obj => (
@@ -479,11 +463,11 @@ const DivisionGroupsWorksheet: React.FC = () => {
                 recycle={false}
                 numberOfPieces={200}
                 colors={[
-                  '#34D399', // Emerald
+                  '#22D3EE', // Cyan
                   '#0EA5E9', // Sky
-                  '#F59E0B', // Amber
-                  '#A855F7', // Purple
-                  '#14B8A6', // Teal
+                  '#2DD4BF', // Teal
+                  '#FB7185', // Rose
+                  '#34D399', // Emerald
                 ]}
               />
             )}
@@ -494,4 +478,4 @@ const DivisionGroupsWorksheet: React.FC = () => {
   );
 };
 
-export default DivisionGroupsWorksheet; 
+export default DivisionSeaWorksheet; 
