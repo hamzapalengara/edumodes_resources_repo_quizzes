@@ -1,0 +1,1 @@
+Practice building the multiplication table for 2 through an interactive drag-and-drop activity. Complete equations by dragging the correct answers, reinforcing multiplication facts from 2×1 to 2×10. Includes immediate feedback and audio guidance. 
