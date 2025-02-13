@@ -250,7 +250,7 @@ const MultiplicationChoiceWorksheet: React.FC = () => {
     markIncorrect: () => void;
     markAttempted: () => void;
   }, option: string) => {
-    if (isTransitioning || selectedOption) return;
+    if (isTransitioning) return;
 
     markAttempted();
     setSelectedOption(option);
@@ -269,7 +269,12 @@ const MultiplicationChoiceWorksheet: React.FC = () => {
     } else {
       markIncorrect();
       setIsAnswerCorrect(false);
-      speakText("Try again! Count the groups and items carefully.");
+      await speakText("Try again! Count the groups and items carefully.");
+      // Reset selection after a short delay to allow for retry
+      setTimeout(() => {
+        setSelectedOption(null);
+        setIsAnswerCorrect(null);
+      }, 1500);
     }
   };
 
@@ -367,7 +372,7 @@ const MultiplicationChoiceWorksheet: React.FC = () => {
                       ${selectedOption && !option.isCorrect ? 'opacity-50' : ''}
                     `}
                     onClick={() => handleOptionSelect({ markCorrect, markIncorrect, markAttempted }, option.expression)}
-                    disabled={!!selectedOption}
+                    disabled={isTransitioning || (!!selectedOption && !!isAnswerCorrect)}
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.3 + (index * 0.1) }}
