@@ -1,75 +1,43 @@
 import React from 'react';
-import { motion } from 'framer-motion';
 
 const SpeakingShopThumbnail: React.FC = () => {
   return (
-    <div className="w-[500px] h-[375px] bg-gradient-to-br from-pink-400 via-orange-300 to-yellow-300 flex items-center justify-center p-4 relative overflow-hidden">
-      {/* Decorative candy elements */}
-      <motion.div 
-        className="absolute top-4 right-4 w-16 h-16 bg-red-400 rounded-full opacity-50"
-        animate={{ rotate: 360 }}
-        transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
-      />
-      <motion.div 
-        className="absolute bottom-4 left-4 w-20 h-20 bg-blue-400 rounded-full opacity-50"
-        animate={{ rotate: -360 }}
-        transition={{ duration: 12, repeat: Infinity, ease: "linear" }}
-      />
-      <motion.div 
-        className="absolute top-1/2 left-8 w-12 h-12 bg-green-400 rounded-full opacity-50"
-        animate={{ y: [0, -20, 0] }}
-        transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-      />
-      <motion.div 
-        className="absolute top-8 left-1/2 w-14 h-14 bg-purple-400 rounded-full opacity-50"
-        animate={{ x: [0, 20, 0] }}
-        transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-      />
-
-      <div className="w-[420px] h-[240px] bg-white/95 backdrop-blur-sm rounded-xl shadow-lg p-6 flex flex-col relative overflow-hidden">
-        {/* Candy shop decorations */}
-        <div className="absolute -top-6 -right-6 w-24 h-24 bg-gradient-to-br from-pink-200 to-red-200 rounded-full opacity-30" />
-        <div className="absolute -bottom-4 -left-4 w-20 h-20 bg-gradient-to-br from-blue-200 to-green-200 rounded-full opacity-30" />
+    <div className="w-[500px] h-[375px] bg-gradient-to-br from-emerald-100 via-teal-50 to-emerald-100 flex items-center justify-center p-4">
+      <div className="w-[420px] h-[240px] bg-white rounded-xl shadow-lg p-6 flex flex-col items-center justify-center relative overflow-hidden">
+        {/* Shop Icon Background */}
+        <div className="absolute top-0 right-0 opacity-5 text-9xl text-emerald-500">
+          🏪
+        </div>
         
-        <h1 className="text-xl font-bold text-center bg-gradient-to-r from-pink-500 to-orange-500 bg-clip-text text-transparent mb-4 relative z-10">
-          Fun at the Candy Shop!
+        {/* Title */}
+        <h1 className="text-2xl font-bold text-emerald-700 text-center mb-4 relative z-10">
+          Speaking with Shopkeeper
         </h1>
 
-        {/* Dialogue Preview */}
-        <div className="flex-1 flex flex-col justify-center space-y-4 relative z-10">
-          {/* Shopkeeper's message */}
-          <div className="flex items-start gap-2">
-            <div className="w-8 h-8 rounded-full bg-pink-100 flex items-center justify-center">
-              🍬
-            </div>
-            <div className="bg-gradient-to-r from-pink-100 to-orange-100 rounded-lg p-2">
-              <p className="text-sm font-medium text-pink-800">
-                Welcome to the candy shop! 🎈
-              </p>
-            </div>
-          </div>
-
-          {/* Kid's response area */}
-          <div className="flex items-start justify-end gap-2">
-            <div className="bg-gradient-to-r from-blue-100 to-green-100 rounded-lg p-2 flex items-center gap-2">
-              <span className="text-sm font-medium text-blue-800">
-                🎤 Practice speaking
-              </span>
-            </div>
-            <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
-              👧
-            </div>
+        {/* Preview Content */}
+        <div className="flex items-center space-x-4 mb-6">
+          <div className="text-4xl">👨‍💼</div>
+          <div className="text-lg text-emerald-600 font-medium">
+            "How may I help you?"
           </div>
         </div>
 
-        {/* Feature Indicators */}
-        <div className="flex justify-center gap-2 mt-4 relative z-10">
-          <div className="px-3 py-1 bg-gradient-to-r from-pink-100 to-orange-100 rounded-full text-sm text-pink-600 flex items-center gap-1 shadow-sm">
-            🗣️ Voice Recognition
+        {/* Interactive Elements Preview */}
+        <div className="flex items-center space-x-3">
+          <div className="bg-emerald-100 px-3 py-1 rounded-full text-emerald-600 text-sm">
+            🎤 Voice Input
           </div>
-          <div className="px-3 py-1 bg-gradient-to-r from-blue-100 to-green-100 rounded-full text-sm text-blue-600 flex items-center gap-1 shadow-sm">
-            🔊 Speech Synthesis
+          <div className="bg-emerald-100 px-3 py-1 rounded-full text-emerald-600 text-sm">
+            🔊 Text to Speech
           </div>
+        </div>
+
+        {/* Shop Icons */}
+        <div className="absolute bottom-4 left-4 text-2xl opacity-30">
+          🛍️
+        </div>
+        <div className="absolute top-4 right-4 text-2xl opacity-30">
+          💳
         </div>
       </div>
     </div>
