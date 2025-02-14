@@ -319,12 +319,12 @@ const SpeakingHobbiesWorksheet: React.FC = () => {
                 newCompleted[activeDialogueIndex] = true;
                 setCompletedDialogues(newCompleted);
                 
-                // Colorful hobby-themed confetti celebration
+                // Confetti celebration
                 confetti({
                   particleCount: 80,
                   spread: 100,
                   origin: { x: 0.5, y: 0.8 },
-                  colors: ['#8B5CF6', '#6366F1', '#0EA5E9', '#22D3EE'],
+                  colors: ['#8B5CF6', '#7C3AED', '#6D28D9', '#5B21B6'],
                   ticks: 200
                 });
 
@@ -334,14 +334,14 @@ const SpeakingHobbiesWorksheet: React.FC = () => {
                     angle: 60,
                     spread: 80,
                     origin: { x: 0, y: 0.8 },
-                    colors: ['#8B5CF6', '#6366F1', '#0EA5E9', '#22D3EE']
+                    colors: ['#8B5CF6', '#7C3AED', '#6D28D9', '#5B21B6']
                   });
                   confetti({
                     particleCount: 50,
                     angle: 120,
                     spread: 80,
                     origin: { x: 1, y: 0.8 },
-                    colors: ['#8B5CF6', '#6366F1', '#0EA5E9', '#22D3EE']
+                    colors: ['#8B5CF6', '#7C3AED', '#6D28D9', '#5B21B6']
                   });
                 }, 250);
 
@@ -400,9 +400,9 @@ const SpeakingHobbiesWorksheet: React.FC = () => {
                   />
                 </div>
 
-                <div className="bg-white rounded-lg shadow-lg">
+                <div className="bg-white rounded-lg shadow-lg overflow-hidden">
                   <h1 className="text-xl md:text-2xl font-bold text-center text-violet-600 p-4 border-b border-violet-100">
-                    Let's Talk About Hobbies!
+                    Speaking with Friend
                   </h1>
 
                   <div className="divide-y divide-gray-100">
@@ -412,11 +412,11 @@ const SpeakingHobbiesWorksheet: React.FC = () => {
                         initial={{ opacity: index <= activeDialogueIndex ? 1 : 0 }}
                         animate={{ opacity: index <= activeDialogueIndex ? 1 : 0 }}
                         className={`p-3 md:p-4 ${
-                          completedDialogues[index] ? 'bg-sky-50' : 'bg-white'
+                          completedDialogues[index] ? 'bg-violet-50' : 'bg-white'
                         } ${index > activeDialogueIndex ? 'hidden' : ''}`}
                       >
                         {/* Friend's Line */}
-                        <div className="flex items-start gap-3">
+                        <div className="flex items-start gap-3 mb-4">
                           <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-violet-100 flex items-center justify-center shrink-0">
                             👧
                           </div>
@@ -440,30 +440,31 @@ const SpeakingHobbiesWorksheet: React.FC = () => {
                           </div>
                         </div>
 
-                        {/* Kid's Response Section */}
-                        <div className="flex items-start gap-3 mt-3 flex-row-reverse">
-                          <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-sky-100 flex items-center justify-center shrink-0">
-                            👦
+                        {/* Your Response Section */}
+                        <div className="flex items-start gap-3 pl-12">
+                          <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-blue-100 flex items-center justify-center shrink-0">
+                            🧑
                           </div>
                           <div className="flex-1 min-w-0">
-                            <div className="bg-sky-50 rounded-lg p-3">
-                              {dialogue.hint && (
-                                <div className="text-sm text-sky-600 mb-2">
-                                  💡 {dialogue.hint}
-                                </div>
-                              )}
+                            <div className="bg-blue-50 rounded-lg p-3">
+                              <div className="text-sm text-blue-600 mb-2 font-medium">
+                                Say: "{dialogue.expectedResponse}"
+                              </div>
+                              <div className="text-xs text-blue-500 mb-3">
+                                {dialogue.hint}
+                              </div>
                               {isEditing && activeDialogueIndex === index ? (
                                 <div className="mb-3">
                                   <input
                                     type="text"
                                     value={editableText}
                                     onChange={(e) => setEditableText(e.target.value)}
-                                    className="w-full p-2 border border-sky-200 rounded-lg text-base"
+                                    className="w-full p-2 border border-violet-200 rounded-lg text-base"
                                   />
-                                  <div className="mt-2 flex gap-2">
+                                  <div className="flex gap-2 mt-2">
                                     <motion.button
                                       onClick={handleEditSubmit}
-                                      className="bg-sky-500 text-white px-3 py-1.5 rounded-full text-sm"
+                                      className="bg-violet-500 text-white px-3 py-1.5 rounded-full text-sm"
                                       whileHover={{ scale: 1.05 }}
                                       whileTap={{ scale: 0.95 }}
                                     >
@@ -480,13 +481,13 @@ const SpeakingHobbiesWorksheet: React.FC = () => {
                                   </div>
                                 </div>
                               ) : (
-                                <p className="text-base md:text-lg font-semibold text-sky-800 min-h-[2rem] break-words">
+                                <p className="text-base md:text-lg font-semibold text-violet-800 min-h-[2rem] break-words">
                                   {activeDialogueIndex === index ? spokenText : 
                                    completedDialogues[index] ? "✅ Completed!" : 
                                    "Click 'Start Speaking' to respond..."}
                                 </p>
                               )}
-                              <div className="mt-3 flex flex-wrap gap-2">
+                              <div className="flex flex-wrap gap-2 mt-3">
                                 {activeDialogueIndex === index && !completedDialogues[index] && (
                                   <>
                                     <motion.button
@@ -494,7 +495,7 @@ const SpeakingHobbiesWorksheet: React.FC = () => {
                                       className={`${
                                         isListening 
                                           ? "bg-red-500" 
-                                          : "bg-sky-500"
+                                          : "bg-violet-500"
                                       } text-white px-4 py-1.5 md:py-2 rounded-full flex items-center gap-2 text-sm md:text-base`}
                                       whileHover={{ scale: 1.05 }}
                                       whileTap={{ scale: 0.95 }}
@@ -533,10 +534,11 @@ const SpeakingHobbiesWorksheet: React.FC = () => {
                                     )}
                                   </>
                                 )}
+                                
                                 {completedDialogues[index] && (
                                   <motion.button
                                     onClick={() => speakKidResponse(lastSpokenResponse)}
-                                    className="bg-sky-200 text-sky-700 px-4 py-1.5 md:py-2 rounded-full flex items-center gap-2 text-sm md:text-base"
+                                    className="bg-violet-200 text-violet-700 px-4 py-1.5 md:py-2 rounded-full flex items-center gap-2 text-sm md:text-base"
                                     whileHover={{ scale: 1.05 }}
                                     whileTap={{ scale: 0.95 }}
                                   >
