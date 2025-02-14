@@ -421,11 +421,13 @@ const SpeakingWorksheet: React.FC = () => {
                   {/* All Dialogues Display */}
                   <div className="divide-y divide-gray-100">
                     {dialogues.map((dialogue, index) => (
-                      <div 
+                      <motion.div 
                         key={dialogue.id}
+                        initial={{ opacity: index <= activeDialogueIndex ? 1 : 0 }}
+                        animate={{ opacity: index <= activeDialogueIndex ? 1 : 0 }}
                         className={`p-3 md:p-4 ${
                           completedDialogues[index] ? 'bg-green-50' : 'bg-white'
-                        }`}
+                        } ${index > activeDialogueIndex ? 'hidden' : ''}`}
                       >
                         {/* Mom's Line */}
                         <div className="flex items-start gap-3">
@@ -557,7 +559,7 @@ const SpeakingWorksheet: React.FC = () => {
                             </div>
                           </div>
                         </div>
-                      </div>
+                      </motion.div>
                     ))}
                   </div>
                 </div>
