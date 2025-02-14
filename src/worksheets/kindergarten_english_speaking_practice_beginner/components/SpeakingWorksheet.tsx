@@ -142,7 +142,6 @@ const SpeakingWorksheet: React.FC = () => {
   const [activeDialogueIndex, setActiveDialogueIndex] = useState<number>(0);
   const [isListening, setIsListening] = useState(false);
   const [spokenText, setSpokenText] = useState('');
-  const [showHint, setShowHint] = useState(false);
   const [completedDialogues, setCompletedDialogues] = useState<boolean[]>(Array(dialogues.length).fill(false));
   const [lastSpokenResponse, setLastSpokenResponse] = useState<string>('');
   const [isEditing, setIsEditing] = useState(false);
@@ -170,11 +169,14 @@ const SpeakingWorksheet: React.FC = () => {
         };
 
         recognitionRef.current.onend = () => {
-          setIsListening(false);
+          // On mobile, automatically restart if we're still in listening mode
+          if (isListening && recognitionRef.current) {
+            recognitionRef.current.start();
+          }
         };
       }
     }
-  }, []);
+  }, [isListening]);
 
   // Play mom's voice on initial load
   useEffect(() => {
@@ -208,8 +210,22 @@ const SpeakingWorksheet: React.FC = () => {
     utterance.rate = 0.9;
 
     const voices = window.speechSynthesis.getVoices();
+    // Try to find a female English voice
+    const femaleVoice = voices.find(voice => 
+      voice.lang.startsWith('en-') && 
+      (voice.name.includes('female') || 
+       voice.name.includes('woman') || 
+       voice.name.toLowerCase().includes('samantha') ||
+       voice.name.toLowerCase().includes('victoria') ||
+       voice.name.toLowerCase().includes('karen'))
+    );
+    
+    // Fallback to any English voice if no female voice is found
     const englishVoice = voices.find(voice => voice.lang.startsWith('en-'));
-    if (englishVoice) {
+    
+    if (femaleVoice) {
+      utterance.voice = femaleVoice;
+    } else if (englishVoice) {
       utterance.voice = englishVoice;
     }
 
@@ -262,7 +278,7 @@ const SpeakingWorksheet: React.FC = () => {
           console.log('Worksheet Summary:', summary);
         }}
       >
-        {({ score, addPoints, markCorrect, markAttempted }) => {
+        {({ score, markCorrect, markAttempted }) => {
           const checkAnswer = (transcript: string) => {
             if (activeDialogueIndex === null) return;
             
@@ -312,19 +328,40 @@ const SpeakingWorksheet: React.FC = () => {
                 newCompleted[activeDialogueIndex] = true;
                 setCompletedDialogues(newCompleted);
                 
+                // Enhanced confetti celebration
+                // First burst from bottom
                 confetti({
-                  particleCount: 100,
-                  spread: 70,
-                  origin: { y: 0.6 }
+                  particleCount: 80,
+                  spread: 100,
+                  origin: { x: 0.5, y: 0.8 },
+                  colors: ['#ff718d', '#ff8c37', '#ffcd3c', '#ff5252'],
+                  ticks: 200
                 });
 
-                // Move to next uncompleted dialogue after a short delay
+                // Second burst from bottom corners
+                setTimeout(() => {
+                  confetti({
+                    particleCount: 50,
+                    angle: 60,
+                    spread: 80,
+                    origin: { x: 0, y: 0.8 },
+                    colors: ['#ff718d', '#ff8c37', '#ffcd3c', '#ff5252']
+                  });
+                  confetti({
+                    particleCount: 50,
+                    angle: 120,
+                    spread: 80,
+                    origin: { x: 1, y: 0.8 },
+                    colors: ['#ff718d', '#ff8c37', '#ffcd3c', '#ff5252']
+                  });
+                }, 250);
+
+                // Move to next uncompleted dialogue after a delay
                 setTimeout(() => {
                   const nextIndex = activeDialogueIndex + 1;
                   if (nextIndex < dialogues.length) {
                     setActiveDialogueIndex(nextIndex);
                     setSpokenText('');
-                    setShowHint(false);
                     // Play mom's voice for next dialogue
                     speakMomText(dialogues[nextIndex].text);
                   }
@@ -341,10 +378,10 @@ const SpeakingWorksheet: React.FC = () => {
           };
 
           return (
-            <div className="px-0 md:px-4 py-4">
+            <div className="px-0 py-2 md:py-4">
               <div className="max-w-4xl mx-auto">
                 {showMicPermissionAlert && (
-                  <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-4 rounded-r">
+                  <div className="mx-2 md:mx-4 bg-yellow-50 border-l-4 border-yellow-400 p-3 md:p-4 mb-4 rounded-r">
                     <div className="flex items-start">
                       <div className="flex-shrink-0">
                         <span className="text-2xl">🎤</span>
@@ -369,43 +406,43 @@ const SpeakingWorksheet: React.FC = () => {
                   </div>
                 )}
 
-                <div className="bg-blue-50 p-4 shadow-md mb-4">
+                <div className="mx-2 md:mx-4 bg-blue-50 p-3 md:p-4 shadow-md mb-4 rounded-lg">
                   <ScoreDisplay 
                     score={score}
                     totalQuestions={dialogues.length * 10}
                   />
                 </div>
 
-                <div className="bg-white rounded-lg shadow-lg p-2 md:p-6">
-                  <h1 className="text-2xl font-bold text-center text-pink-600 mb-6">
+                <div className="bg-white rounded-lg shadow-lg">
+                  <h1 className="text-xl md:text-2xl font-bold text-center text-pink-600 p-4 border-b border-pink-100">
                     Speaking Practice with Mom
                   </h1>
 
                   {/* All Dialogues Display */}
-                  <div className="space-y-6">
+                  <div className="divide-y divide-gray-100">
                     {dialogues.map((dialogue, index) => (
                       <div 
                         key={dialogue.id}
-                        className={`rounded-lg p-4 ${
-                          completedDialogues[index] ? 'bg-green-50' : 'bg-gray-50'
+                        className={`p-3 md:p-4 ${
+                          completedDialogues[index] ? 'bg-green-50' : 'bg-white'
                         }`}
                       >
                         {/* Mom's Line */}
-                        <div className="flex items-start gap-4">
-                          <div className="w-12 h-12 rounded-full bg-pink-100 flex items-center justify-center">
+                        <div className="flex items-start gap-3">
+                          <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-pink-100 flex items-center justify-center shrink-0">
                             👩
                           </div>
-                          <div className="flex-1">
-                            <div className="bg-pink-50 rounded-lg p-4">
+                          <div className="flex-1 min-w-0">
+                            <div className="bg-pink-50 rounded-lg p-3">
                               <div className="flex items-center gap-2 mb-2">
-                                <span className="text-2xl">{dialogue.emoji}</span>
-                                <p className="text-lg font-semibold text-pink-800">
+                                <span className="text-xl md:text-2xl">{dialogue.emoji}</span>
+                                <p className="text-base md:text-lg font-semibold text-pink-800 break-words">
                                   {dialogue.text}
                                 </p>
                               </div>
                               <motion.button
                                 onClick={() => speakMomText(dialogue.text)}
-                                className="mt-2 bg-pink-200 text-pink-700 px-4 py-2 rounded-full flex items-center gap-2"
+                                className="mt-2 bg-pink-200 text-pink-700 px-3 py-1.5 md:px-4 md:py-2 rounded-full flex items-center gap-2 text-sm md:text-base"
                                 whileHover={{ scale: 1.05 }}
                                 whileTap={{ scale: 0.95 }}
                               >
@@ -416,27 +453,27 @@ const SpeakingWorksheet: React.FC = () => {
                         </div>
 
                         {/* Kid's Response Section */}
-                        <div className="flex items-start gap-4 mt-4 flex-row-reverse">
-                          <div className="w-12 h-12 rounded-full bg-orange-100 flex items-center justify-center">
+                        <div className="flex items-start gap-3 mt-3 flex-row-reverse">
+                          <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-orange-100 flex items-center justify-center shrink-0">
                             👧
                           </div>
-                          <div className="flex-1">
-                            <div className="bg-orange-50 rounded-lg p-4">
-                              <div className="mb-2 text-sm text-orange-600">
-                                Expected response: "{dialogue.expectedResponse}"
+                          <div className="flex-1 min-w-0">
+                            <div className="bg-orange-50 rounded-lg p-3">
+                              <div className="text-sm text-orange-600 mb-2">
+                                Say: "{dialogue.expectedResponse}"
                               </div>
                               {isEditing && activeDialogueIndex === index ? (
-                                <div className="mb-4">
+                                <div className="mb-3">
                                   <input
                                     type="text"
                                     value={editableText}
                                     onChange={(e) => setEditableText(e.target.value)}
-                                    className="w-full p-2 border border-orange-200 rounded-lg"
+                                    className="w-full p-2 border border-orange-200 rounded-lg text-base"
                                   />
                                   <div className="mt-2 flex gap-2">
                                     <motion.button
                                       onClick={handleEditSubmit}
-                                      className="bg-green-500 text-white px-4 py-2 rounded-full"
+                                      className="bg-green-500 text-white px-3 py-1.5 rounded-full text-sm"
                                       whileHover={{ scale: 1.05 }}
                                       whileTap={{ scale: 0.95 }}
                                     >
@@ -444,7 +481,7 @@ const SpeakingWorksheet: React.FC = () => {
                                     </motion.button>
                                     <motion.button
                                       onClick={() => setIsEditing(false)}
-                                      className="bg-gray-500 text-white px-4 py-2 rounded-full"
+                                      className="bg-gray-500 text-white px-3 py-1.5 rounded-full text-sm"
                                       whileHover={{ scale: 1.05 }}
                                       whileTap={{ scale: 0.95 }}
                                     >
@@ -453,88 +490,70 @@ const SpeakingWorksheet: React.FC = () => {
                                   </div>
                                 </div>
                               ) : (
-                                <p className="text-lg font-semibold text-orange-800 min-h-[2rem]">
+                                <p className="text-base md:text-lg font-semibold text-orange-800 min-h-[2rem] break-words">
                                   {activeDialogueIndex === index ? spokenText : 
                                    completedDialogues[index] ? "✅ Completed!" : 
                                    "Click 'Start Speaking' to respond..."}
                                 </p>
                               )}
-                              <div className="mt-4 flex flex-wrap gap-2">
+                              <div className="mt-3 flex flex-wrap gap-2">
                                 {activeDialogueIndex === index && !completedDialogues[index] && (
                                   <>
-                                    {!isListening ? (
-                                      <motion.button
-                                        onClick={startListening}
-                                        className="bg-orange-500 text-white px-6 py-2 rounded-full flex items-center gap-2"
-                                        whileHover={{ scale: 1.05 }}
-                                        whileTap={{ scale: 0.95 }}
-                                      >
-                                        🎤 Start Speaking
-                                      </motion.button>
-                                    ) : (
+                                    <motion.button
+                                      onClick={isListening ? stopListening : startListening}
+                                      className={`${
+                                        isListening 
+                                          ? "bg-red-500" 
+                                          : "bg-orange-500"
+                                      } text-white px-4 py-1.5 md:py-2 rounded-full flex items-center gap-2 text-sm md:text-base`}
+                                      whileHover={{ scale: 1.05 }}
+                                      whileTap={{ scale: 0.95 }}
+                                    >
+                                      {isListening ? "⏹️ Stop Recording" : "🎤 Start Speaking"}
+                                    </motion.button>
+                                    
+                                    {spokenText && (
                                       <>
                                         <motion.button
-                                          onClick={stopListening}
-                                          className="bg-red-500 text-white px-6 py-2 rounded-full flex items-center gap-2"
+                                          onClick={() => {
+                                            stopListening();
+                                            checkAnswer(spokenText);
+                                          }}
+                                          className="bg-green-500 text-white px-4 py-1.5 md:py-2 rounded-full flex items-center gap-2 text-sm md:text-base"
                                           whileHover={{ scale: 1.05 }}
                                           whileTap={{ scale: 0.95 }}
                                         >
-                                          ⏹️ Stop Recording
+                                          ✅ Submit
                                         </motion.button>
-                                        {spokenText && (
+                                        
+                                        {!isListening && (
                                           <motion.button
                                             onClick={() => {
-                                              stopListening();
-                                              checkAnswer(spokenText);
+                                              setIsEditing(true);
+                                              setEditableText(spokenText);
                                             }}
-                                            className="bg-green-500 text-white px-6 py-2 rounded-full flex items-center gap-2"
+                                            className="bg-blue-500 text-white px-4 py-1.5 md:py-2 rounded-full flex items-center gap-2 text-sm md:text-base"
                                             whileHover={{ scale: 1.05 }}
                                             whileTap={{ scale: 0.95 }}
                                           >
-                                            ✅ Submit
+                                            ✏️ Edit Response
                                           </motion.button>
                                         )}
                                       </>
-                                    )}
-                                    {spokenText && !isListening && !isEditing && (
-                                      <motion.button
-                                        onClick={() => {
-                                          setIsEditing(true);
-                                          setEditableText(spokenText);
-                                        }}
-                                        className="bg-blue-500 text-white px-6 py-2 rounded-full flex items-center gap-2"
-                                        whileHover={{ scale: 1.05 }}
-                                        whileTap={{ scale: 0.95 }}
-                                      >
-                                        ✏️ Edit Response
-                                      </motion.button>
                                     )}
                                   </>
                                 )}
                                 {completedDialogues[index] && (
                                   <motion.button
                                     onClick={() => speakKidResponse(lastSpokenResponse)}
-                                    className="bg-green-200 text-green-700 px-6 py-2 rounded-full flex items-center gap-2"
+                                    className="bg-green-200 text-green-700 px-4 py-1.5 md:py-2 rounded-full flex items-center gap-2 text-sm md:text-base"
                                     whileHover={{ scale: 1.05 }}
                                     whileTap={{ scale: 0.95 }}
                                   >
                                     🔊 Play My Response
                                   </motion.button>
                                 )}
-                                <motion.button
-                                  onClick={() => setShowHint(!showHint)}
-                                  className="bg-orange-200 text-orange-700 px-6 py-2 rounded-full"
-                                  whileHover={{ scale: 1.05 }}
-                                  whileTap={{ scale: 0.95 }}
-                                >
-                                  💡 {showHint ? "Hide Hint" : "Show Hint"}
-                                </motion.button>
                               </div>
-                              {showHint && activeDialogueIndex === index && (
-                                <div className="mt-4 bg-white rounded-lg p-3 text-orange-600 border border-orange-200">
-                                  💭 {dialogue.hint}
-                                </div>
-                              )}
                             </div>
                           </div>
                         </div>
