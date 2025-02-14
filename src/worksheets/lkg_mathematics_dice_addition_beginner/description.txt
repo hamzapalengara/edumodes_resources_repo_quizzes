@@ -1,1 +1,0 @@
-Practice adding single-digit numbers using colorful dice patterns. Count dots on each dice and find their sum. Features interactive dice, audio guidance, and instant feedback. Perfect for early learners developing addition skills with numbers 1-6, with sums up to 12. 
