@@ -310,21 +310,14 @@ const ListeningActivitiesWorksheet: React.FC = () => {
                           handleSoundClick(activity.id);
                           markAttempted();
                         }}
-                        className={`w-full aspect-square rounded-xl flex flex-col items-center justify-center gap-3 transition-all shadow-md hover:shadow-lg ${
-                          selectedSound === activity.id
-                            ? 'bg-gradient-to-r from-purple-100 to-purple-200 border-2 border-purple-400'
-                            : completedPairs[activity.id]
-                            ? 'bg-gradient-to-r from-green-100 to-green-200 border-2 border-green-400'
-                            : 'bg-gradient-to-r from-blue-50 to-indigo-100 border-2 border-blue-200 hover:border-purple-300'
-                        }`}
+                        className={`w-full aspect-square md:w-32 md:h-32 relative rounded-xl flex flex-col items-center justify-center gap-3 transition-all shadow-md hover:shadow-lg ${selectedSound === activity.id ? 'bg-gradient-to-r from-purple-100 to-purple-200 border-2 border-purple-400' : completedPairs[activity.id] ? 'bg-gradient-to-r from-green-100 to-green-200 border-2 border-green-400' : 'bg-gradient-to-r from-blue-50 to-indigo-100 border-2 border-blue-200 hover:border-purple-300'}`}
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
                         disabled={!!completedPairs[activity.id]}
                       >
                         <span className="text-3xl">🔊</span>
-                        <span className="text-base font-medium text-center">{activity.audio}</span>
                         {completedPairs[activity.id] && (
-                          <span className="text-green-600 text-xl">✨</span>
+                          <span className="absolute top-1 right-1 text-green-600 text-lg">✨</span>
                         )}
                       </motion.button>
                     ))}
@@ -336,7 +329,7 @@ const ListeningActivitiesWorksheet: React.FC = () => {
                   </div>
 
                   {/* Image Options Column */}
-                  <div className="w-5/12 space-y-4 relative z-0">
+                  <div className="w-5/12 flex flex-col items-center space-y-4 relative z-0">
                     {shuffledImages.map((image, index) => (
                       <motion.button
                         id={`image-${image}`}
@@ -349,7 +342,7 @@ const ListeningActivitiesWorksheet: React.FC = () => {
                             }
                           }
                         }}
-                        className={`w-full aspect-square rounded-xl overflow-hidden transition-all shadow-md hover:shadow-lg ${
+                        className={`w-full aspect-square md:w-32 md:h-32 mx-auto rounded-xl overflow-hidden transition-all shadow-md hover:shadow-lg ${
                           selectedImage === image
                             ? isCorrect
                               ? 'border-4 border-green-400'
@@ -380,8 +373,30 @@ const ListeningActivitiesWorksheet: React.FC = () => {
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ delay: 0.4 }}
-                className="bg-gradient-to-r from-purple-100 to-pink-100 rounded-2xl p-6 mt-6 max-w-md mx-auto shadow-xl border-4 border-purple-200"
+                className="relative bg-gradient-to-r from-purple-100 to-pink-100 rounded-2xl p-6 mt-6 max-w-md mx-auto shadow-xl border-4 border-purple-200 overflow-hidden"
               >
+                {/* Confetti Effect */}
+                <motion.div
+                  className="absolute inset-0 pointer-events-none"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 1 }}
+                >
+                  {Array.from({ length: 30 }).map((_, index) => (
+                    <motion.div
+                      key={index}
+                      className="w-2 h-2 rounded-full bg-yellow-400"
+                      initial={{ y: -20, opacity: 0 }}
+                      animate={{ y: [ -20, 50 ], opacity: [0, 1, 0] }}
+                      transition={{ duration: 1.5, delay: Math.random() * 1.5, repeat: Infinity, repeatDelay: 0.5 }}
+                      style={{
+                        position: 'absolute',
+                        left: `${Math.random() * 100}%`
+                      }}
+                    />
+                  ))}
+                </motion.div>
+
                 <h3 className="text-xl font-bold text-purple-800 mb-4 text-center">
                   🎉 Amazing Job! You're a Matching Star! 🌟
                 </h3>
