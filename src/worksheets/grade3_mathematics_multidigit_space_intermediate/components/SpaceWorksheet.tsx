@@ -6,77 +6,110 @@ import Confetti from 'react-confetti';
 import spaceImage from '../assets/space-scene.jpg';
 import WorksheetTracker, { WorksheetSummary } from '../../../components/shared/WorksheetTracker';
 
-interface Problem {
+interface MathTile {
   id: number;
+  value: string;
+  type: 'question' | 'answer';
+  position: number;
   operation: 'addition' | 'subtraction' | 'multiplication';
   num1: number;
   num2: number;
-  imagePosition: 'top-left' | 'top-center' | 'top-right' | 'bottom-left' | 'bottom-center' | 'bottom-right';
-  hint: string;
 }
 
 const SpaceWorksheet: React.FC = () => {
-  const [userAnswers, setUserAnswers] = useState<{ [key: number]: string }>({});
-  const [feedback, setFeedback] = useState<{ [key: number]: 'correct' | 'incorrect' | null }>({});
-  const [showCelebration, setShowCelebration] = useState(false);
+  const [selectedTile, setSelectedTile] = useState<MathTile | null>(null);
+  const [matchedPairs, setMatchedPairs] = useState<string[]>([]);
   const [showConfetti, setShowConfetti] = useState(false);
-  const [revealedPieces, setRevealedPieces] = useState<number[]>([]);
   const [windowSize, setWindowSize] = useState({
     width: window.innerWidth,
     height: window.innerHeight,
   });
-  const markCorrectRef = useRef<(() => void) | null>(null);
 
-  const problems: Problem[] = [
-    {
-      id: 1,
-      operation: 'multiplication',
-      num1: 24,
-      num2: 3,
-      imagePosition: 'top-left',
-      hint: "Count the stars in each galaxy cluster"
-    },
-    {
-      id: 2,
-      operation: 'addition',
-      num1: 458,
-      num2: 367,
-      imagePosition: 'top-center',
-      hint: "Add the meteorites"
-    },
-    {
-      id: 3,
-      operation: 'subtraction',
-      num1: 902,
-      num2: 545,
-      imagePosition: 'top-right',
-      hint: "Calculate remaining space debris"
-    },
-    {
-      id: 4,
-      operation: 'multiplication',
-      num1: 16,
-      num2: 4,
-      imagePosition: 'bottom-left',
-      hint: "Count total satellites"
-    },
-    {
-      id: 5,
-      operation: 'addition',
-      num1: 734,
-      num2: 289,
-      imagePosition: 'bottom-center',
-      hint: "Sum up the light years"
-    },
-    {
-      id: 6,
-      operation: 'subtraction',
-      num1: 856,
-      num2: 378,
-      imagePosition: 'bottom-right',
-      hint: "Find the distance between planets"
+  // Add reference to track current speech
+  const currentSpeech = useRef<SpeechSynthesisUtterance | null>(null);
+
+  const calculateAnswer = (operation: 'addition' | 'subtraction' | 'multiplication', num1: number, num2: number): number => {
+    switch (operation) {
+      case 'addition': return num1 + num2;
+      case 'subtraction': return num1 - num2;
+      case 'multiplication': return num1 * num2;
+      default: return 0;
     }
-  ];
+  };
+
+  const getQuestionText = (operation: 'addition' | 'subtraction' | 'multiplication', num1: number, num2: number): string => {
+    const symbol = operation === 'addition' ? '+' : operation === 'subtraction' ? '-' : '×';
+    return `${num1} ${symbol} ${num2}`;
+  };
+
+  // Create initial math problems and shuffle them
+  const createShuffledTiles = () => {
+    const problems: { id: number; operation: 'addition' | 'subtraction' | 'multiplication'; num1: number; num2: number; }[] = [
+      { id: 1, operation: 'multiplication', num1: 24, num2: 3 },
+      { id: 2, operation: 'addition', num1: 458, num2: 367 },
+      { id: 3, operation: 'subtraction', num1: 902, num2: 545 },
+      { id: 4, operation: 'multiplication', num1: 16, num2: 4 },
+      { id: 5, operation: 'addition', num1: 734, num2: 289 },
+      { id: 6, operation: 'subtraction', num1: 856, num2: 378 }
+    ];
+    
+    const tiles: MathTile[] = [];
+    
+    // Create question and answer pairs
+    problems.forEach((problem, index) => {
+      const answer = calculateAnswer(problem.operation, problem.num1, problem.num2);
+      const questionText = getQuestionText(problem.operation, problem.num1, problem.num2);
+      
+      tiles.push({
+        id: index * 2,
+        value: questionText,
+        type: 'question',
+        position: 0,
+        operation: problem.operation,
+        num1: problem.num1,
+        num2: problem.num2
+      });
+      tiles.push({
+        id: index * 2 + 1,
+        value: answer.toString(),
+        type: 'answer',
+        position: 0,
+        operation: problem.operation,
+        num1: problem.num1,
+        num2: problem.num2
+      });
+    });
+
+    // Shuffle the tiles
+    const shuffled = [...tiles].sort(() => Math.random() - 0.5);
+    
+    // Assign positions
+    return shuffled.map((tile, index) => ({
+      ...tile,
+      position: index
+    }));
+  };
+
+  const [tiles] = useState<MathTile[]>(createShuffledTiles());
+
+  // Function to stop current speech
+  const stopCurrentSpeech = () => {
+    if (window.speechSynthesis && currentSpeech.current) {
+      window.speechSynthesis.cancel();
+      currentSpeech.current = null;
+    }
+  };
+
+  // Function to speak text
+  const speak = (text: string) => {
+    if ('speechSynthesis' in window) {
+      stopCurrentSpeech();
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.rate = 0.9;
+      currentSpeech.current = utterance;
+      window.speechSynthesis.speak(utterance);
+    }
+  };
 
   useEffect(() => {
     const handleResize = () => {
@@ -87,83 +120,74 @@ const SpaceWorksheet: React.FC = () => {
     };
 
     window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
 
-  const calculateCorrectAnswer = (problem: Problem): number => {
-    switch (problem.operation) {
-      case 'addition':
-        return problem.num1 + problem.num2;
-      case 'subtraction':
-        return problem.num1 - problem.num2;
-      case 'multiplication':
-        return problem.num1 * problem.num2;
-      default:
-        return 0;
-    }
-  };
+    // Initial instruction
+    setTimeout(() => {
+      speak("Welcome to Space Math Adventure! Match the math problems with their answers to reveal the cosmic scene!");
+    }, 1000);
 
-  const checkAnswer = (problemId: number) => {
-    const problem = problems.find(p => p.id === problemId);
-    if (!problem || !userAnswers[problemId]) return;
-
-    const isCorrect = parseInt(userAnswers[problemId]) === calculateCorrectAnswer(problem);
-    
-    setFeedback(prev => ({
-      ...prev,
-      [problemId]: isCorrect ? 'correct' : 'incorrect'
-    }));
-
-    if (isCorrect && !revealedPieces.includes(problemId)) {
-      setRevealedPieces(prev => [...prev, problemId]);
-      
-      if (markCorrectRef.current) {
-        markCorrectRef.current();
-      }
-
-      if (revealedPieces.length + 1 === problems.length) {
-        setShowConfetti(true);
-        setShowCelebration(true);
-        setTimeout(() => setShowConfetti(false), 8000);
-      }
-    }
-  };
-
-  const getOperationSymbol = (operation: string): string => {
-    switch (operation) {
-      case 'addition': return '+';
-      case 'subtraction': return '-';
-      case 'multiplication': return '×';
-      default: return '';
-    }
-  };
-
-  const getOverlayStyle = (position: string) => {
-    const baseStyle = "absolute transition-all duration-700 flex flex-col items-center justify-center";
-    
-    const positionStyles = {
-      'top-left': 'top-0 left-0 w-1/3 h-1/2 p-1',
-      'top-center': 'top-0 left-1/3 w-1/3 h-1/2 p-1',
-      'top-right': 'top-0 right-0 w-1/3 h-1/2 p-1',
-      'bottom-left': 'bottom-0 left-0 w-1/3 h-1/2 p-1',
-      'bottom-center': 'bottom-0 left-1/3 w-1/3 h-1/2 p-1',
-      'bottom-right': 'bottom-0 right-0 w-1/3 h-1/2 p-1'
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      stopCurrentSpeech();
     };
-
-    return `${baseStyle} ${positionStyles[position as keyof typeof positionStyles]}`;
-  };
+  }, []);
 
   return (
     <WorksheetTracker 
-      totalQuestions={problems.length}
+      totalQuestions={6}
       pointsPerQuestion={10}
       onSummaryGenerated={(summary: WorksheetSummary) => {
         console.log('Space Math Adventure Summary:', summary);
       }}
     >
       {({ score, maxScore, markCorrect }) => {
-        markCorrectRef.current = markCorrect;
-        
+        const handleTileClick = (tile: MathTile) => {
+          const answer = calculateAnswer(tile.operation, tile.num1, tile.num2);
+          if (matchedPairs.includes(answer.toString())) return;
+
+          if (!selectedTile) {
+            setSelectedTile(tile);
+            // Speak the selected tile
+            speak(tile.type === 'question' ? 
+              `${tile.value} equals what?` : 
+              `The answer is ${tile.value}`
+            );
+          } else {
+            const isMatch = (
+              selectedTile.operation === tile.operation &&
+              selectedTile.num1 === tile.num1 &&
+              selectedTile.num2 === tile.num2 &&
+              selectedTile.type !== tile.type
+            );
+
+            if (selectedTile.id !== tile.id && isMatch) {
+              // Match found
+              const matchedAnswer = calculateAnswer(tile.operation, tile.num1, tile.num2).toString();
+              setMatchedPairs([...matchedPairs, matchedAnswer]);
+              markCorrect();
+              
+              // Play success sound and speak feedback
+              const successAudio = new Audio('/success.mp3');
+              successAudio.play().catch(console.error);
+              speak(`Correct! ${tile.num1} ${tile.operation === 'addition' ? 'plus' : tile.operation === 'subtraction' ? 'minus' : 'times'} ${tile.num2} equals ${matchedAnswer}`);
+              
+              if (matchedPairs.length + 1 === 6) {
+                setShowConfetti(true);
+                setTimeout(() => setShowConfetti(false), 8000);
+                setTimeout(() => {
+                  speak("Amazing! You've solved all the space math problems and revealed the cosmic scene!");
+                }, 1000);
+              }
+            } else {
+              // No match - provide feedback
+              const errorAudio = new Audio('/error.mp3');
+              errorAudio.play().catch(console.error);
+              speak("Try again! Match the problem with its correct answer.");
+            }
+            setSelectedTile(null);
+          }
+        };
+
         return (
           <div className="min-h-screen bg-gray-900">
             {showConfetti && (
@@ -185,97 +209,106 @@ const SpaceWorksheet: React.FC = () => {
                   <ScoreDisplay score={score} totalQuestions={maxScore} />
                 </div>
 
-                <div className="bg-gray-800 rounded-lg p-2 md:p-4 mb-4 md:mb-6 text-white">
+                <div className="bg-gray-800 rounded-lg p-2 md:p-4 mb-4 text-white">
                   <h1 className="text-xl md:text-2xl font-bold text-center mb-3">
                     Space Math Adventure 🚀
                   </h1>
 
                   <div className="bg-gray-700 rounded p-2 md:p-3">
                     <p className="font-medium">✨ Mission:</p>
-                    <p>Solve the space math problems to reveal the cosmic scene!</p>
+                    <p>Match math problems with their answers to reveal the cosmic scene!</p>
                   </div>
                 </div>
 
-                <div className="relative aspect-[3/2] w-full rounded-lg overflow-hidden bg-gray-800 shadow-lg">
-                  {/* Full image */}
-                  <img 
-                    src={spaceImage}
-                    alt="Space Scene"
-                    className="absolute inset-0 w-full h-full object-cover"
-                  />
-                  
-                  {/* Overlay pieces with problems */}
-                  <div className="absolute inset-0">
-                    {problems.map((problem) => (
-                      <div 
-                        key={problem.id}
-                        className={`${getOverlayStyle(problem.imagePosition)} bg-gray-900/90 backdrop-blur-sm ${
-                          revealedPieces.includes(problem.id) ? 'opacity-0 pointer-events-none' : 'opacity-100'
-                        }`}
-                      >
-                        {!revealedPieces.includes(problem.id) && (
-                          <div className="w-full h-full flex flex-col items-center justify-center text-white">
-                            <div className="flex flex-col items-end font-mono text-lg md:text-2xl lg:text-3xl w-full">
-                              <div className="flex justify-end w-full">
-                                <span>{problem.num1}</span>
-                              </div>
-                              <div className="flex justify-end w-full">
-                                <span className="mr-1 text-blue-400">{getOperationSymbol(problem.operation)}</span>
-                                <span>{problem.num2}</span>
-                              </div>
-                              <div className="w-full flex justify-end">
-                                <div className="border-t-2 border-blue-400 pt-0.5">
-                                  <input
-                                    type="number"
-                                    value={userAnswers[problem.id] || ''}
-                                    onChange={(e) => setUserAnswers(prev => ({
-                                      ...prev,
-                                      [problem.id]: e.target.value
-                                    }))}
-                                    className="w-[4.5em] text-right bg-transparent border-none focus:outline-none text-white text-lg md:text-2xl lg:text-3xl"
-                                    placeholder="?"
-                                  />
-                                </div>
-                              </div>
-                            </div>
-
-                            <button
-                              onClick={() => checkAnswer(problem.id)}
-                              className="mt-3 px-3 py-1 bg-blue-500 text-white text-xs md:text-sm rounded-full hover:bg-blue-600 transition-colors"
+                <div className="flex flex-col md:flex-row gap-4">
+                  {/* Image Container - Vertical orientation */}
+                  <div className="w-full md:w-1/2">
+                    <div className="relative aspect-[3/4] w-full rounded-lg overflow-hidden bg-gray-800 shadow-lg">
+                      <img 
+                        src={spaceImage}
+                        alt="Space Scene"
+                        className="absolute inset-0 w-full h-full object-cover"
+                      />
+                      
+                      {/* Grid container with equal divisions */}
+                      <div className="absolute inset-0">
+                        <div className="w-full h-full grid grid-rows-6 grid-cols-2">
+                          {tiles.map((tile) => (
+                            <div 
+                              key={tile.id}
+                              style={{ 
+                                gridRow: Math.floor(tile.position / 2) + 1, 
+                                gridColumn: (tile.position % 2) + 1 
+                              }}
+                              className="p-0.5"
                             >
-                              Check
-                            </button>
-                            
-                            {feedback[problem.id] === 'incorrect' && (
-                              <p className="text-red-400 mt-1 text-[10px] md:text-xs">
-                                Try again!
-                              </p>
-                            )}
-                          </div>
-                        )}
+                              {!matchedPairs.includes(calculateAnswer(tile.operation, tile.num1, tile.num2).toString()) ? (
+                                <button
+                                  onClick={() => handleTileClick(tile)}
+                                  className={`
+                                    relative w-full h-full
+                                    flex items-center justify-center
+                                    text-lg sm:text-xl md:text-2xl font-bold
+                                    bg-black/90 backdrop-blur-sm
+                                    border-2 ${selectedTile?.id === tile.id ? 'border-blue-400' : 'border-white/30'}
+                                    rounded-lg shadow-lg
+                                    ${selectedTile?.id === tile.id 
+                                      ? 'text-blue-400 ring-2 ring-blue-400' 
+                                      : 'text-white hover:text-blue-300 hover:border-blue-300'
+                                    }
+                                    transition-all duration-200
+                                    hover:scale-105 active:scale-95
+                                  `}
+                                >
+                                  <span className="relative z-10 px-2 text-center">
+                                    {tile.value}
+                                  </span>
+                                </button>
+                              ) : (
+                                <div className="w-full h-full rounded-lg transition-opacity duration-500" />
+                              )}
+                            </div>
+                          ))}
+                        </div>
                       </div>
-                    ))}
-                  </div>
-                </div>
-
-                {showCelebration && (
-                  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
-                    <div className="bg-gray-800 text-white rounded-lg p-4 md:p-6 text-center max-w-sm">
-                      <h2 className="text-xl md:text-2xl font-bold mb-4">
-                        🎉 Mission Accomplished! 🚀
-                      </h2>
-                      <p className="text-blue-300">
-                        You've uncovered the entire cosmic scene! Stellar work!
-                      </p>
-                      <button
-                        onClick={() => setShowCelebration(false)}
-                        className="mt-4 py-2 px-4 bg-blue-500 rounded-lg hover:bg-blue-600"
-                      >
-                        Close
-                      </button>
                     </div>
                   </div>
-                )}
+
+                  {/* Instructions and Progress - Desktop */}
+                  <div className="hidden md:flex w-1/2 flex-col gap-4">
+                    <div className="bg-gray-800 p-4 rounded-lg">
+                      <h2 className="text-xl font-bold text-white mb-3">How to Play:</h2>
+                      <ul className="text-gray-100 space-y-2">
+                        <li>1. Click on any tile (problem or answer)</li>
+                        <li>2. Find its matching pair</li>
+                        <li>3. Match all pairs to reveal the cosmic scene!</li>
+                      </ul>
+                    </div>
+
+                    <div className="bg-gray-800 p-4 rounded-lg">
+                      <h2 className="text-xl font-bold text-white mb-3">Progress:</h2>
+                      <div className="grid grid-cols-3 gap-2">
+                        {tiles.filter(t => t.type === 'question').map((problem) => {
+                          const answer = calculateAnswer(problem.operation, problem.num1, problem.num2);
+                          return (
+                            <div
+                              key={problem.id}
+                              className={`
+                                p-2 rounded-lg text-center font-bold
+                                ${matchedPairs.includes(answer.toString())
+                                  ? 'bg-green-500 text-white'
+                                  : 'bg-gray-700 text-gray-200'
+                                }
+                              `}
+                            >
+                              {problem.value}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </TouchContainer>
           </div>
