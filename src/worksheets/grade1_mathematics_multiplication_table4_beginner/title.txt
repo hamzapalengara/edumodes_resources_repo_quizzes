@@ -1,1 +1,0 @@
-Build Multiplication Table of 4 
