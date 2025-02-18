@@ -3,7 +3,7 @@ import WorksheetHeader from '../../../components/shared/layout/Header/WorksheetH
 import TouchContainer from '../../../components/shared/layout/Container/TouchContainer';
 import ScoreDisplay from '../../../components/shared/ScoreDisplay';
 import Confetti from 'react-confetti';
-import jungleImage from '../assets/jungle-scene.jpg';
+import carImage from '../assets/car-scene.jpg';
 import WorksheetTracker, { WorksheetSummary } from '../../../components/shared/WorksheetTracker';
 
 interface LetterTile {
@@ -13,7 +13,7 @@ interface LetterTile {
   position: number;
 }
 
-const LetterMatchingWorksheet: React.FC = () => {
+const CarLetterMatchingWorksheet: React.FC = () => {
   const [selectedTile, setSelectedTile] = useState<LetterTile | null>(null);
   const [matchedPairs, setMatchedPairs] = useState<string[]>([]);
   const [showCelebration, setShowCelebration] = useState(false);
@@ -26,28 +26,9 @@ const LetterMatchingWorksheet: React.FC = () => {
   // Add reference to track current speech
   const currentSpeech = useRef<SpeechSynthesisUtterance | null>(null);
 
-  // Function to stop current speech
-  const stopCurrentSpeech = () => {
-    if (window.speechSynthesis && currentSpeech.current) {
-      window.speechSynthesis.cancel();
-      currentSpeech.current = null;
-    }
-  };
-
-  // Function to speak text
-  const speak = (text: string) => {
-    if ('speechSynthesis' in window) {
-      stopCurrentSpeech();
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.rate = 0.9;
-      currentSpeech.current = utterance;
-      window.speechSynthesis.speak(utterance);
-    }
-  };
-
   // Create initial letter pairs and shuffle them
   const createShuffledTiles = () => {
-    const letters = ['A', 'B', 'C', 'D', 'E', 'F'];
+    const letters = ['G', 'H', 'I', 'J', 'K', 'L'];
     const tiles: LetterTile[] = [];
     
     // Create uppercase and lowercase pairs
@@ -78,6 +59,25 @@ const LetterMatchingWorksheet: React.FC = () => {
 
   const [tiles] = useState<LetterTile[]>(createShuffledTiles());
 
+  // Function to stop current speech
+  const stopCurrentSpeech = () => {
+    if (window.speechSynthesis && currentSpeech.current) {
+      window.speechSynthesis.cancel();
+      currentSpeech.current = null;
+    }
+  };
+
+  // Function to speak text
+  const speak = (text: string) => {
+    if ('speechSynthesis' in window) {
+      stopCurrentSpeech();
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.rate = 0.9;
+      currentSpeech.current = utterance;
+      window.speechSynthesis.speak(utterance);
+    }
+  };
+
   useEffect(() => {
     const handleResize = () => {
       setWindowSize({
@@ -87,12 +87,6 @@ const LetterMatchingWorksheet: React.FC = () => {
     };
 
     window.addEventListener('resize', handleResize);
-
-    // Initial instruction
-    setTimeout(() => {
-      speak("Welcome to Jungle Letter Match! Match capital and small letters to reveal the jungle scene.");
-    }, 1000);
-
     return () => {
       window.removeEventListener('resize', handleResize);
       stopCurrentSpeech();
@@ -104,7 +98,7 @@ const LetterMatchingWorksheet: React.FC = () => {
       totalQuestions={6}
       pointsPerQuestion={10}
       onSummaryGenerated={(summary: WorksheetSummary) => {
-        console.log('Letter Matching Summary:', summary);
+        console.log('Car Letter Matching Summary:', summary);
       }}
     >
       {({ score, maxScore, markCorrect }) => {
@@ -133,7 +127,7 @@ const LetterMatchingWorksheet: React.FC = () => {
                 setShowCelebration(true);
                 setTimeout(() => setShowConfetti(false), 8000);
                 setTimeout(() => {
-                  speak("Amazing! You've discovered all the jungle letters!");
+                  speak("Amazing! You've matched all the letters!");
                 }, 1000);
               }
             } else {
@@ -147,7 +141,7 @@ const LetterMatchingWorksheet: React.FC = () => {
         };
 
         return (
-          <div className="min-h-screen bg-green-900">
+          <div className="min-h-screen bg-gray-900">
             {showConfetti && (
               <Confetti
                 width={windowSize.width}
@@ -155,7 +149,7 @@ const LetterMatchingWorksheet: React.FC = () => {
                 numberOfPieces={500}
                 recycle={true}
                 tweenDuration={8000}
-                colors={['#FFD700', '#90EE90', '#98FB98', '#32CD32', '#228B22']}
+                colors={['#FF0000', '#FFD700', '#FF4500', '#FF6B6B', '#FF8C00']}
               />
             )}
             
@@ -167,24 +161,24 @@ const LetterMatchingWorksheet: React.FC = () => {
                   <ScoreDisplay score={score} totalQuestions={maxScore} />
                 </div>
 
-                <div className="bg-green-800 rounded-lg p-2 md:p-4 mb-4 text-white">
+                <div className="bg-gray-800 rounded-lg p-2 md:p-4 mb-4 text-white">
                   <h1 className="text-xl md:text-2xl font-bold text-center mb-3">
-                    Jungle Letter Match 🦁
+                    Speed Letter Match 🏎️
                   </h1>
 
-                  <div className="bg-green-700 rounded p-2 md:p-3">
+                  <div className="bg-gray-700 rounded p-2 md:p-3">
                     <p className="font-medium">✨ Mission:</p>
-                    <p>Match capital and small letters to reveal the jungle scene!</p>
+                    <p>Match capital and small letters to reveal the super car!</p>
                   </div>
                 </div>
 
                 <div className="flex flex-col md:flex-row gap-4">
                   {/* Image Container - Vertical orientation */}
                   <div className="w-full md:w-1/2">
-                    <div className="relative aspect-[3/4] w-full rounded-lg overflow-hidden bg-green-800 shadow-lg">
+                    <div className="relative aspect-[3/4] w-full rounded-lg overflow-hidden bg-gray-800 shadow-lg">
                       <img 
-                        src={jungleImage}
-                        alt="Jungle Scene"
+                        src={carImage}
+                        alt="Super Car Scene"
                         className="absolute inset-0 w-full h-full object-cover"
                       />
                       
@@ -208,11 +202,11 @@ const LetterMatchingWorksheet: React.FC = () => {
                                     flex items-center justify-center
                                     text-2xl sm:text-3xl md:text-4xl font-bold
                                     bg-black/90 backdrop-blur-sm
-                                    border-2 ${selectedTile?.id === tile.id ? 'border-yellow-400' : 'border-white/30'}
+                                    border-2 ${selectedTile?.id === tile.id ? 'border-red-400' : 'border-white/30'}
                                     rounded-lg shadow-lg
                                     ${selectedTile?.id === tile.id 
-                                      ? 'text-yellow-400 ring-2 ring-yellow-400' 
-                                      : 'text-white hover:text-yellow-300 hover:border-yellow-300'
+                                      ? 'text-red-400 ring-2 ring-red-400' 
+                                      : 'text-white hover:text-red-300 hover:border-red-300'
                                     }
                                     transition-all duration-200
                                     hover:scale-105 active:scale-95
@@ -234,26 +228,26 @@ const LetterMatchingWorksheet: React.FC = () => {
 
                   {/* Instructions and Progress - Desktop */}
                   <div className="hidden md:flex w-1/2 flex-col gap-4">
-                    <div className="bg-green-800 p-4 rounded-lg">
+                    <div className="bg-gray-800 p-4 rounded-lg">
                       <h2 className="text-xl font-bold text-white mb-3">How to Play:</h2>
                       <ul className="text-gray-300 space-y-2">
                         <li>1. Click on any letter tile</li>
                         <li>2. Find its matching pair (capital or small)</li>
-                        <li>3. Match all pairs to reveal the jungle!</li>
+                        <li>3. Match all pairs to reveal the car!</li>
                       </ul>
                     </div>
 
-                    <div className="bg-green-800 p-4 rounded-lg">
+                    <div className="bg-gray-800 p-4 rounded-lg">
                       <h2 className="text-xl font-bold text-white mb-3">Progress:</h2>
                       <div className="grid grid-cols-3 gap-2">
-                        {['A', 'B', 'C', 'D', 'E', 'F'].map((letter) => (
+                        {['G', 'H', 'I', 'J', 'K', 'L'].map((letter) => (
                           <div
                             key={letter}
                             className={`
                               p-2 text-center rounded-md
                               ${matchedPairs.includes(letter) 
-                                ? 'bg-green-600 text-white' 
-                                : 'bg-green-700 text-gray-400'}
+                                ? 'bg-red-900 text-white' 
+                                : 'bg-gray-700 text-gray-400'}
                             `}
                           >
                             {letter}
@@ -265,17 +259,17 @@ const LetterMatchingWorksheet: React.FC = () => {
                 </div>
 
                 {/* Instructions - Mobile Only */}
-                <div className="md:hidden mt-4 bg-green-800 p-4 rounded-lg">
+                <div className="md:hidden mt-4 bg-gray-800 p-4 rounded-lg">
                   <h2 className="text-lg font-bold text-white mb-2">Progress:</h2>
                   <div className="grid grid-cols-6 gap-2">
-                    {['A', 'B', 'C', 'D', 'E', 'F'].map((letter) => (
+                    {['G', 'H', 'I', 'J', 'K', 'L'].map((letter) => (
                       <div
                         key={letter}
                         className={`
                           p-2 text-center rounded-md text-sm
                           ${matchedPairs.includes(letter) 
-                            ? 'bg-green-600 text-white' 
-                            : 'bg-green-700 text-gray-400'}
+                            ? 'bg-red-900 text-white' 
+                            : 'bg-gray-700 text-gray-400'}
                         `}
                       >
                         {letter}
@@ -286,16 +280,16 @@ const LetterMatchingWorksheet: React.FC = () => {
 
                 {showCelebration && (
                   <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
-                    <div className="bg-green-800 text-white rounded-lg p-4 md:p-6 text-center max-w-sm">
+                    <div className="bg-gray-800 text-white rounded-lg p-4 md:p-6 text-center max-w-sm">
                       <h2 className="text-xl md:text-2xl font-bold mb-4">
-                        🎉 Amazing Job! 🦁
+                        🎉 Amazing Speed! 🏎️
                       </h2>
-                      <p className="text-green-300">
-                        You've matched all the letters and revealed the jungle scene!
+                      <p className="text-red-400">
+                        You've matched all the letters and revealed the super car!
                       </p>
                       <button
                         onClick={() => setShowCelebration(false)}
-                        className="mt-4 py-2 px-4 bg-green-600 rounded-lg hover:bg-green-700"
+                        className="mt-4 py-2 px-4 bg-red-600 rounded-lg hover:bg-red-700"
                       >
                         Close
                       </button>
@@ -311,4 +305,4 @@ const LetterMatchingWorksheet: React.FC = () => {
   );
 };
 
-export default LetterMatchingWorksheet; 
+export default CarLetterMatchingWorksheet; 
