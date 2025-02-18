@@ -54,7 +54,7 @@ const LetterMatchingWorksheet: React.FC = () => {
     }));
   };
 
-  const [tiles, setTiles] = useState<LetterTile[]>(createShuffledTiles());
+  const [tiles] = useState<LetterTile[]>(createShuffledTiles());
 
   useEffect(() => {
     const handleResize = () => {
