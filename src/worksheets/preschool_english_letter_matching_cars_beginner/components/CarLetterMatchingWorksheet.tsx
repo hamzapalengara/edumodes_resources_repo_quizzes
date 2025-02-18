@@ -87,6 +87,12 @@ const CarLetterMatchingWorksheet: React.FC = () => {
     };
 
     window.addEventListener('resize', handleResize);
+
+    // Initial instruction with racing theme
+    setTimeout(() => {
+      speak("Start your engines! Welcome to Speed Letter Match! Find and match capital and small letters to reveal the super car. Ready, set, match!");
+    }, 1000);
+
     return () => {
       window.removeEventListener('resize', handleResize);
       stopCurrentSpeech();
