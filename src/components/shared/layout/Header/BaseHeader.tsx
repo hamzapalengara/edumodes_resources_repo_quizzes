@@ -9,17 +9,20 @@ interface BaseHeaderProps {
 
 const sizeClasses = {
   small: {
+    container: 'flex items-baseline',
     e: 'text-xl',
-    du: 'text-lg',
-    modes: 'text-lg'
+    du: 'text-xl',
+    modes: 'text-xl'
   },
   default: {
-    e: 'text-3xl',
+    container: 'flex items-baseline',
+    e: 'text-2xl',
     du: 'text-2xl',
     modes: 'text-2xl'
   },
   large: {
-    e: 'text-4xl',
+    container: 'flex items-baseline',
+    e: 'text-3xl',
     du: 'text-3xl',
     modes: 'text-3xl'
   }
@@ -50,9 +53,97 @@ const BaseHeader: React.FC<BaseHeaderProps> = ({
       document.head.appendChild(meta);
     }
 
+    // Add custom styles
+    const style = document.createElement('style');
+    style.textContent = `
+      .kidszoo-style {
+        font-family: 'Fredoka One', cursive;
+        letter-spacing: 0.5px;
+        paint-order: stroke fill;
+      }
+
+      .letter-box {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+        line-height: 1;
+        border-radius: 0.15em;
+        transform-origin: center;
+        box-shadow: 1px 1px 0 rgba(0, 0, 0, 0.1),
+                   inset -0.5px -0.5px 1px rgba(0, 0, 0, 0.05),
+                   inset 0.5px 0.5px 1px rgba(255, 255, 255, 0.1);
+        border: 1px solid #FCD34D;
+        margin: 0 0.02em;
+        height: 1.2em;
+        width: 1.2em;
+        aspect-ratio: 1;
+        text-shadow: 0.5px 0.5px 0.5px rgba(0, 0, 0, 0.2);
+        background-image: linear-gradient(135deg, 
+            rgba(255, 255, 255, 0.15) 0%, 
+            rgba(255, 255, 255, 0) 50%, 
+            rgba(0, 0, 0, 0.05) 100%);
+      }
+
+      .letter-box.e-box {
+        transform: rotate(4deg);
+        margin-top: 0.1em;
+        width: 0.9em;
+      }
+
+      .letter-box.m-box {
+        transform: rotate(-4deg);
+        margin-top: 0.1em;
+      }
+
+      .letter-container {
+        display: inline-block;
+        transform-origin: center;
+      }
+
+      @keyframes tiltBounceRight {
+        0%, 100% { transform: rotate(4deg); }
+        50% { transform: rotate(-2deg); }
+      }
+
+      @keyframes tiltBounceLeft {
+        0%, 100% { transform: rotate(-4deg); }
+        50% { transform: rotate(2deg); }
+      }
+
+      .tilt-e {
+        animation: tiltBounceRight 3s ease-in-out infinite;
+      }
+
+      .tilt-m {
+        animation: tiltBounceLeft 3s ease-in-out infinite;
+      }
+
+      .letter-container:hover .letter-box {
+        animation-play-state: paused;
+        transform: rotate(0deg) scale(1.1);
+        transition: all 0.3s ease-out;
+        box-shadow: 1px 1px 0 rgba(0, 0, 0, 0.1),
+                   inset -0.5px -0.5px 1px rgba(0, 0, 0, 0.05),
+                   inset 0.5px 0.5px 1px rgba(255, 255, 255, 0.2);
+      }
+
+      .bounce-effect {
+        animation: bounce 1s ease-in-out infinite;
+      }
+
+      @keyframes bounce {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-3px); }
+      }
+    `;
+    document.head.appendChild(style);
+
     // Cleanup
     return () => {
       document.head.removeChild(link);
+      document.head.removeChild(style);
     };
   }, [themeColor]);
 
@@ -63,37 +154,24 @@ const BaseHeader: React.FC<BaseHeaderProps> = ({
           <div className="flex items-center justify-between">
             {/* Logo Section - Always visible */}
             <div className="flex flex-col min-w-0">
-              <div className="flex items-baseline group">
-                {/* E */}
-                <div className="inline-block transform-origin-center">
-                  <span 
-                    className={`${sizeClasses[size].e} font-['Fredoka_One'] tracking-[0.5px] text-primary-500
-                    [-webkit-text-stroke:1.5px_#2C3E50] [paint-order:stroke_fill]
-                    group-hover:scale-105 transition-all duration-300 ease-out hover:-rotate-6`}
-                  >
-                    E
-                  </span>
+              <div className={sizeClasses[size].container}>
+                <div className="flex items-baseline">
+                  {/* Special E with box */}
+                  <div className="letter-container">
+                    <div className={`${sizeClasses[size].e} kidszoo-style letter-box e-box tilt-e bg-secondary-600 text-white leading-none flex items-center justify-center`}>E</div>
+                  </div>
+                  
+                  {/* du */}
+                  <div className="letter-container -ml-1">
+                    <span className={`${sizeClasses[size].du} kidszoo-style text-primary-500 bounce-effect leading-none`}>du</span>
+                  </div>
                 </div>
                 
-                {/* du */}
-                <div className="inline-block transform-origin-center">
-                  <span 
-                    className={`${sizeClasses[size].du} font-['Fredoka_One'] tracking-[0.5px] text-primary-500
-                    [-webkit-text-stroke:1.5px_#2C3E50] [paint-order:stroke_fill]
-                    group-hover:scale-105 transition-all duration-300 ease-out hover:rotate-3`}
-                  >
-                    du
-                  </span>
-                </div>
-                
-                {/* Modes */}
-                <div className="inline-block transform-origin-center ml-0.5">
-                  <span 
-                    className={`${sizeClasses[size].modes} font-['Fredoka_One'] tracking-[0.5px] text-secondary-500
-                    [-webkit-text-stroke:1.5px_#2C3E50] [paint-order:stroke_fill]
-                    group-hover:scale-105 transition-all duration-300 ease-out hover:rotate-6`}
-                  >
-                    Modes
+                {/* Modes with boxed M */}
+                <div className="letter-container ml-0.5">
+                  <span className={`${sizeClasses[size].modes} kidszoo-style`}>
+                    <span className="letter-box m-box tilt-m bg-primary-600 text-white leading-none flex items-center justify-center">M</span>
+                    <span className="text-secondary-500 bounce-effect -ml-1">odes</span>
                   </span>
                 </div>
               </div>
