@@ -1,1 +1,0 @@
-An interactive boxing-themed game for practicing the 8 times multiplication table. Students match multiplication facts (8×1 to 8×10) with their answers in an engaging game format, with each match scoring points in the boxing ring. Features immediate feedback, visual rewards, and boxing-themed elements that make learning multiplication engaging and fun. 
