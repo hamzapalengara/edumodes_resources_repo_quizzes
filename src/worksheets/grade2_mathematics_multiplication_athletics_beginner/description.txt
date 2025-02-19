@@ -1,0 +1,1 @@
+An interactive athletics-themed game for practicing the 9 times multiplication table. Students match multiplication facts (9×1 to 9×10) with their answers in an engaging game format, with each match scoring points on the running track. Features immediate feedback, visual rewards, and athletics-themed elements that make learning multiplication engaging and fun. 
