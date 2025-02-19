@@ -1,0 +1,1 @@
+An interactive rugby-themed game for practicing the 6 times multiplication table. Students match multiplication facts (6×1 to 6×10) with their answers in a fun game format, with each match revealing more of the rugby field. Features immediate feedback, visual rewards, and rugby-themed elements that make learning multiplication engaging and fun. 
