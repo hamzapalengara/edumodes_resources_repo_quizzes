@@ -18,13 +18,11 @@ const WORD_LIST = [
   { word: 'BED', hint: 'Where we sleep', emoji: '🛏️' },
   { word: 'FAN', hint: 'Keeps us cool', emoji: '🌀' },
   { word: 'CUP', hint: 'We drink from it', emoji: '☕' },
-  { word: 'MAT', hint: 'We wipe our feet on it', emoji: '🏠' },
-  { word: 'RUG', hint: 'Covers the floor', emoji: '🏠' },
+  { word: 'MAT', hint: 'We wipe our feet on it', emoji: '🏡' },
   { word: 'PAN', hint: 'We cook in it', emoji: '🍳' },
   { word: 'POT', hint: 'Plants grow in it', emoji: '🪴' },
   { word: 'BOX', hint: 'Stores things', emoji: '📦' },
-  { word: 'BIN', hint: 'Put trash in it', emoji: '🗑️' },
-  { word: 'TAP', hint: 'Water comes from it', emoji: '🚰' }
+  { word: 'BIN', hint: 'Put trash in it', emoji: '🗑️' }
 ];
 
 // Generate letter grid for the current word
@@ -33,7 +31,8 @@ const generateLetterGrid = (word: string): string[] => {
   const wordLetters = word.split('');
   const remainingLetters = letters.filter(l => !wordLetters.includes(l));
   const shuffledRemaining = remainingLetters.sort(() => Math.random() - 0.5);
-  const grid = [...wordLetters, ...shuffledRemaining.slice(0, 23)];
+  // Only add enough letters to make total of 6 (including word letters)
+  const grid = [...wordLetters, ...shuffledRemaining.slice(0, 6 - wordLetters.length)];
   return grid.sort(() => Math.random() - 0.5);
 };
 
@@ -102,7 +101,7 @@ const HomeDictationWorksheet: React.FC = () => {
     return () => window.removeEventListener('resize', handleResize);
   }, [showConfetti]);
 
-  const handleLetterClick = (letter: string, { addPoints, markCorrect, markAttempted, markIncorrect }: any) => {
+  const handleLetterClick = (letter: string, { markCorrect, markAttempted, markIncorrect }: any) => {
     const currentWord = words[currentWordIndex];
     const newWords = [...words];
     const currentUserInput = [...currentWord.userInput, letter];
@@ -132,8 +131,8 @@ const HomeDictationWorksheet: React.FC = () => {
       if (isWordCorrect) {
         setShowConfetti(true);
         speak("Excellent!");
+        // Only use markCorrect which will add the points internally
         markCorrect();
-        addPoints(10); // Add 10 points for completing the word correctly
 
         setTimeout(() => {
           setShowConfetti(false);
@@ -175,97 +174,105 @@ const HomeDictationWorksheet: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-amber-50 to-orange-50">
+    <div className="min-h-screen bg-[#1F2937]">
       <WorksheetHeader />
       
       <WorksheetTracker
-        totalQuestions={WORD_LIST.length}
+        totalQuestions={8}
         pointsPerQuestion={10}
         onSummaryGenerated={handleSummaryGenerated}
       >
-        {({ addPoints, markCorrect, markAttempted, markIncorrect, score }) => (
+        {({ markCorrect, markAttempted, markIncorrect, score }) => (
           <TouchContainer>
             <div className="px-0 md:px-4">
               <div className="max-w-4xl mx-auto">
                 {/* Score Display */}
-                <div className="bg-white rounded-lg p-2 md:p-4 mb-4 shadow-md">
+                <div className="bg-[#374151] rounded-2xl p-4 mb-6 border border-[#4B5563]">
                   <ScoreDisplay 
                     score={score}
-                    totalQuestions={WORD_LIST.length * 10}
+                    totalQuestions={80}
                   />
                 </div>
 
                 {/* Game Area */}
-                <div className="bg-white rounded-lg p-4 shadow-md">
+                <div className="bg-[#374151] rounded-2xl p-6 border border-[#4B5563]">
                   {!isComplete ? (
                     <>
                       {/* Current Word Display */}
-                      <div className="flex items-center justify-between mb-6">
-                        <div className="flex items-center gap-4">
+                      <div className="flex items-center justify-between mb-8">
+                        <div className="flex items-center gap-6">
                           <button
                             onClick={() => speak(words[currentWordIndex]?.word)}
-                            className="w-20 h-20 bg-gradient-to-r from-amber-400 to-orange-400 rounded-full flex items-center justify-center text-white text-3xl shadow-lg hover:scale-105 transition-transform"
+                            className="w-24 h-24 bg-[#4B5563] hover:bg-[#6B7280] rounded-2xl flex items-center justify-center text-4xl shadow-sm transition-all hover:scale-105"
                           >
                             🔊
                           </button>
-                          <span className="text-sm text-amber-600">Click to hear the word</span>
+                          <div className="space-y-2">
+                            <span className="text-lg font-medium text-gray-200">Click to hear the word</span>
+                          </div>
                         </div>
-                        <button
-                          onClick={() => setShowHint(true)}
-                          className="px-4 py-2 bg-amber-100 text-amber-800 rounded-lg hover:bg-amber-200 transition-colors"
-                        >
-                          Show Hint
-                        </button>
+                        <div className="flex gap-4">
+                          <button
+                            onClick={() => setShowHint(true)}
+                            className="px-6 py-3 bg-[#4B5563] text-gray-200 rounded-xl hover:bg-[#6B7280] transition-all hover:scale-105 font-medium"
+                          >
+                            Need a Hint? 💡
+                          </button>
+                        </div>
                       </div>
 
                       {/* Hint Display */}
                       {showHint && (
-                        <div className="mb-6 p-4 bg-amber-50 rounded-lg border border-amber-200">
-                          <div className="flex items-center gap-2">
-                            <span className="text-3xl">{words[currentWordIndex]?.emoji}</span>
-                            <p className="text-amber-800">{words[currentWordIndex]?.hint}</p>
+                        <div className="mb-8 p-6 bg-[#4B5563] rounded-2xl border border-[#6B7280] animate-fade-in">
+                          <div className="flex items-center gap-4">
+                            <span className="text-4xl">{words[currentWordIndex]?.emoji}</span>
+                            <p className="text-gray-200 text-lg">{words[currentWordIndex]?.hint}</p>
                           </div>
                         </div>
                       )}
 
                       {/* User Input Display */}
-                      <div className="flex justify-center gap-2 mb-6">
+                      <div className="flex justify-center gap-4 mb-10">
                         {words[currentWordIndex]?.letters.map((_, index) => (
                           <div
                             key={index}
-                            className="w-12 h-12 border-2 border-amber-300 rounded flex items-center justify-center text-xl font-bold text-amber-800"
+                            className="w-16 h-16 border-2 border-[#6B7280] rounded-xl flex items-center justify-center text-2xl font-bold text-gray-200 bg-[#2D3748] relative overflow-hidden"
                           >
-                            {words[currentWordIndex]?.userInput[index] || ''}
+                            <div className="absolute inset-0 bg-[#4B5563] opacity-20"></div>
+                            <span className="relative z-10">
+                              {words[currentWordIndex]?.userInput[index] || '_'}
+                            </span>
                           </div>
                         ))}
                       </div>
 
                       {/* Letter Grid */}
-                      <div className="grid grid-cols-6 sm:grid-cols-8 gap-2">
+                      <div className="grid grid-cols-3 sm:grid-cols-6 gap-3">
                         {letterGrid.map((letter, index) => (
                           <button
                             key={index}
-                            onClick={() => handleLetterClick(letter, { addPoints, markCorrect, markAttempted, markIncorrect })}
-                            className="w-full aspect-square bg-amber-100 rounded-lg flex items-center justify-center text-lg font-bold text-amber-800 hover:bg-amber-200 transition-colors"
+                            onClick={() => handleLetterClick(letter, { markCorrect, markAttempted, markIncorrect })}
+                            className="w-full aspect-square bg-[#4B5563] rounded-xl flex items-center justify-center text-xl font-bold text-gray-200 hover:bg-[#6B7280] transition-all hover:scale-105 border border-[#6B7280] shadow-lg"
                           >
                             {letter}
                           </button>
                         ))}
                         <button
                           onClick={handleBackspace}
-                          className="w-full aspect-square bg-red-100 rounded-lg flex items-center justify-center text-lg font-bold text-red-800 hover:bg-red-200 transition-colors"
+                          className="w-full aspect-square bg-[#2D3748] rounded-xl flex items-center justify-center text-xl font-bold text-gray-200 hover:bg-[#4B5563] transition-all hover:scale-105 border border-[#4B5563] shadow-lg"
                         >
                           ←
                         </button>
                       </div>
                     </>
                   ) : (
-                    <div className="text-center py-8">
-                      <h2 className="text-2xl font-bold text-amber-800 mb-4">
-                        Congratulations! 🎉
+                    <div className="text-center py-12">
+                      <div className="text-6xl mb-6">🎉</div>
+                      <h2 className="text-3xl font-bold text-gray-200 mb-4">
+                        Amazing Job!
                       </h2>
-                      <p className="text-amber-600">
-                        You've completed all the words!
+                      <p className="text-xl text-gray-300">
+                        You've spelled all the words correctly!
                       </p>
                     </div>
                   )}
@@ -275,13 +282,14 @@ const HomeDictationWorksheet: React.FC = () => {
           </TouchContainer>
         )}
       </WorksheetTracker>
-
       {showConfetti && (
         <Confetti
           width={window.innerWidth}
           height={window.innerHeight}
           recycle={false}
           numberOfPieces={200}
+          gravity={0.3}
+          colors={['#FFD700', '#FFA500', '#FF69B4', '#87CEEB', '#98FB98']}
         />
       )}
     </div>
