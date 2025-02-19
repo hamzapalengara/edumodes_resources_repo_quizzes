@@ -3,7 +3,7 @@ import WorksheetHeader from '../../../components/shared/layout/Header/WorksheetH
 import TouchContainer from '../../../components/shared/layout/Container/TouchContainer';
 import ScoreDisplay from '../../../components/shared/ScoreDisplay';
 import Confetti from 'react-confetti';
-import cricketImage from '../assets/cricket-field.jpg';
+import tennisImage from '../assets/tennis-court.jpg';
 import WorksheetTracker, { WorksheetSummary } from '../../../components/shared/WorksheetTracker';
 
 interface MultiplicationTile {
@@ -15,7 +15,7 @@ interface MultiplicationTile {
   num2: number;
 }
 
-const CricketMultiplicationWorksheet: React.FC = () => {
+const TennisMultiplicationWorksheet: React.FC = () => {
   const [selectedTile, setSelectedTile] = useState<MultiplicationTile | null>(null);
   const [matchedPairs, setMatchedPairs] = useState<string[]>([]);
   const [showConfetti, setShowConfetti] = useState(false);
@@ -27,53 +27,42 @@ const CricketMultiplicationWorksheet: React.FC = () => {
   // Add reference to track current speech
   const currentSpeech = useRef<SpeechSynthesisUtterance | null>(null);
 
+  // Calculate answer for a multiplication fact
   const calculateAnswer = (num1: number, num2: number): number => {
     return num1 * num2;
   };
 
+  // Get question text
   const getQuestionText = (num1: number, num2: number): string => {
     return `${num1} × ${num2}`;
   };
 
-  // Create initial multiplication problems and shuffle them
+  // Create initial tiles and shuffle them
   const createShuffledTiles = () => {
-    const problems = [
-      { num1: 3, num2: 1 },
-      { num1: 3, num2: 2 },
-      { num1: 3, num2: 3 },
-      { num1: 3, num2: 4 },
-      { num1: 3, num2: 5 },
-      { num1: 3, num2: 6 },
-      { num1: 3, num2: 7 },
-      { num1: 3, num2: 8 },
-      { num1: 3, num2: 9 },
-      { num1: 3, num2: 10 }
-    ];
-    
     const tiles: MultiplicationTile[] = [];
     
-    // Create question and answer pairs
-    problems.forEach((problem, index) => {
-      const answer = calculateAnswer(problem.num1, problem.num2);
-      const questionText = getQuestionText(problem.num1, problem.num2);
-      
+    // Create question and answer pairs for 4 times table (4×1 to 4×10)
+    for (let i = 1; i <= 10; i++) {
+      // Question tile
       tiles.push({
-        id: index * 2,
-        value: questionText,
+        id: i * 2 - 1,
+        value: getQuestionText(4, i),
         type: 'question',
         position: 0,
-        num1: problem.num1,
-        num2: problem.num2
+        num1: 4,
+        num2: i
       });
+      
+      // Answer tile
       tiles.push({
-        id: index * 2 + 1,
-        value: answer.toString(),
+        id: i * 2,
+        value: calculateAnswer(4, i).toString(),
         type: 'answer',
         position: 0,
-        num1: problem.num1,
-        num2: problem.num2
+        num1: 4,
+        num2: i
       });
-    });
+    }
 
     // Shuffle the tiles
     const shuffled = [...tiles].sort(() => Math.random() - 0.5);
@@ -118,7 +107,7 @@ const CricketMultiplicationWorksheet: React.FC = () => {
 
     // Initial instruction
     setTimeout(() => {
-      speak("Welcome to Cricket Multiplication! Match the problems with their answers to score runs!");
+      speak("Welcome to Tennis Multiplication! Match the facts with their answers to score points!");
     }, 1000);
 
     return () => {
@@ -132,58 +121,48 @@ const CricketMultiplicationWorksheet: React.FC = () => {
       totalQuestions={10}
       pointsPerQuestion={10}
       onSummaryGenerated={(summary: WorksheetSummary) => {
-        console.log('Cricket Multiplication Summary:', summary);
+        console.log('Tennis Multiplication Summary:', summary);
       }}
     >
       {({ score, maxScore, markCorrect }) => {
         const handleTileClick = (tile: MultiplicationTile) => {
-          const answer = calculateAnswer(tile.num1, tile.num2);
-          if (matchedPairs.includes(answer.toString())) return;
+          if (matchedPairs.includes(calculateAnswer(tile.num1, tile.num2).toString())) return;
 
           if (!selectedTile) {
             setSelectedTile(tile);
-            // Speak the selected tile
-            speak(tile.type === 'question' ? 
-              `${tile.num1} times ${tile.num2} equals what?` : 
-              `The answer is ${tile.value}`
-            );
+            // Speak the selected fact or number
+            speak(tile.value);
           } else {
-            const isMatch = (
-              selectedTile.num1 === tile.num1 &&
-              selectedTile.num2 === tile.num2 &&
-              selectedTile.type !== tile.type
-            );
-
-            if (selectedTile.id !== tile.id && isMatch) {
+            if (selectedTile.id !== tile.id && 
+                calculateAnswer(selectedTile.num1, selectedTile.num2) === calculateAnswer(tile.num1, tile.num2)) {
               // Match found
-              const matchedAnswer = calculateAnswer(tile.num1, tile.num2).toString();
-              setMatchedPairs([...matchedPairs, matchedAnswer]);
+              setMatchedPairs([...matchedPairs, calculateAnswer(tile.num1, tile.num2).toString()]);
               markCorrect();
               
               // Play success sound and speak feedback
               const successAudio = new Audio('/success.mp3');
               successAudio.play().catch(console.error);
-              speak(`Six runs! ${tile.num1} times ${tile.num2} equals ${matchedAnswer}`);
+              speak(`Great serve! ${selectedTile.num1} times ${selectedTile.num2} equals ${calculateAnswer(tile.num1, tile.num2)}`);
               
               if (matchedPairs.length + 1 === 10) {
                 setShowConfetti(true);
                 setTimeout(() => setShowConfetti(false), 8000);
                 setTimeout(() => {
-                  speak("Century! You've mastered the 3 times table!");
+                  speak("Game, Set, Match! You've mastered the 4 times table!");
                 }, 1000);
               }
             } else {
               // No match - provide feedback
               const errorAudio = new Audio('/error.mp3');
               errorAudio.play().catch(console.error);
-              speak("Out! Try another match to score runs!");
+              speak("Out! Try another match.");
             }
             setSelectedTile(null);
           }
         };
 
         return (
-          <div className="min-h-screen bg-blue-900">
+          <div className="min-h-screen bg-green-900">
             {showConfetti && (
               <Confetti
                 width={windowSize.width}
@@ -191,7 +170,7 @@ const CricketMultiplicationWorksheet: React.FC = () => {
                 numberOfPieces={500}
                 recycle={true}
                 tweenDuration={8000}
-                colors={['#FFD700', '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4']}
+                colors={['#FFD700', '#98FB98', '#87CEEB', '#DDA0DD', '#F0E68C']}
               />
             )}
             
@@ -203,24 +182,24 @@ const CricketMultiplicationWorksheet: React.FC = () => {
                   <ScoreDisplay score={score} totalQuestions={maxScore} />
                 </div>
 
-                <div className="bg-blue-800 rounded-lg p-2 md:p-4 mb-4 text-white">
+                <div className="bg-green-800 rounded-lg p-2 md:p-4 mb-4 text-white">
                   <h1 className="text-xl md:text-2xl font-bold text-center mb-3">
-                    Cricket Multiplication: 3 Times Table 🏏
+                    Tennis Multiplication: 4 Times Table 🎾
                   </h1>
 
-                  <div className="bg-blue-700 rounded p-2 md:p-3">
+                  <div className="bg-green-700 rounded p-2 md:p-3">
                     <p className="font-medium">✨ Mission:</p>
-                    <p>Match multiplication facts with their answers to score runs!</p>
+                    <p>Match multiplication facts with their answers to win the match!</p>
                   </div>
                 </div>
 
                 <div className="flex flex-col md:flex-row gap-4">
                   {/* Image Container - Vertical orientation */}
                   <div className="w-full md:w-1/2">
-                    <div className="relative aspect-[3/4] w-full rounded-lg overflow-hidden bg-blue-800 shadow-lg">
+                    <div className="relative aspect-[3/4] w-full rounded-lg overflow-hidden bg-green-800 shadow-lg">
                       <img 
-                        src={cricketImage}
-                        alt="Cricket Field"
+                        src={tennisImage}
+                        alt="Tennis Court"
                         className="absolute inset-0 w-full h-full object-cover"
                       />
                       
@@ -244,14 +223,14 @@ const CricketMultiplicationWorksheet: React.FC = () => {
                                     flex items-center justify-center
                                     text-2xl sm:text-3xl md:text-4xl font-bold
                                     ${tile.type === 'question' 
-                                      ? 'bg-indigo-800 text-white hover:bg-indigo-700'
-                                      : 'bg-orange-400 text-indigo-900 hover:bg-orange-300'
+                                      ? 'bg-blue-800 text-white hover:bg-blue-700'
+                                      : 'bg-yellow-400 text-blue-900 hover:bg-yellow-300'
                                     }
                                     border-2 ${selectedTile?.id === tile.id 
                                       ? 'border-white ring-2 ring-white' 
                                       : tile.type === 'question'
-                                        ? 'border-indigo-600'
-                                        : 'border-orange-500'
+                                        ? 'border-blue-600'
+                                        : 'border-yellow-500'
                                     }
                                     rounded-lg shadow-lg
                                     transition-all duration-200
@@ -263,18 +242,18 @@ const CricketMultiplicationWorksheet: React.FC = () => {
                                     {tile.value}
                                   </span>
                                   {tile.type === 'question' && (
-                                    <div className="absolute top-1 right-1 text-xs text-orange-400">
+                                    <div className="absolute top-1 right-1 text-xs text-yellow-400">
                                       ×
                                     </div>
                                   )}
                                   {tile.type === 'answer' && (
-                                    <div className="absolute top-1 right-1 text-xs text-indigo-800">
+                                    <div className="absolute top-1 right-1 text-xs text-blue-800">
                                       =
                                     </div>
                                   )}
                                 </button>
                               ) : (
-                                <div className="w-full h-full rounded-lg transition-opacity duration-500 opacity-0" />
+                                <div className="w-full h-full rounded-lg transition-opacity duration-500" />
                               )}
                             </div>
                           ))}
@@ -285,26 +264,26 @@ const CricketMultiplicationWorksheet: React.FC = () => {
 
                   {/* Instructions and Progress - Desktop */}
                   <div className="hidden md:flex w-1/2 flex-col gap-4">
-                    <div className="bg-blue-800 p-4 rounded-lg">
+                    <div className="bg-green-800 p-4 rounded-lg">
                       <h2 className="text-xl font-bold text-white mb-3">How to Play:</h2>
-                      <ul className="text-blue-100 space-y-2">
-                        <li>1. Click on any tile (problem or answer)</li>
+                      <ul className="text-green-100 space-y-2">
+                        <li>1. Click on any tile (question or answer)</li>
                         <li>2. Find its matching pair</li>
-                        <li>3. Match all pairs to score a century!</li>
+                        <li>3. Match all pairs to win the game!</li>
                       </ul>
                     </div>
 
-                    <div className="bg-blue-800 p-4 rounded-lg">
-                      <h2 className="text-xl font-bold text-white mb-3">Scoreboard:</h2>
+                    <div className="bg-green-800 p-4 rounded-lg">
+                      <h2 className="text-xl font-bold text-white mb-3">Progress:</h2>
                       <div className="grid grid-cols-5 gap-2">
-                        {[3, 6, 9, 12, 15, 18, 21, 24, 27, 30].map((number) => (
+                        {[4, 8, 12, 16, 20, 24, 28, 32, 36, 40].map((number) => (
                           <div
                             key={number}
                             className={`
                               p-2 rounded-lg text-center font-bold
                               ${matchedPairs.includes(number.toString())
-                                ? 'bg-yellow-500 text-white'
-                                : 'bg-blue-700 text-blue-200'
+                                ? 'bg-yellow-500 text-green-900'
+                                : 'bg-green-700 text-green-200'
                               }
                             `}
                           >
@@ -324,4 +303,4 @@ const CricketMultiplicationWorksheet: React.FC = () => {
   );
 };
 
-export default CricketMultiplicationWorksheet; 
+export default TennisMultiplicationWorksheet; 

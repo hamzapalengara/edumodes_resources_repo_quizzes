@@ -3,7 +3,7 @@ import WorksheetHeader from '../../../components/shared/layout/Header/WorksheetH
 import TouchContainer from '../../../components/shared/layout/Container/TouchContainer';
 import ScoreDisplay from '../../../components/shared/ScoreDisplay';
 import Confetti from 'react-confetti';
-import cricketImage from '../assets/cricket-field.jpg';
+import hockeyImage from '../assets/hockey-rink.jpg';
 import WorksheetTracker, { WorksheetSummary } from '../../../components/shared/WorksheetTracker';
 
 interface MultiplicationTile {
@@ -15,7 +15,7 @@ interface MultiplicationTile {
   num2: number;
 }
 
-const CricketMultiplicationWorksheet: React.FC = () => {
+const HockeyMultiplicationWorksheet: React.FC = () => {
   const [selectedTile, setSelectedTile] = useState<MultiplicationTile | null>(null);
   const [matchedPairs, setMatchedPairs] = useState<string[]>([]);
   const [showConfetti, setShowConfetti] = useState(false);
@@ -38,16 +38,16 @@ const CricketMultiplicationWorksheet: React.FC = () => {
   // Create initial multiplication problems and shuffle them
   const createShuffledTiles = () => {
     const problems = [
-      { num1: 3, num2: 1 },
-      { num1: 3, num2: 2 },
-      { num1: 3, num2: 3 },
-      { num1: 3, num2: 4 },
-      { num1: 3, num2: 5 },
-      { num1: 3, num2: 6 },
-      { num1: 3, num2: 7 },
-      { num1: 3, num2: 8 },
-      { num1: 3, num2: 9 },
-      { num1: 3, num2: 10 }
+      { num1: 5, num2: 1 },
+      { num1: 5, num2: 2 },
+      { num1: 5, num2: 3 },
+      { num1: 5, num2: 4 },
+      { num1: 5, num2: 5 },
+      { num1: 5, num2: 6 },
+      { num1: 5, num2: 7 },
+      { num1: 5, num2: 8 },
+      { num1: 5, num2: 9 },
+      { num1: 5, num2: 10 }
     ];
     
     const tiles: MultiplicationTile[] = [];
@@ -118,7 +118,7 @@ const CricketMultiplicationWorksheet: React.FC = () => {
 
     // Initial instruction
     setTimeout(() => {
-      speak("Welcome to Cricket Multiplication! Match the problems with their answers to score runs!");
+      speak("Welcome to Hockey Multiplication! Match the problems with their answers to score goals!");
     }, 1000);
 
     return () => {
@@ -132,7 +132,7 @@ const CricketMultiplicationWorksheet: React.FC = () => {
       totalQuestions={10}
       pointsPerQuestion={10}
       onSummaryGenerated={(summary: WorksheetSummary) => {
-        console.log('Cricket Multiplication Summary:', summary);
+        console.log('Hockey Multiplication Summary:', summary);
       }}
     >
       {({ score, maxScore, markCorrect }) => {
@@ -163,27 +163,27 @@ const CricketMultiplicationWorksheet: React.FC = () => {
               // Play success sound and speak feedback
               const successAudio = new Audio('/success.mp3');
               successAudio.play().catch(console.error);
-              speak(`Six runs! ${tile.num1} times ${tile.num2} equals ${matchedAnswer}`);
+              speak(`Goal! ${tile.num1} times ${tile.num2} equals ${matchedAnswer}`);
               
               if (matchedPairs.length + 1 === 10) {
                 setShowConfetti(true);
                 setTimeout(() => setShowConfetti(false), 8000);
                 setTimeout(() => {
-                  speak("Century! You've mastered the 3 times table!");
+                  speak("Hat trick! You've mastered the 5 times table!");
                 }, 1000);
               }
             } else {
               // No match - provide feedback
               const errorAudio = new Audio('/error.mp3');
               errorAudio.play().catch(console.error);
-              speak("Out! Try another match to score runs!");
+              speak("Saved by the goalie! Try another shot!");
             }
             setSelectedTile(null);
           }
         };
 
         return (
-          <div className="min-h-screen bg-blue-900">
+          <div className="min-h-screen bg-slate-900">
             {showConfetti && (
               <Confetti
                 width={windowSize.width}
@@ -191,7 +191,7 @@ const CricketMultiplicationWorksheet: React.FC = () => {
                 numberOfPieces={500}
                 recycle={true}
                 tweenDuration={8000}
-                colors={['#FFD700', '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4']}
+                colors={['#FFD700', '#FF0000', '#FFFFFF', '#000000', '#C0C0C0']}
               />
             )}
             
@@ -203,24 +203,24 @@ const CricketMultiplicationWorksheet: React.FC = () => {
                   <ScoreDisplay score={score} totalQuestions={maxScore} />
                 </div>
 
-                <div className="bg-blue-800 rounded-lg p-2 md:p-4 mb-4 text-white">
+                <div className="bg-slate-800 rounded-lg p-2 md:p-4 mb-4 text-white">
                   <h1 className="text-xl md:text-2xl font-bold text-center mb-3">
-                    Cricket Multiplication: 3 Times Table 🏏
+                    Hockey Multiplication: 5 Times Table 🏒
                   </h1>
 
-                  <div className="bg-blue-700 rounded p-2 md:p-3">
+                  <div className="bg-slate-700 rounded p-2 md:p-3">
                     <p className="font-medium">✨ Mission:</p>
-                    <p>Match multiplication facts with their answers to score runs!</p>
+                    <p>Match multiplication facts with their answers to score goals!</p>
                   </div>
                 </div>
 
                 <div className="flex flex-col md:flex-row gap-4">
                   {/* Image Container - Vertical orientation */}
                   <div className="w-full md:w-1/2">
-                    <div className="relative aspect-[3/4] w-full rounded-lg overflow-hidden bg-blue-800 shadow-lg">
+                    <div className="relative aspect-[3/4] w-full rounded-lg overflow-hidden bg-slate-800 shadow-lg">
                       <img 
-                        src={cricketImage}
-                        alt="Cricket Field"
+                        src={hockeyImage}
+                        alt="Hockey Rink"
                         className="absolute inset-0 w-full h-full object-cover"
                       />
                       
@@ -244,14 +244,14 @@ const CricketMultiplicationWorksheet: React.FC = () => {
                                     flex items-center justify-center
                                     text-2xl sm:text-3xl md:text-4xl font-bold
                                     ${tile.type === 'question' 
-                                      ? 'bg-indigo-800 text-white hover:bg-indigo-700'
-                                      : 'bg-orange-400 text-indigo-900 hover:bg-orange-300'
+                                      ? 'bg-red-800 text-white hover:bg-red-700'
+                                      : 'bg-slate-200 text-slate-900 hover:bg-slate-100'
                                     }
                                     border-2 ${selectedTile?.id === tile.id 
                                       ? 'border-white ring-2 ring-white' 
                                       : tile.type === 'question'
-                                        ? 'border-indigo-600'
-                                        : 'border-orange-500'
+                                        ? 'border-red-600'
+                                        : 'border-slate-300'
                                     }
                                     rounded-lg shadow-lg
                                     transition-all duration-200
@@ -263,12 +263,12 @@ const CricketMultiplicationWorksheet: React.FC = () => {
                                     {tile.value}
                                   </span>
                                   {tile.type === 'question' && (
-                                    <div className="absolute top-1 right-1 text-xs text-orange-400">
+                                    <div className="absolute top-1 right-1 text-xs text-slate-200">
                                       ×
                                     </div>
                                   )}
                                   {tile.type === 'answer' && (
-                                    <div className="absolute top-1 right-1 text-xs text-indigo-800">
+                                    <div className="absolute top-1 right-1 text-xs text-red-800">
                                       =
                                     </div>
                                   )}
@@ -285,26 +285,26 @@ const CricketMultiplicationWorksheet: React.FC = () => {
 
                   {/* Instructions and Progress - Desktop */}
                   <div className="hidden md:flex w-1/2 flex-col gap-4">
-                    <div className="bg-blue-800 p-4 rounded-lg">
+                    <div className="bg-slate-800 p-4 rounded-lg">
                       <h2 className="text-xl font-bold text-white mb-3">How to Play:</h2>
-                      <ul className="text-blue-100 space-y-2">
+                      <ul className="text-slate-100 space-y-2">
                         <li>1. Click on any tile (problem or answer)</li>
                         <li>2. Find its matching pair</li>
-                        <li>3. Match all pairs to score a century!</li>
+                        <li>3. Match all pairs to score a hat trick!</li>
                       </ul>
                     </div>
 
-                    <div className="bg-blue-800 p-4 rounded-lg">
+                    <div className="bg-slate-800 p-4 rounded-lg">
                       <h2 className="text-xl font-bold text-white mb-3">Scoreboard:</h2>
                       <div className="grid grid-cols-5 gap-2">
-                        {[3, 6, 9, 12, 15, 18, 21, 24, 27, 30].map((number) => (
+                        {[5, 10, 15, 20, 25, 30, 35, 40, 45, 50].map((number) => (
                           <div
                             key={number}
                             className={`
                               p-2 rounded-lg text-center font-bold
                               ${matchedPairs.includes(number.toString())
-                                ? 'bg-yellow-500 text-white'
-                                : 'bg-blue-700 text-blue-200'
+                                ? 'bg-red-500 text-white'
+                                : 'bg-slate-700 text-slate-200'
                               }
                             `}
                           >
@@ -324,4 +324,4 @@ const CricketMultiplicationWorksheet: React.FC = () => {
   );
 };
 
-export default CricketMultiplicationWorksheet; 
+export default HockeyMultiplicationWorksheet; 
