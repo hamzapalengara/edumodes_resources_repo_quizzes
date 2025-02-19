@@ -1,1 +1,0 @@
-An interactive basketball-themed game for practicing the 7 times multiplication table. Students match multiplication facts (7×1 to 7×10) with their answers in a fun game format, with each match revealing more of the basketball court. Features immediate feedback, visual rewards, and basketball-themed elements that make learning multiplication engaging and fun. 
