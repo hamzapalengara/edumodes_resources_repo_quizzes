@@ -1,0 +1,1 @@
+An interactive number tracing adventure for preschoolers to learn numbers one through ten. Each number is paired with a delicious fruit, making learning fun and engaging. Features include voice guidance, step-by-step tracing instructions, and immediate feedback. Perfect for developing number recognition, counting skills, and fine motor control. 
