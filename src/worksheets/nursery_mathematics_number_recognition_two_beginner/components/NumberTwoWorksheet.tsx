@@ -6,7 +6,7 @@ import './NumberTwoWorksheet.css';
 import { createRoot } from 'react-dom/client';
 
 const TOTAL_ATTEMPTS = 5;
-const TOLERANCE = 15;
+const TOLERANCE = 25;
 
 // Define the number two path - curved top, diagonal line, horizontal base
 const NUMBER_TWO = {
@@ -16,12 +16,14 @@ const NUMBER_TWO = {
     { 
       id: 'top_curve', 
       d: 'M60 60C60 40 80 30 100 30C120 30 140 40 140 60C140 90 60 140 60 160', 
-      order: 1 
+      order: 1,
+      startPoint: { x: 60, y: 60 }
     },
     { 
       id: 'base', 
       d: 'M60 160L140 160', 
-      order: 2 
+      order: 2,
+      startPoint: { x: 60, y: 160 }
     }
   ]
 };
@@ -74,14 +76,13 @@ const NumberTwoWorksheet: React.FC = () => {
   const [pathLengths, setPathLengths] = useState<Record<string, number>>({});
   const [lastPoint, setLastPoint] = useState<number>(0);
   const [animationKey, setAnimationKey] = useState(0);
-  const [gamePhase, setGamePhase] = useState<'demo' | 'tracing' | 'identification'>('demo');
+  const [gamePhase, setGamePhase] = useState<'tracing' | 'identification'>('tracing');
   const [selectedItems, setSelectedItems] = useState<number[]>([]);
   const [shuffledItems, setShuffledItems] = useState<typeof GRID_ITEMS>([]);
   const [identificationComplete, setIdentificationComplete] = useState(false);
   const trackerFunctionsRef = useRef<TrackerFunctions | null>(null);
   const [selectedColor, setSelectedColor] = useState(COLOR_OPTIONS[0].value);
-  const [showAnimationSection, setShowAnimationSection] = useState(true);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isAnimating, setIsAnimating] = useState(true);
 
   // Optional: Add voice feedback
   const speak = useCallback((text: string) => {
@@ -103,14 +104,6 @@ const NumberTwoWorksheet: React.FC = () => {
       lengths[path.id] = tempPath.getTotalLength();
     });
     setPathLengths(lengths);
-  }, []);
-
-  useEffect(() => {
-    // Defer initial animations
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 500);
-    return () => clearTimeout(timer);
   }, []);
 
   const handleSummaryGenerated = (summary: WorksheetSummary) => {
@@ -154,9 +147,23 @@ const NumberTwoWorksheet: React.FC = () => {
     let minDistance = Infinity;
     let closestPointOnPath = 0;
     
+    // For the base stroke, make it easier to start from the beginning
+    if (currentPath.id === 'base') {
+      const startPoint = { x: 60, y: 160 };
+      const distanceToStart = getDistance(point, startPoint);
+      
+      if (distanceToStart < TOLERANCE * 1.5) { // Increased tolerance for base stroke start
+        setIsDrawing(true);
+        setProgress(0);
+        setLastPoint(0);
+        e.currentTarget.setPointerCapture(e.pointerId);
+        return;
+      }
+    }
+    
     // Search more points if we've already started tracing
-    const searchStart = progress > 0 ? lastPoint - 20 : 0;
-    const searchEnd = progress > 0 ? lastPoint + 20 : Math.min(20, length);
+    const searchStart = progress > 0 ? lastPoint - 25 : 0;
+    const searchEnd = progress > 0 ? lastPoint + 25 : Math.min(25, length);
     
     for (let i = searchStart; i <= searchEnd; i += 2) {
       if (i < 0) continue;
@@ -303,7 +310,6 @@ const NumberTwoWorksheet: React.FC = () => {
         } else {
           speak("Amazing! You've learned to write number two! Now let's find all the twos!");
           setGamePhase('identification');
-          setShowAnimationSection(false);
         }
       }
     }, 1500);
@@ -430,21 +436,21 @@ const NumberTwoWorksheet: React.FC = () => {
 
   // Handle animation replay
   const handleReplayAnimation = useCallback(() => {
+    setIsAnimating(false);
     setAnimationKey(prev => prev + 1);
     setTimeout(() => {
-      setAnimationKey(prev => prev + 1);
-    }, 3000);
+      setIsAnimating(true);
+    }, 100);
   }, []);
 
   // Initial animation setup
   useEffect(() => {
     const timer = setTimeout(() => {
-      setAnimationKey(prev => prev + 1);
       setGamePhase('tracing');
-    }, 3000);
+    }, 4000);
 
     return () => clearTimeout(timer);
-  }, [animationKey]);
+  }, []);
 
   return (
     <WorksheetTracker
@@ -455,17 +461,6 @@ const NumberTwoWorksheet: React.FC = () => {
       {({ addPoints, markCorrect, markAttempted, markIncorrect, score }) => {
         trackerFunctionsRef.current = { addPoints, markCorrect, markAttempted, markIncorrect };
         
-        if (isLoading) {
-          return (
-            <div className="min-h-screen bg-blue-50 flex items-center justify-center">
-              <div className="text-center">
-                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mx-auto mb-4"></div>
-                <p className="text-blue-600 font-medium">Loading your worksheet...</p>
-              </div>
-            </div>
-          );
-        }
-
         return (
           <div className="min-h-screen bg-blue-50">
             <div className="px-0 md:px-4 py-4 max-w-4xl mx-auto">
@@ -481,58 +476,59 @@ const NumberTwoWorksheet: React.FC = () => {
 
                 {gamePhase === 'tracing' && (
                   <div className="grid md:grid-cols-2 gap-6">
-                    {/* Animation Section - Only shown during tracing phase */}
-                    {showAnimationSection && (
-                      <div className="w-full">
-                        <div className="bg-gradient-to-r from-blue-100 via-purple-100 to-pink-100 rounded-2xl p-4 shadow-lg border-2 border-indigo-200">
-                          <h2 className="text-xl font-bold text-center text-indigo-600 mb-4 flex items-center justify-center gap-2">
-                            <span className="text-2xl">✨</span>
-                            Watch How to Write Number 2
-                            <span className="text-2xl">✨</span>
-                          </h2>
-                          <div className="relative w-4/5 mx-auto aspect-square bg-white rounded-xl overflow-hidden border-4 border-dashed border-indigo-200 shadow-inner">
-                            <svg
-                              key={animationKey}
-                              viewBox={NUMBER_TWO.viewBox}
-                              className="w-full h-full"
-                            >
-                              <pattern id="demo-grid" width="20" height="20" patternUnits="userSpaceOnUse">
-                                <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#e0e7ff" strokeWidth="1"/>
-                              </pattern>
-                              <rect width="200" height="200" fill="url(#demo-grid)" className="opacity-50"/>
-                              <circle cx="100" cy="100" r="90" fill="rgba(99, 102, 241, 0.1)"/>
+                    {/* Animation Section */}
+                    <div className="w-full">
+                      <div className="bg-gradient-to-r from-blue-100 via-purple-100 to-pink-100 rounded-2xl p-4 shadow-lg border-2 border-indigo-200">
+                        <h2 className="text-xl font-bold text-center text-indigo-600 mb-4 flex items-center justify-center gap-2">
+                          <span className="text-2xl">✨</span>
+                          Watch How to Write Number 2
+                          <span className="text-2xl">✨</span>
+                        </h2>
+                        <div className="relative w-4/5 mx-auto aspect-square bg-white rounded-xl overflow-hidden border-4 border-dashed border-indigo-200 shadow-inner">
+                          <svg
+                            key={animationKey}
+                            viewBox={NUMBER_TWO.viewBox}
+                            className="w-full h-full"
+                          >
+                            <pattern id="demo-grid" width="20" height="20" patternUnits="userSpaceOnUse">
+                              <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#e0e7ff" strokeWidth="1"/>
+                            </pattern>
+                            <rect width="200" height="200" fill="url(#demo-grid)" className="opacity-50"/>
+                            <circle cx="100" cy="100" r="90" fill="rgba(99, 102, 241, 0.1)"/>
 
-                              {NUMBER_TWO.paths.map((path) => (
-                                <path
-                                  key={`animation-${path.id}-${animationKey}`}
-                                  d={path.d}
-                                  fill="none"
-                                  stroke="#2563eb"
-                                  strokeWidth="16"
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  className="number-path-animation"
-                                  style={{
-                                    animationDelay: `${(path.order - 1) * 2}s`
-                                  }}
-                                />
-                              ))}
+                            {NUMBER_TWO.paths.map((path) => (
+                              <path
+                                key={`animation-${path.id}-${animationKey}`}
+                                d={path.d}
+                                fill="none"
+                                stroke="#2563eb"
+                                strokeWidth="16"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                className={isAnimating ? "number-path-animation" : ""}
+                                style={{
+                                  animationDelay: `${(path.order - 1) * 2}s`,
+                                  strokeDasharray: "1000",
+                                  strokeDashoffset: isAnimating ? undefined : "0",
+                                  strokeOpacity: isAnimating ? undefined : "1"
+                                }}
+                              />
+                            ))}
+                          </svg>
+                        </div>
+                        <div className="relative mt-4 flex justify-center">
+                          <button 
+                            onClick={handleReplayAnimation} 
+                            className="bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white font-bold py-2 px-6 rounded-full shadow-lg transition-all duration-200 flex items-center gap-2 transform hover:scale-105"
+                          >
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                              <path fillRule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clipRule="evenodd" />
                             </svg>
-                          </div>
-                          <div className="relative mt-4 flex justify-center">
-                            <button 
-                              onClick={handleReplayAnimation} 
-                              className="bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white font-bold py-2 px-6 rounded-full shadow-lg transition-all duration-200 flex items-center gap-2 transform hover:scale-105"
-                            >
-                              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                <path fillRule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clipRule="evenodd" />
-                              </svg>
-                              Watch Again!
-                            </button>
-                          </div>
+                            Watch Again!
+                          </button>
                         </div>
                       </div>
-                    )}
+                    </div>
 
                     {/* Practice Section */}
                     <div className="w-full">
@@ -644,12 +640,12 @@ const NumberTwoWorksheet: React.FC = () => {
                               )}
 
                               {/* Start point with animation */}
-                              {!filledPaths.includes('curve') && (
+                              {!filledPaths.includes('top_curve') && (
                                 <>
                                   <circle
                                     cx="60"
                                     cy="60"
-                                    r="12"
+                                    r="14"
                                     className="animate-ping"
                                     fill={selectedColor}
                                     fillOpacity="0.2"
@@ -657,12 +653,32 @@ const NumberTwoWorksheet: React.FC = () => {
                                   <circle
                                     cx="60"
                                     cy="60"
-                                    r="8"
+                                    r="10"
                                     className="animate-pulse"
                                     fill={selectedColor}
                                     fillOpacity="0.5"
                                   />
                                 </>
+                              )}
+
+                              {/* Bottom stroke start indicator */}
+                              {filledPaths.includes('top_curve') && !filledPaths.includes('base') && (
+                                <g className="bottom-start-indicator">
+                                  <circle
+                                    cx="60"
+                                    cy="160"
+                                    r="14"
+                                    fill={selectedColor}
+                                    fillOpacity="0.2"
+                                  />
+                                  <circle
+                                    cx="60"
+                                    cy="160"
+                                    r="10"
+                                    fill={selectedColor}
+                                    fillOpacity="0.5"
+                                  />
+                                </g>
                               )}
                             </svg>
                           </div>

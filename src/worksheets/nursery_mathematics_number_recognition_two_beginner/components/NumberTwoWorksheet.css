@@ -1,67 +1,77 @@
+/* Base Animations */
 .number-path-animation {
   stroke-dasharray: 1000;
   stroke-dashoffset: 1000;
-  animation: drawPath 2s ease-in-out forwards;
+  animation: drawNumber 4s forwards;
+  animation-timing-function: ease-in-out;
+  will-change: stroke-dashoffset, stroke-opacity;
 }
 
-/* Add animation class for resetting */
 .reset-animation {
   animation: none;
   stroke-dashoffset: 1000;
   stroke-opacity: 0.3;
 }
 
-@keyframes drawPath {
-  to {
-    stroke-dashoffset: 0;
-  }
+/* Drawing Paths */
+.drawing-path {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  will-change: stroke-dashoffset, stroke-opacity;
 }
 
-/* Add smooth color transitions */
-path {
-  transition: stroke 0.3s ease-in-out;
+.completed-path {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 0;
 }
 
-circle {
-  transition: fill 0.3s ease-in-out;
+/* Main Animations */
+.main-stroke {
+  animation: draw 1s ease-in-out forwards;
+  will-change: stroke-dashoffset, stroke-opacity;
 }
 
-/* Add a fun background pattern */
-.practice-background {
-  background-image: radial-gradient(#e0e7ff 1px, transparent 1px);
-  background-size: 20px 20px;
+.bottom-stroke {
+  animation: drawDelayed 1s ease-in-out forwards;
+  will-change: stroke-dashoffset, stroke-opacity;
 }
 
-/* Add a glow effect to the success state */
+/* Guide Elements */
+.guide-dot {
+  filter: drop-shadow(0 0 2px rgba(37, 99, 235, 0.5));
+}
+
+.start-dot {
+  animation: pulse 2s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+.bottom-start-indicator {
+  animation: simplePulse 1.5s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+.drawing-guide {
+  filter: drop-shadow(0 0 4px rgba(37, 99, 235, 0.5));
+}
+
+.guide-arrow {
+  animation: fadeInOut 1.5s ease-in-out infinite;
+  will-change: opacity;
+}
+
+.guide-path {
+  opacity: 0.3;
+  transition: opacity 0.3s ease-in-out;
+}
+
+/* Success States */
 .success-glow {
   filter: drop-shadow(0 0 10px rgba(124, 58, 237, 0.5));
   animation: glow 1s ease-in-out infinite alternate;
 }
 
-@keyframes glow {
-  from {
-    filter: drop-shadow(0 0 5px rgba(124, 58, 237, 0.5));
-  }
-  to {
-    filter: drop-shadow(0 0 15px rgba(124, 58, 237, 0.8));
-  }
-}
-
-/* Add a bouncing animation for the start point */
-.bounce {
-  animation: bounce 1s ease-in-out infinite;
-}
-
-@keyframes bounce {
-  0%, 100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-10px);
-  }
-}
-
-/* Add hover effect for color buttons */
+/* Interactive Elements */
 .color-button {
   transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
 }
@@ -71,7 +81,6 @@ circle {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-/* Add smooth transitions for identification game buttons */
 .identification-button {
   transition: all 0.3s ease-in-out;
 }
@@ -84,49 +93,43 @@ circle {
   animation: incorrectShake 0.5s ease-in-out;
 }
 
-@keyframes correctPulse {
-  0%, 100% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.1);
-  }
+/* Number 2 Specific */
+.curve-guide {
+  opacity: 1;
+  transition: opacity 0.3s ease-in-out;
 }
 
-@keyframes incorrectShake {
-  0%, 100% {
-    transform: translateX(0);
+.line-guide {
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+}
+
+/* Keyframe Animations */
+@keyframes drawNumber {
+  0% {
+    stroke-opacity: 0;
+    stroke-dashoffset: 1000;
   }
-  25% {
-    transform: translateX(-5px);
+  10% {
+    stroke-opacity: 1;
+    stroke-dashoffset: 1000;
   }
-  75% {
-    transform: translateX(5px);
+  90% {
+    stroke-opacity: 1;
+    stroke-dashoffset: 0;
   }
-}
-
-.drawing-path {
-  stroke-dasharray: 1;
-  stroke-dashoffset: 1;
-}
-
-.completed-path {
-  stroke-dasharray: 1;
-  stroke-dashoffset: 0;
-}
-
-/* Main curved stroke animation */
-.main-stroke {
-  animation: draw 1.5s ease-in-out forwards;
-}
-
-/* Bottom line stroke animation with delay */
-.bottom-stroke {
-  animation: drawDelayed 1.5s ease-in-out forwards;
+  100% {
+    stroke-opacity: 1;
+    stroke-dashoffset: 0;
+  }
 }
 
 @keyframes draw {
   0% {
+    stroke-opacity: 0.3;
+    stroke-dashoffset: 1;
+  }
+  20% {
     stroke-opacity: 1;
     stroke-dashoffset: 1;
   }
@@ -138,6 +141,10 @@ circle {
 
 @keyframes drawDelayed {
   0%, 50% {
+    stroke-opacity: 0.3;
+    stroke-dashoffset: 1;
+  }
+  70% {
     stroke-opacity: 1;
     stroke-dashoffset: 1;
   }
@@ -145,14 +152,6 @@ circle {
     stroke-opacity: 1;
     stroke-dashoffset: 0;
   }
-}
-
-.guide-dot {
-  filter: drop-shadow(0 0 2px rgba(37, 99, 235, 0.5));
-}
-
-.start-dot {
-  animation: pulse 2s ease-in-out infinite;
 }
 
 @keyframes pulse {
@@ -170,14 +169,6 @@ circle {
   }
 }
 
-.drawing-guide {
-  filter: drop-shadow(0 0 4px rgba(37, 99, 235, 0.5));
-}
-
-.guide-arrow {
-  animation: fadeInOut 1.5s ease-in-out infinite;
-}
-
 @keyframes fadeInOut {
   0%, 100% {
     opacity: 0.2;
@@ -187,21 +178,87 @@ circle {
   }
 }
 
-.pulse-animation {
-  animation: pulse 1.5s ease-in-out infinite;
-}
-
-.guide-path {
-  animation: fadeIn 0.5s ease-in-out forwards;
-}
-
-@keyframes fadeIn {
+@keyframes glow {
   from {
-    opacity: 0;
+    filter: drop-shadow(0 0 5px rgba(124, 58, 237, 0.5));
   }
   to {
-    opacity: 0.3;
+    filter: drop-shadow(0 0 15px rgba(124, 58, 237, 0.8));
   }
+}
+
+@keyframes correctPulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+@keyframes incorrectShake {
+  25% {
+    transform: translateX(-5px);
+  }
+  75% {
+    transform: translateX(5px);
+  }
+}
+
+@keyframes pulseAndBounce {
+  0%, 100% {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.3) translateY(-5px);
+    opacity: 0.7;
+  }
+}
+
+@keyframes simplePulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 0.7;
+  }
+}
+
+/* Transitions */
+path {
+  transition: stroke 0.3s ease-in-out;
+}
+
+circle {
+  transition: fill 0.3s ease-in-out;
+}
+
+/* Background Pattern */
+.practice-background {
+  background-image: radial-gradient(#e0e7ff 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+/* Bounce Animation */
+.bounce {
+  animation: bounce 1s ease-in-out infinite;
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.pulse-animation {
+  animation: pulse 1.5s ease-in-out infinite;
+  will-change: transform, opacity;
 }
 
 /* Specific animations for number 2 */
