@@ -16,19 +16,13 @@ const answers: AnswerExample[] = [
     keywords: ["like", "go", "park", "please"]
   },
   {
-    question: "The park? Let me check if this bus goes there.",
-    answer: "Yes does this bus go to the park",
-    explanation: "This is a good follow-up question to confirm if you're on the right bus. It shows you're actively engaged in the conversation.",
-    keywords: ["yes", "bus", "go", "park"]
-  },
-  {
-    question: "Yes, this bus goes to the park. Do you have your bus pass?",
+    question: "Yes, this bus stops at the park. Do you have your bus pass?",
     answer: "Yes I have my bus pass here",
     explanation: "This response confirms you have your pass ready. Adding 'here' indicates you're prepared to show it.",
     keywords: ["yes", "have", "bus", "pass"]
   },
   {
-    question: "Perfect! The park is about 15 minutes away. Please take a seat.",
+    question: "Perfect! Please take a seat. The park is about 15 minutes away.",
     answer: "Thank you how long will it take to get there",
     explanation: "This response shows politeness with 'thank you' and asks for specific travel time information.",
     keywords: ["thank", "how", "long", "take"]
@@ -47,12 +41,12 @@ const answers: AnswerExample[] = [
   },
   {
     question: "We're getting close to the park now. Would you like to get off at the next stop?",
-    answer: "Yes is the next stop the park",
-    explanation: "This response confirms your intention to get off and double-checks that it's the correct stop.",
-    keywords: ["yes", "next", "stop", "park"]
+    answer: "Yes please is this the park stop",
+    explanation: "This response confirms your intention to get off while politely double-checking it's the correct stop.",
+    keywords: ["yes", "please", "park", "stop"]
   },
   {
-    question: "Yes, the next stop is right in front of the park.",
+    question: "Yes, the next stop is right in front of the park entrance.",
     answer: "Thank you I will get off at the next stop",
     explanation: "This response confirms your understanding and intention to exit at the next stop.",
     keywords: ["thank", "get", "off", "next", "stop"]

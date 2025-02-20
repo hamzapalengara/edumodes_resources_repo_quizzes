@@ -65,61 +65,54 @@ const dialogues: Dialogue[] = [
   {
     id: 2,
     speaker: 'driver',
-    text: "The park? Let me check if this bus goes there.",
+    text: "Yes, this bus stops at the park. Do you have your bus pass?",
     emoji: '🚌',
-    expectedResponse: "Yes does this bus go to the park"
+    expectedResponse: "Yes I have my bus pass here"
   },
   {
     id: 3,
     speaker: 'driver',
-    text: "Yes, this bus goes to the park. Do you have your bus pass?",
-    emoji: '🎫',
-    expectedResponse: "Yes I have my bus pass here"
-  },
-  {
-    id: 4,
-    speaker: 'driver',
-    text: "Perfect! The park is about 15 minutes away. Please take a seat.",
+    text: "Perfect! Please take a seat. The park is about 15 minutes away.",
     emoji: '💺',
     expectedResponse: "Thank you how long will it take to get there"
   },
   {
-    id: 5,
+    id: 4,
     speaker: 'driver',
     text: "It will take about 15 minutes. Would you like me to tell you when we reach?",
     emoji: '⏰',
     expectedResponse: "Yes please tell me when we reach there"
   },
   {
-    id: 6,
+    id: 5,
     speaker: 'driver',
     text: "Don't worry, I'll let you know when we reach the park.",
     emoji: '👍',
     expectedResponse: "Thank you very much"
   },
   {
-    id: 7,
+    id: 6,
     speaker: 'driver',
     text: "We're getting close to the park now. Would you like to get off at the next stop?",
     emoji: '🌳',
-    expectedResponse: "Yes is the next stop the park"
+    expectedResponse: "Yes please is this the park stop"
   },
   {
-    id: 8,
+    id: 7,
     speaker: 'driver',
-    text: "Yes, the next stop is right in front of the park.",
+    text: "Yes, the next stop is right in front of the park entrance.",
     emoji: '🎯',
     expectedResponse: "Thank you I will get off at the next stop"
   },
   {
-    id: 9,
+    id: 8,
     speaker: 'driver',
     text: "We've reached the park now. This is your stop!",
     emoji: '🚏',
     expectedResponse: "Thank you for the ride"
   },
   {
-    id: 10,
+    id: 9,
     speaker: 'driver',
     text: "You're welcome! Have a great time at the park!",
     emoji: '😊',
