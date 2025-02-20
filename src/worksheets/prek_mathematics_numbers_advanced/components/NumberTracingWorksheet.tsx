@@ -30,12 +30,12 @@ export const NUMBERS: Number[] = [
   {
     value: '11',
     vehicle: 'eleven',
-    vehicleEmoji: '��',
+    vehicleEmoji: '🚗',
     vehicleCount: 11,
-    viewBox: '0 0 300 200',
+    viewBox: '0 0 400 200',
     paths: [
       { id: 'first_one', d: 'M80 40L80 160', order: 1 },
-      { id: 'second_one', d: 'M180 40L180 160', order: 2 }
+      { id: 'second_one', d: 'M280 40L280 160', order: 2 }
     ]
   },
   {
@@ -43,11 +43,11 @@ export const NUMBERS: Number[] = [
     vehicle: 'twelve',
     vehicleEmoji: '🚌',
     vehicleCount: 12,
-    viewBox: '0 0 300 200',
+    viewBox: '0 0 400 200',
     paths: [
       { id: 'one', d: 'M80 40L80 160', order: 1 },
-      { id: 'two_curve', d: 'M160 60C160 40 180 30 200 30C220 30 240 40 240 60C240 90 160 140 160 160', order: 2 },
-      { id: 'two_base', d: 'M160 160L240 160', order: 3 }
+      { id: 'two_curve', d: 'M260 60C260 40 280 30 300 30C320 30 340 40 340 60C340 90 260 140 260 160', order: 2 },
+      { id: 'two_base', d: 'M260 160L340 160', order: 3 }
     ]
   },
   {
@@ -55,11 +55,11 @@ export const NUMBERS: Number[] = [
     vehicle: 'thirteen',
     vehicleEmoji: '✈️',
     vehicleCount: 13,
-    viewBox: '0 0 300 200',
+    viewBox: '0 0 400 200',
     paths: [
       { id: 'one', d: 'M80 40L80 160', order: 1 },
-      { id: 'three_top', d: 'M160 40C190 40 240 40 240 70C240 100 190 100 160 100', order: 2 },
-      { id: 'three_bottom', d: 'M160 100C190 100 240 100 240 130C240 160 190 160 160 160', order: 3 }
+      { id: 'three_top', d: 'M260 40C290 40 340 40 340 70C340 100 290 100 260 100', order: 2 },
+      { id: 'three_bottom', d: 'M260 100C290 100 340 100 340 130C340 160 290 160 260 160', order: 3 }
     ]
   },
   {
@@ -67,12 +67,12 @@ export const NUMBERS: Number[] = [
     vehicle: 'fourteen',
     vehicleEmoji: '🚂',
     vehicleCount: 14,
-    viewBox: '0 0 300 200',
+    viewBox: '0 0 400 200',
     paths: [
       { id: 'one', d: 'M80 40L80 160', order: 1 },
-      { id: 'four_diagonal', d: 'M200 40L140 100', order: 2 },
-      { id: 'four_horizontal', d: 'M140 100L220 100', order: 3 },
-      { id: 'four_vertical', d: 'M200 40L200 160', order: 4 }
+      { id: 'four_diagonal', d: 'M300 40L240 100', order: 2 },
+      { id: 'four_horizontal', d: 'M240 100L320 100', order: 3 },
+      { id: 'four_vertical', d: 'M300 40L300 160', order: 4 }
     ]
   },
   {
@@ -80,12 +80,12 @@ export const NUMBERS: Number[] = [
     vehicle: 'fifteen',
     vehicleEmoji: '🚁',
     vehicleCount: 15,
-    viewBox: '0 0 300 200',
+    viewBox: '0 0 400 200',
     paths: [
       { id: 'one', d: 'M80 40L80 160', order: 1 },
-      { id: 'five_top', d: 'M220 40L140 40', order: 2 },
-      { id: 'five_vertical', d: 'M140 40L140 100', order: 3 },
-      { id: 'five_curve', d: 'M140 100C160 100 220 100 220 130C220 160 180 160 140 160', order: 4 }
+      { id: 'five_top', d: 'M320 40L240 40', order: 2 },
+      { id: 'five_vertical', d: 'M240 40L240 100', order: 3 },
+      { id: 'five_curve', d: 'M240 100C260 100 320 100 320 130C320 160 280 160 240 160', order: 4 }
     ]
   },
   {
@@ -93,23 +93,23 @@ export const NUMBERS: Number[] = [
     vehicle: 'sixteen',
     vehicleEmoji: '🚓',
     vehicleCount: 16,
-    viewBox: '0 0 300 200',
+    viewBox: '0 0 400 200',
     paths: [
       { id: 'one', d: 'M80 40L80 160', order: 1 },
-      { id: 'six_curve', d: 'M220 60C180 60 140 100 140 140', order: 2 },
-      { id: 'six_circle', d: 'M140 140C140 160 160 180 180 180C200 180 220 160 220 140C220 120 200 100 180 100C160 100 140 120 140 140', order: 3 }
+      { id: 'six_curve', d: 'M320 60C280 60 240 100 240 140', order: 2 },
+      { id: 'six_circle', d: 'M240 140C240 160 260 180 280 180C300 180 320 160 320 140C320 120 300 100 280 100C260 100 240 120 240 140', order: 3 }
     ]
   },
   {
     value: '17',
     vehicle: 'seventeen',
-    vehicleEmoji: '��',
+    vehicleEmoji: '🚕',
     vehicleCount: 17,
-    viewBox: '0 0 300 200',
+    viewBox: '0 0 400 200',
     paths: [
       { id: 'one', d: 'M80 40L80 160', order: 1 },
-      { id: 'seven_top', d: 'M140 40L220 40', order: 2 },
-      { id: 'seven_diagonal', d: 'M220 40L160 160', order: 3 }
+      { id: 'seven_top', d: 'M240 40L320 40', order: 2 },
+      { id: 'seven_diagonal', d: 'M320 40L260 160', order: 3 }
     ]
   },
   {
@@ -117,11 +117,11 @@ export const NUMBERS: Number[] = [
     vehicle: 'eighteen',
     vehicleEmoji: '🚎',
     vehicleCount: 18,
-    viewBox: '0 0 300 200',
+    viewBox: '0 0 400 200',
     paths: [
       { id: 'one', d: 'M80 40L80 160', order: 1 },
-      { id: 'eight_top', d: 'M180 20C160 20 140 40 140 60C140 80 160 100 180 100C200 100 220 80 220 60C220 40 200 20 180 20', order: 2 },
-      { id: 'eight_bottom', d: 'M180 100C160 100 140 120 140 140C140 160 160 180 180 180C200 180 220 160 220 140C220 120 200 100 180 100', order: 3 }
+      { id: 'eight_top', d: 'M280 20C260 20 240 40 240 60C240 80 260 100 280 100C300 100 320 80 320 60C320 40 300 20 280 20', order: 2 },
+      { id: 'eight_bottom', d: 'M280 100C260 100 240 120 240 140C240 160 260 180 280 180C300 180 320 160 320 140C320 120 300 100 280 100', order: 3 }
     ]
   },
   {
@@ -129,11 +129,11 @@ export const NUMBERS: Number[] = [
     vehicle: 'nineteen',
     vehicleEmoji: '🚤',
     vehicleCount: 19,
-    viewBox: '0 0 300 200',
+    viewBox: '0 0 400 200',
     paths: [
       { id: 'one', d: 'M80 40L80 160', order: 1 },
-      { id: 'nine_circle', d: 'M220 80C220 60 200 40 180 40C160 40 140 60 140 80C140 100 160 120 180 120C200 120 220 100 220 80', order: 2 },
-      { id: 'nine_line', d: 'M220 80L220 180', order: 3 }
+      { id: 'nine_circle', d: 'M320 80C320 60 300 40 280 40C260 40 240 60 240 80C240 100 260 120 280 120C300 120 320 100 320 80', order: 2 },
+      { id: 'nine_line', d: 'M320 80L320 180', order: 3 }
     ]
   },
   {
@@ -141,11 +141,11 @@ export const NUMBERS: Number[] = [
     vehicle: 'twenty',
     vehicleEmoji: '🚀',
     vehicleCount: 20,
-    viewBox: '0 0 300 200',
+    viewBox: '0 0 400 200',
     paths: [
-      { id: 'two_curve', d: 'M60 60C60 40 80 30 100 30C120 30 140 40 140 60C140 90 60 140 60 160', order: 1 },
-      { id: 'two_base', d: 'M60 160L140 160', order: 2 },
-      { id: 'zero', d: 'M250 100C250 70 230 40 210 40C190 40 170 70 170 100C170 130 190 160 210 160C230 160 250 130 250 100', order: 3 }
+      { id: 'two_curve', d: 'M160 60C160 40 180 30 200 30C220 30 240 40 240 60C240 90 160 140 160 160', order: 1 },
+      { id: 'two_base', d: 'M160 160L240 160', order: 2 },
+      { id: 'zero', d: 'M350 100C350 70 330 40 310 40C290 40 270 70 270 100C270 130 290 160 310 160C330 160 350 130 350 100', order: 3 }
     ]
   }
 ];
@@ -292,7 +292,6 @@ const NumberTracingWorksheet: React.FC = () => {
     const searchStart = progress > 0 ? lastPoint - 20 : 0;
     const searchEnd = progress > 0 ? lastPoint + 20 : Math.min(20, length);
     
-    // More precise point detection with smaller step size
     for (let i = searchStart; i <= searchEnd; i += 2) {
       if (i < 0) continue;
       const pathPoint = pathElement.getPointAtLength(i);
@@ -304,7 +303,7 @@ const NumberTracingWorksheet: React.FC = () => {
       }
     }
     
-    // More precise distance threshold for starting
+    // Allow continuing from current progress or starting from beginning
     if (minDistance < 15) {
       setIsDrawing(true);
       if (progress === 0) {
@@ -356,7 +355,6 @@ const NumberTracingWorksheet: React.FC = () => {
   }, [isDrawing]);
 
   const handleRetry = useCallback(() => {
-    // Reset all drawing states
     setCurrentPathIndex(0);
     setFilledPaths([]);
     setProgress(0);
@@ -365,10 +363,8 @@ const NumberTracingWorksheet: React.FC = () => {
     setIsDrawing(false);
     setShowSuccess(false);
     
-    // Release pointer capture if it's active
     if (svgRef.current) {
       try {
-        // Find any active pointer captures and release them
         const pointerIds = svgRef.current.getAttributeNames()
           .filter(name => name.startsWith('pointer-events-'))
           .map(name => parseInt(name.split('-')[2]));
@@ -501,7 +497,7 @@ const NumberTracingWorksheet: React.FC = () => {
                           strokeDasharray={pathLengths[currentPath.id] || 0}
                           strokeDashoffset={
                             pathLengths[currentPath.id]
-                              ? pathLengths[currentPath.id] * (1 - progress)
+                              ? pathLengths[currentPath.id] * (1 - (progress))
                               : 0
                           }
                         />
