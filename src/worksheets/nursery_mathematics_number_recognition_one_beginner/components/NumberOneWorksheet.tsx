@@ -65,7 +65,6 @@ const NumberOneWorksheet: React.FC = () => {
   const [filledPaths, setFilledPaths] = useState<string[]>([]);
   const [progress, setProgress] = useState(0);
   const [pathLengths, setPathLengths] = useState<Record<string, number>>({});
-  const [showSuccess, setShowSuccess] = useState(false);
   const [lastPoint, setLastPoint] = useState<number>(0);
   const [animationKey, setAnimationKey] = useState(0);
   const [gamePhase, setGamePhase] = useState<'tracing' | 'identification'>('tracing');
@@ -74,6 +73,7 @@ const NumberOneWorksheet: React.FC = () => {
   const [identificationComplete, setIdentificationComplete] = useState(false);
   const trackerFunctionsRef = useRef<TrackerFunctions | null>(null);
   const [selectedColor, setSelectedColor] = useState(COLOR_OPTIONS[0].value);
+  const [isAnimating, setIsAnimating] = useState(true);
 
   // Optional: Add voice feedback
   const speak = useCallback((text: string) => {
@@ -201,83 +201,78 @@ const NumberOneWorksheet: React.FC = () => {
     if (!currentPath || !trackerFunctionsRef.current) return;
 
     setFilledPaths(prev => [...prev, currentPath.id]);
-    setShowSuccess(true);
     speak("Great job!");
     trackerFunctionsRef.current.markAttempted();
     trackerFunctionsRef.current.markCorrect();
     trackerFunctionsRef.current.addPoints(POINTS_PER_ATTEMPT);
 
-    setTimeout(() => {
-      setShowSuccess(false);
+    if (filledPaths.length + 1 === NUMBER_ONE.paths.length) {
+      setAttempts(prev => prev + 1);
+      
+      // Create falling ones celebration
+      const colors = ['#2563eb', '#7c3aed', '#ec4899', '#10b981', '#f97316', '#ef4444'];
+      const container = document.createElement('div');
+      container.style.position = 'fixed';
+      container.style.top = '0';
+      container.style.left = '0';
+      container.style.width = '100%';
+      container.style.height = '100%';
+      container.style.pointerEvents = 'none';
+      container.style.zIndex = '50';
+      document.body.appendChild(container);
 
-      if (filledPaths.length + 1 === NUMBER_ONE.paths.length) {
-        setAttempts(prev => prev + 1);
-        
-        // Create falling ones celebration
-        const colors = ['#2563eb', '#7c3aed', '#ec4899', '#10b981', '#f97316', '#ef4444'];
-        const container = document.createElement('div');
-        container.style.position = 'fixed';
-        container.style.top = '0';
-        container.style.left = '0';
-        container.style.width = '100%';
-        container.style.height = '100%';
-        container.style.pointerEvents = 'none';
-        container.style.zIndex = '50';
-        document.body.appendChild(container);
+      const root = createRoot(container);
+      root.render(
+        <div className="w-full h-full">
+          {Array.from({ length: 30 }).map((_, i) => (
+            <motion.div
+              key={i}
+              initial={{ 
+                x: Math.random() * window.innerWidth,
+                y: -50,
+                rotate: Math.random() * 360,
+                scale: Math.random() * 0.5 + 0.5
+              }}
+              animate={{ 
+                y: window.innerHeight + 50,
+                rotate: Math.random() * 720 - 360
+              }}
+              transition={{ 
+                duration: Math.random() * 2 + 2,
+                ease: "linear",
+                delay: Math.random() * 0.5
+              }}
+              style={{
+                position: 'absolute',
+                color: colors[Math.floor(Math.random() * colors.length)],
+                fontSize: '2rem',
+                fontWeight: 'bold'
+              }}
+            >
+              1
+            </motion.div>
+          ))}
+        </div>
+      );
 
-        const root = createRoot(container);
-        root.render(
-          <div className="w-full h-full">
-            {Array.from({ length: 30 }).map((_, i) => (
-              <motion.div
-                key={i}
-                initial={{ 
-                  x: Math.random() * window.innerWidth,
-                  y: -50,
-                  rotate: Math.random() * 360,
-                  scale: Math.random() * 0.5 + 0.5
-                }}
-                animate={{ 
-                  y: window.innerHeight + 50,
-                  rotate: Math.random() * 720 - 360
-                }}
-                transition={{ 
-                  duration: Math.random() * 2 + 2,
-                  ease: "linear",
-                  delay: Math.random() * 0.5
-                }}
-                style={{
-                  position: 'absolute',
-                  color: colors[Math.floor(Math.random() * colors.length)],
-                  fontSize: '2rem',
-                  fontWeight: 'bold'
-                }}
-              >
-                1
-              </motion.div>
-            ))}
-          </div>
-        );
+      // Cleanup after animation
+      setTimeout(() => {
+        document.body.removeChild(container);
+      }, 4000);
 
-        // Cleanup after animation
+      if (attempts < TOTAL_ATTEMPTS - 1) {
         setTimeout(() => {
-          document.body.removeChild(container);
-        }, 4000);
-
-        if (attempts < TOTAL_ATTEMPTS - 1) {
-          setTimeout(() => {
-            setFilledPaths([]);
-            setCurrentPath(NUMBER_ONE.paths[0]);
-            setProgress(0);
-            setLastPoint(0);
-            speak("Let's do it again! Try to make it even better!");
-          }, 1500);
-        } else {
-          speak("Great job with the tracing! Now, let's find all the number ones!");
-          setGamePhase('identification');
-        }
+          setFilledPaths([]);
+          setCurrentPath(NUMBER_ONE.paths[0]);
+          setProgress(0);
+          setLastPoint(0);
+          speak("Let's do it again! Try to make it even better!");
+        }, 1500);
+      } else {
+        speak("Great job with the tracing! Now, let's find all the number ones!");
+        setGamePhase('identification');
       }
-    }, 1500);
+    }
 
     setIsDrawing(false);
     setCurrentPath(null);
@@ -389,20 +384,23 @@ const NumberOneWorksheet: React.FC = () => {
     }
   }, [selectedItems, shuffledItems, speak]);
 
-  const handleRetry = () => {
-    setFilledPaths([]);
-    setCurrentPath(NUMBER_ONE.paths[0]);
-    setProgress(0);
-    setLastPoint(0);
-    setShowSuccess(false);
+  // Handle animation replay
+  const handleReplayAnimation = useCallback(() => {
+    setIsAnimating(false);
     setAnimationKey(prev => prev + 1);
-    setAttempts(0);
-    setGamePhase('tracing');
-    setSelectedItems([]);
-    setIdentificationComplete(false);
-    setShuffledItems(shuffleArray(GRID_ITEMS));
-    speak("Let's start again from the beginning!");
-  };
+    setTimeout(() => {
+      setIsAnimating(true);
+    }, 100);
+  }, []);
+
+  // Initial animation setup
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setGamePhase('tracing');
+    }, 4000);
+
+    return () => clearTimeout(timer);
+  }, []);
 
   return (
     <WorksheetTracker
@@ -411,41 +409,42 @@ const NumberOneWorksheet: React.FC = () => {
       onSummaryGenerated={handleSummaryGenerated}
     >
       {({ addPoints, markCorrect, markAttempted, markIncorrect, score }) => {
-        // Update tracker functions ref
         trackerFunctionsRef.current = { addPoints, markCorrect, markIncorrect, markAttempted };
-
+        
         return (
-          <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50">
+          <div className="min-h-screen bg-blue-50">
             <div className="px-0 md:px-4 py-4 max-w-4xl mx-auto">
-              <ScoreDisplay 
-                score={score}
-                totalQuestions={100}
-              />
-              
-              <div className="bg-white rounded-2xl shadow-lg p-4 mt-4 border-4 border-indigo-200">
-                <motion.h1 
-                  className="text-2xl md:text-3xl font-bold text-center text-indigo-600 mb-4"
-                  initial={{ scale: 1 }}
-                  animate={{ scale: showSuccess ? 1.1 : 1 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  {gamePhase === 'tracing' ? "Let's Write Number One!" : "Find All The Ones!"}
-                </motion.h1>
+              <div className="bg-white rounded-lg shadow-md p-4">
+                <h1 className="text-2xl md:text-3xl font-bold text-center text-blue-600 mb-6">
+                  Learning to Write Number One
+                </h1>
 
-                {gamePhase === 'tracing' ? (
-                  <>
-                    {/* Animation Section */}
-                    <div className="mb-8 bg-gradient-to-r from-indigo-50 to-purple-50 rounded-xl p-4">
-                      <h2 className="text-lg font-semibold text-indigo-600 mb-2">Watch How to Write</h2>
-                      <div className="relative w-full aspect-[2/1] max-w-md mx-auto bg-white rounded-lg overflow-hidden border-2 border-indigo-100">
+                {/* Score Display */}
+                <div className="mb-6">
+                  <ScoreDisplay score={score} totalQuestions={100} />
+                </div>
+
+                {/* Tracing Section */}
+                <div className="grid md:grid-cols-2 gap-6 mb-8">
+                  {/* Animation Section */}
+                  <div className="w-full">
+                    <div className="bg-gradient-to-r from-blue-100 via-purple-100 to-pink-100 rounded-2xl p-4 shadow-lg border-2 border-indigo-200">
+                      <h2 className="text-xl font-bold text-center text-indigo-600 mb-4 flex items-center justify-center gap-2">
+                        <span className="text-2xl">✨</span>
+                        Watch How to Write Number 1
+                        <span className="text-2xl">✨</span>
+                      </h2>
+                      <div className="relative w-4/5 mx-auto aspect-square bg-white rounded-xl overflow-hidden border-4 border-dashed border-indigo-200 shadow-inner">
                         <svg
+                          key={animationKey}
                           viewBox={NUMBER_ONE.viewBox}
                           className="w-full h-full"
                         >
                           <pattern id="demo-grid" width="20" height="20" patternUnits="userSpaceOnUse">
                             <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#e0e7ff" strokeWidth="1"/>
                           </pattern>
-                          <rect width="200" height="200" fill="url(#demo-grid)" />
+                          <rect width="200" height="200" fill="url(#demo-grid)" className="opacity-50"/>
+                          <circle cx="100" cy="100" r="90" fill="rgba(99, 102, 241, 0.1)"/>
 
                           {NUMBER_ONE.paths.map((path) => (
                             <path
@@ -453,137 +452,176 @@ const NumberOneWorksheet: React.FC = () => {
                               d={path.d}
                               fill="none"
                               stroke="#2563eb"
-                              strokeWidth="24"
+                              strokeWidth="16"
                               strokeLinecap="round"
                               strokeLinejoin="round"
-                              className="number-path-animation"
+                              className={isAnimating ? "number-path-animation" : ""}
+                              style={{
+                                animationDelay: `${(path.order - 1) * 2}s`,
+                                strokeDasharray: "1000",
+                                strokeDashoffset: isAnimating ? undefined : "0",
+                                strokeOpacity: isAnimating ? undefined : "1"
+                              }}
                             />
                           ))}
                         </svg>
                       </div>
-                    </div>
-
-                    {/* Color Picker Section */}
-                    <div className="mb-4">
-                      <h3 className="text-lg font-semibold text-indigo-600 mb-2 text-center">
-                        Choose Your Color!
-                      </h3>
-                      <div className="flex justify-center gap-2 flex-wrap">
-                        {COLOR_OPTIONS.map((color) => (
-                          <motion.button
-                            key={color.value}
-                            onClick={() => setSelectedColor(color.value)}
-                            className={`w-12 h-12 rounded-full ${color.background} shadow-md 
-                              ${selectedColor === color.value ? 'ring-4 ring-offset-2 ring-indigo-300' : ''}
-                            `}
-                            whileHover={{ scale: 1.1 }}
-                            whileTap={{ scale: 0.95 }}
-                          />
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Practice Section */}
-                    <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl p-4">
-                      <div className="flex items-center justify-between mb-2">
-                        <h2 className="text-lg font-semibold text-indigo-600">Practice Area</h2>
-                        <p className="text-sm text-indigo-600 font-medium">
-                          {attempts === TOTAL_ATTEMPTS ? 
-                            "All practice completed!" : 
-                            `Practice ${attempts + 1} of ${TOTAL_ATTEMPTS}`
-                          }
-                        </p>
-                      </div>
-
-                      <div className="relative w-full aspect-square max-w-md mx-auto bg-white rounded-lg overflow-hidden border-2 border-indigo-100 shadow-lg">
-                        <svg
-                          ref={svgRef}
-                          viewBox={NUMBER_ONE.viewBox}
-                          className="w-full h-full touch-none"
-                          style={{ touchAction: 'none' }}
-                          onPointerDown={handlePointerDown}
-                          onPointerMove={handlePointerMove}
-                          onPointerUp={handlePointerUp}
-                          onPointerLeave={handlePointerUp}
-                          onPointerCancel={handlePointerUp}
+                      <div className="relative mt-4 flex justify-center">
+                        <button 
+                          onClick={handleReplayAnimation} 
+                          className="bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white font-bold py-2 px-6 rounded-full shadow-lg transition-all duration-200 flex items-center gap-2 transform hover:scale-105"
                         >
-                          <pattern id="practice-grid" width="20" height="20" patternUnits="userSpaceOnUse">
-                            <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#e0e7ff" strokeWidth="1"/>
-                          </pattern>
-                          <rect width="200" height="200" fill="url(#practice-grid)" />
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fillRule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clipRule="evenodd" />
+                          </svg>
+                          Watch Again!
+                        </button>
+                      </div>
+                    </div>
+                  </div>
 
-                          {/* Guide Paths Layer */}
-                          <g>
-                            {NUMBER_ONE.paths.map((path) => (
-                              <path
-                                key={`guide-${path.id}`}
-                                d={path.d}
-                                fill="none"
-                                stroke={selectedColor}
-                                strokeWidth="24"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeOpacity="0.15"
-                              />
-                            ))}
-                          </g>
+                  {/* Practice Section */}
+                  <div className="w-full">
+                    <div className="bg-gradient-to-r from-pink-100 via-purple-100 to-indigo-100 rounded-2xl p-4 shadow-lg border-2 border-indigo-200">
+                      <div className="mb-4">
+                        <h3 className="text-xl font-bold text-center text-indigo-600 mb-2 flex items-center justify-center gap-2">
+                          <span className="text-2xl">🎨</span>
+                          Pick Your Favorite Color!
+                        </h3>
+                        <div className="flex justify-center gap-3 flex-wrap p-2 bg-white/50 rounded-xl">
+                          {COLOR_OPTIONS.map((color) => (
+                            <motion.button
+                              key={color.value}
+                              onClick={() => setSelectedColor(color.value)}
+                              className={`w-12 h-12 rounded-full ${color.background} shadow-md transform hover:scale-110 transition-transform duration-200
+                                ${selectedColor === color.value ? 'ring-4 ring-offset-2 ring-indigo-300 scale-110' : ''}
+                              `}
+                              whileHover={{ scale: 1.1 }}
+                              whileTap={{ scale: 0.95 }}
+                            />
+                          ))}
+                        </div>
+                      </div>
 
-                          {/* Completed Paths Layer */}
-                          <g>
-                            {NUMBER_ONE.paths.map((path) => 
-                              filledPaths.includes(path.id) && (
+                      <div className="bg-white/70 backdrop-blur-sm rounded-xl p-4 shadow-inner">
+                        <div className="flex items-center justify-between mb-2">
+                          <h2 className="text-xl font-bold text-indigo-600 flex items-center gap-2">
+                            <span className="text-2xl">✏️</span>
+                            Your Turn!
+                          </h2>
+                          <p className="text-sm font-bold text-indigo-600 bg-white px-3 py-1 rounded-full shadow">
+                            {attempts === TOTAL_ATTEMPTS ? 
+                              "All done! 🎉" : 
+                              `Try ${attempts + 1} of ${TOTAL_ATTEMPTS} ✨`
+                            }
+                          </p>
+                        </div>
+
+                        <div className="relative w-full aspect-square max-w-md mx-auto bg-white rounded-xl overflow-hidden border-4 border-dashed border-indigo-200 shadow-lg">
+                          <svg
+                            ref={svgRef}
+                            viewBox={NUMBER_ONE.viewBox}
+                            className="w-full h-full touch-none"
+                            style={{ touchAction: 'none' }}
+                            onPointerDown={handlePointerDown}
+                            onPointerMove={handlePointerMove}
+                            onPointerUp={handlePointerUp}
+                            onPointerLeave={handlePointerUp}
+                            onPointerCancel={handlePointerUp}
+                          >
+                            <pattern id="practice-grid" width="20" height="20" patternUnits="userSpaceOnUse">
+                              <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#e0e7ff" strokeWidth="1"/>
+                            </pattern>
+                            <rect width="200" height="200" fill="url(#practice-grid)" className="opacity-50"/>
+                            <circle cx="100" cy="100" r="90" fill="rgba(99, 102, 241, 0.1)"/>
+
+                            {/* Guide Paths Layer */}
+                            <g>
+                              {NUMBER_ONE.paths.map((path) => (
                                 <path
-                                  key={`completed-${path.id}`}
+                                  key={`guide-${path.id}`}
                                   d={path.d}
                                   fill="none"
                                   stroke={selectedColor}
                                   strokeWidth="24"
                                   strokeLinecap="round"
                                   strokeLinejoin="round"
+                                  strokeOpacity="0.15"
                                 />
-                              )
-                            )}
-                          </g>
-                          
-                          {/* Current Tracing Path Layer */}
-                          {currentPath && (
-                            <g>
-                              <path
-                                ref={pathRef}
-                                d={currentPath.d}
-                                fill="none"
-                                stroke={selectedColor}
-                                strokeWidth="24"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeDasharray={pathLengths[currentPath.id] || 0}
-                                strokeDashoffset={
-                                  pathLengths[currentPath.id]
-                                    ? pathLengths[currentPath.id] * (1 - progress)
-                                    : 0
-                                }
-                              />
+                              ))}
                             </g>
-                          )}
 
-                          {/* Start point */}
-                          {!filledPaths.includes('vertical') && (
-                            <circle
-                              cx="100"
-                              cy="40"
-                              r="8"
-                              className="animate-pulse"
-                              fill={selectedColor}
-                              fillOpacity="0.5"
-                            />
-                          )}
-                        </svg>
+                            {/* Completed Paths Layer */}
+                            <g>
+                              {NUMBER_ONE.paths.map((path) => 
+                                filledPaths.includes(path.id) && (
+                                  <path
+                                    key={`completed-${path.id}`}
+                                    d={path.d}
+                                    fill="none"
+                                    stroke={selectedColor}
+                                    strokeWidth="24"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                  />
+                                )
+                              )}
+                            </g>
+                            
+                            {/* Current Tracing Path Layer */}
+                            {currentPath && (
+                              <g>
+                                <path
+                                  ref={pathRef}
+                                  d={currentPath.d}
+                                  fill="none"
+                                  stroke={selectedColor}
+                                  strokeWidth="24"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeDasharray={pathLengths[currentPath.id] || 0}
+                                  strokeDashoffset={
+                                    pathLengths[currentPath.id]
+                                      ? pathLengths[currentPath.id] * (1 - progress)
+                                      : 0
+                                  }
+                                />
+                              </g>
+                            )}
+
+                            {/* Start point with animation */}
+                            {!filledPaths.includes('vertical') && (
+                              <>
+                                <circle
+                                  cx="100"
+                                  cy="40"
+                                  r="14"
+                                  className="animate-ping"
+                                  fill={selectedColor}
+                                  fillOpacity="0.2"
+                                />
+                                <circle
+                                  cx="100"
+                                  cy="40"
+                                  r="10"
+                                  className="animate-pulse"
+                                  fill={selectedColor}
+                                  fillOpacity="0.5"
+                                />
+                              </>
+                            )}
+                          </svg>
+                        </div>
                       </div>
                     </div>
-                  </>
-                ) : (
-                  <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl p-4">
-                    <h2 className="text-lg font-semibold text-indigo-600 mb-4">
+                  </div>
+                </div>
+
+                {/* Identification Section */}
+                <div className={`transition-all duration-500 ${gamePhase === 'identification' ? 'opacity-100' : 'opacity-50 pointer-events-none'}`}>
+                  <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl p-4 mb-6">
+                    <h2 className="text-lg font-semibold text-indigo-600 mb-4 flex items-center gap-2">
+                      <span className="text-2xl">🔍</span>
                       Find and click all five number ones!
                     </h2>
                     <div className="grid grid-cols-4 gap-4 max-w-md mx-auto">
@@ -598,30 +636,40 @@ const NumberOneWorksheet: React.FC = () => {
                                 : 'bg-red-100 border-2 border-red-500 text-red-700'
                               : 'bg-white hover:bg-indigo-50 text-indigo-600'
                             }
+                            ${gamePhase !== 'identification' ? 'cursor-not-allowed' : ''}
                           `}
-                          whileHover={{ scale: 1.05 }}
-                          whileTap={{ scale: 0.95 }}
-                          disabled={identificationComplete}
+                          whileHover={{ scale: gamePhase === 'identification' ? 1.05 : 1 }}
+                          whileTap={{ scale: gamePhase === 'identification' ? 0.95 : 1 }}
+                          disabled={gamePhase !== 'identification' || identificationComplete}
                         >
                           {item.value}
                         </motion.button>
                       ))}
                     </div>
                   </div>
-                )}
-
-                <div className="mt-4 text-center space-x-4">
-                  {(attempts === TOTAL_ATTEMPTS || identificationComplete) && (
-                    <motion.button
-                      onClick={handleRetry}
-                      className="bg-gradient-to-r from-indigo-500 to-purple-500 text-white px-8 py-3 rounded-full hover:from-indigo-600 hover:to-purple-600 transition-colors font-medium shadow-md"
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                    >
-                      Try Again
-                    </motion.button>
-                  )}
                 </div>
+
+                {/* Completion Message */}
+                {identificationComplete && (
+                  <div className="mt-8 text-center">
+                    <div className="bg-gradient-to-r from-blue-100 via-purple-100 to-pink-100 rounded-2xl p-6 max-w-2xl mx-auto">
+                      <div className="flex flex-col items-center gap-4">
+                        <div className="text-3xl">🎉 🌟 🎨</div>
+                        <h2 className="text-2xl font-bold text-indigo-600">Amazing Job!</h2>
+                        <p className="text-lg text-indigo-500">
+                          You've learned to write and find number one!
+                        </p>
+                        <div className="flex gap-2 text-2xl mt-2">
+                          <span className="animate-bounce delay-100">1</span>
+                          <span className="animate-bounce delay-200">✨</span>
+                          <span className="animate-bounce delay-300">1</span>
+                          <span className="animate-bounce delay-400">✨</span>
+                          <span className="animate-bounce delay-500">1</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>
