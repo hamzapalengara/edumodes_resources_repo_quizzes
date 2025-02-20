@@ -77,12 +77,14 @@ const NumberTwoWorksheet: React.FC = () => {
   const [showSuccess, setShowSuccess] = useState(false);
   const [lastPoint, setLastPoint] = useState<number>(0);
   const [animationKey, setAnimationKey] = useState(0);
-  const [gamePhase, setGamePhase] = useState<'tracing' | 'identification'>('tracing');
+  const [gamePhase, setGamePhase] = useState<'demo' | 'tracing' | 'identification'>('demo');
   const [selectedItems, setSelectedItems] = useState<number[]>([]);
   const [shuffledItems, setShuffledItems] = useState<typeof GRID_ITEMS>([]);
   const [identificationComplete, setIdentificationComplete] = useState(false);
   const trackerFunctionsRef = useRef<TrackerFunctions | null>(null);
   const [selectedColor, setSelectedColor] = useState(COLOR_OPTIONS[0].value);
+  const [isAnimating, setIsAnimating] = useState(true);
+  const [showGuide, setShowGuide] = useState(false);
 
   // Optional: Add voice feedback
   const speak = useCallback((text: string) => {
@@ -418,68 +420,107 @@ const NumberTwoWorksheet: React.FC = () => {
     speak("Let's start again from the beginning!");
   };
 
+  // Handle animation replay
+  const handleReplayAnimation = useCallback(() => {
+    setIsAnimating(true);
+    setShowGuide(false);
+    setAnimationKey(prev => prev + 1);
+    setTimeout(() => {
+      setIsAnimating(false);
+      setShowGuide(true);
+    }, 3000);
+  }, []);
+
+  // Initial animation setup
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsAnimating(false);
+      setShowGuide(true);
+      setGamePhase('tracing');
+    }, 3000);
+
+    return () => clearTimeout(timer);
+  }, [animationKey]);
+
   return (
     <WorksheetTracker
-      totalQuestions={10}
-      pointsPerQuestion={10}
+      totalQuestions={TOTAL_ATTEMPTS + GRID_ITEMS.filter(item => item.isTarget).length}
+      pointsPerQuestion={POINTS_PER_ATTEMPT}
       onSummaryGenerated={handleSummaryGenerated}
     >
       {({ addPoints, markCorrect, markAttempted, markIncorrect, score }) => {
-        // Update tracker functions ref
-        trackerFunctionsRef.current = { addPoints, markCorrect, markIncorrect, markAttempted };
-
+        trackerFunctionsRef.current = { addPoints, markCorrect, markAttempted, markIncorrect };
+        
         return (
-          <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50">
+          <div className="min-h-screen bg-blue-50">
             <div className="px-0 md:px-4 py-4 max-w-4xl mx-auto">
-              <ScoreDisplay 
-                score={score}
-                totalQuestions={100}
-              />
-              
-              <div className="bg-white rounded-2xl shadow-lg p-4 mt-4 border-4 border-indigo-200">
-                <motion.h1 
-                  className="text-2xl md:text-3xl font-bold text-center text-indigo-600 mb-4"
-                  initial={{ scale: 1 }}
-                  animate={{ scale: showSuccess ? 1.1 : 1 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  {gamePhase === 'tracing' ? "Let's Write Number Two!" : "Find All The Twos!"}
-                </motion.h1>
+              <div className="bg-white rounded-lg shadow-md p-4">
+                <h1 className="text-2xl md:text-3xl font-bold text-center text-blue-600 mb-6">
+                  Learning to Write Number Two
+                </h1>
 
-                {gamePhase === 'tracing' ? (
+                {/* Score Display */}
+                <div className="mb-6">
+                  <ScoreDisplay score={score} totalQuestions={100} />
+                </div>
+
+                {/* Animation Section */}
+                <div className="w-full max-w-md mx-auto mb-6">
+                  <h2 className="text-xl font-semibold text-center text-blue-600 mb-4">
+                    Watch How to Write Number 2
+                  </h2>
+                  <div className="relative w-full aspect-square bg-white rounded-lg overflow-hidden border-2 border-indigo-100">
+                    <svg
+                      key={animationKey}
+                      viewBox={NUMBER_TWO.viewBox}
+                      className="w-full h-full"
+                    >
+                      <pattern id="demo-grid" width="20" height="20" patternUnits="userSpaceOnUse">
+                        <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#e0e7ff" strokeWidth="1"/>
+                      </pattern>
+                      <rect width="200" height="200" fill="url(#demo-grid)" />
+
+                      {NUMBER_TWO.paths.map((path) => (
+                        <path
+                          key={`animation-${path.id}-${animationKey}`}
+                          d={path.d}
+                          fill="none"
+                          stroke="#2563eb"
+                          strokeWidth="24"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          className="number-path-animation"
+                          style={{
+                            animationDelay: `${(path.order - 1) * 2}s`
+                          }}
+                        />
+                      ))}
+                    </svg>
+
+                    {/* Replay button */}
+                    <button 
+                      onClick={handleReplayAnimation}
+                      className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md transition-colors duration-200 flex items-center gap-2"
+                    >
+                      <svg 
+                        xmlns="http://www.w3.org/2000/svg" 
+                        className="h-5 w-5" 
+                        viewBox="0 0 20 20" 
+                        fill="currentColor"
+                      >
+                        <path 
+                          fillRule="evenodd" 
+                          d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" 
+                          clipRule="evenodd" 
+                        />
+                      </svg>
+                      Replay
+                    </button>
+                  </div>
+                </div>
+
+                {gamePhase === 'tracing' && (
                   <>
-                    {/* Animation Section */}
-                    <div className="mb-8 bg-gradient-to-r from-indigo-50 to-purple-50 rounded-xl p-4">
-                      <h2 className="text-lg font-semibold text-indigo-600 mb-2">Watch How to Write</h2>
-                      <div className="relative w-full aspect-[2/1] max-w-md mx-auto bg-white rounded-lg overflow-hidden border-2 border-indigo-100">
-                        <svg
-                          viewBox={NUMBER_TWO.viewBox}
-                          className="w-full h-full"
-                        >
-                          <pattern id="demo-grid" width="20" height="20" patternUnits="userSpaceOnUse">
-                            <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#e0e7ff" strokeWidth="1"/>
-                          </pattern>
-                          <rect width="200" height="200" fill="url(#demo-grid)" />
-
-                          {NUMBER_TWO.paths.map((path) => (
-                            <path
-                              key={`animation-${path.id}-${animationKey}`}
-                              d={path.d}
-                              fill="none"
-                              stroke="#2563eb"
-                              strokeWidth="24"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              className="number-path-animation"
-                              style={{
-                                animationDelay: `${path.order * 3}s`
-                              }}
-                            />
-                          ))}
-                        </svg>
-                      </div>
-                    </div>
-
                     {/* Color Picker Section */}
                     <div className="mb-4">
                       <h3 className="text-lg font-semibold text-indigo-600 mb-2 text-center">
@@ -598,7 +639,9 @@ const NumberTwoWorksheet: React.FC = () => {
                       </div>
                     </div>
                   </>
-                ) : (
+                )}
+
+                {gamePhase === 'identification' && (
                   <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl p-4">
                     <h2 className="text-lg font-semibold text-indigo-600 mb-4">
                       Find and click all five number twos!

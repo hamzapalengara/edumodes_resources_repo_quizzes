@@ -1,8 +1,7 @@
 .number-path-animation {
   stroke-dasharray: 1000;
   stroke-dashoffset: 1000;
-  animation: drawNumber 6s forwards infinite;
-  animation-timing-function: ease-in-out;
+  animation: drawPath 2s ease-in-out forwards;
 }
 
 /* Add animation class for resetting */
@@ -12,25 +11,8 @@
   stroke-opacity: 0.3;
 }
 
-@keyframes drawNumber {
-  0% {
-    stroke-opacity: 0.3;
-    stroke-dashoffset: 1000;
-  }
-  15% {
-    stroke-opacity: 1;
-    stroke-dashoffset: 1000;
-  }
-  65% {
-    stroke-opacity: 1;
-    stroke-dashoffset: 0;
-  }
-  85% {
-    stroke-opacity: 1;
-    stroke-dashoffset: 0;
-  }
-  100% {
-    stroke-opacity: 0;
+@keyframes drawPath {
+  to {
     stroke-dashoffset: 0;
   }
 }
@@ -121,4 +103,116 @@ circle {
   75% {
     transform: translateX(5px);
   }
+}
+
+.drawing-path {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+}
+
+.completed-path {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 0;
+}
+
+/* Main curved stroke animation */
+.main-stroke {
+  animation: draw 1.5s ease-in-out forwards;
+}
+
+/* Bottom line stroke animation with delay */
+.bottom-stroke {
+  animation: drawDelayed 1.5s ease-in-out forwards;
+}
+
+@keyframes draw {
+  0% {
+    stroke-opacity: 1;
+    stroke-dashoffset: 1;
+  }
+  100% {
+    stroke-opacity: 1;
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes drawDelayed {
+  0%, 50% {
+    stroke-opacity: 1;
+    stroke-dashoffset: 1;
+  }
+  100% {
+    stroke-opacity: 1;
+    stroke-dashoffset: 0;
+  }
+}
+
+.guide-dot {
+  filter: drop-shadow(0 0 2px rgba(37, 99, 235, 0.5));
+}
+
+.start-dot {
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.5);
+    opacity: 0.5;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.drawing-guide {
+  filter: drop-shadow(0 0 4px rgba(37, 99, 235, 0.5));
+}
+
+.guide-arrow {
+  animation: fadeInOut 1.5s ease-in-out infinite;
+}
+
+@keyframes fadeInOut {
+  0%, 100% {
+    opacity: 0.2;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+.pulse-animation {
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+.guide-path {
+  animation: fadeIn 0.5s ease-in-out forwards;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 0.3;
+  }
+}
+
+/* Specific animations for number 2 */
+.curve-guide {
+  opacity: 1;
+  animation: fadeOut 0.5s ease-in-out forwards;
+  animation-delay: 1.5s;
+}
+
+.line-guide {
+  opacity: 0;
+  animation: fadeIn 0.5s ease-in-out forwards;
+  animation-delay: 1.5s;
 } 

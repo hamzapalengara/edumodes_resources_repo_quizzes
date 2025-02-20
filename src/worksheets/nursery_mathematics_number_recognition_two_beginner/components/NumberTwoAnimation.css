@@ -10,12 +10,12 @@
 
 /* Main curved stroke animation */
 .main-stroke {
-  animation: draw 2s ease-in-out forwards, fadeOut 1s ease-in-out 4s forwards;
+  animation: draw 1.5s ease-in-out forwards;
 }
 
 /* Bottom line stroke animation with delay */
 .bottom-stroke {
-  animation: drawDelayed 2s ease-in-out forwards, fadeOut 1s ease-in-out 4s forwards;
+  animation: drawDelayed 1.5s ease-in-out forwards;
 }
 
 @keyframes draw {
@@ -37,15 +37,6 @@
   100% {
     stroke-opacity: 1;
     stroke-dashoffset: 0;
-  }
-}
-
-@keyframes fadeOut {
-  0% {
-    stroke-opacity: 1;
-  }
-  100% {
-    stroke-opacity: 0;
   }
 }
 
@@ -110,11 +101,29 @@
 .curve-guide {
   opacity: 1;
   animation: fadeOut 0.5s ease-in-out forwards;
-  animation-delay: 2.5s;
+  animation-delay: 1.5s;
 }
 
 .line-guide {
   opacity: 0;
   animation: fadeIn 0.5s ease-in-out forwards;
-  animation-delay: 2s;
+  animation-delay: 1.5s;
+}
+
+/* Replay button styles */
+.fixed-size-button {
+  min-width: 120px;
+  min-height: 48px;
+  font-size: 16px;
+  margin-top: 1rem;
+  z-index: 10;
+}
+
+.fixed-size-button:hover {
+  transform: scale(1.05);
+  transition: transform 0.2s ease;
+}
+
+.fixed-size-button:active {
+  transform: scale(0.95);
 } 
