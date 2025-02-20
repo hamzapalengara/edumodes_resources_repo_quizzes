@@ -83,6 +83,10 @@ const NumberTwoWorksheet: React.FC = () => {
   const trackerFunctionsRef = useRef<TrackerFunctions | null>(null);
   const [selectedColor, setSelectedColor] = useState(COLOR_OPTIONS[0].value);
   const [isAnimating, setIsAnimating] = useState(true);
+  const [isPathCompleting, setIsPathCompleting] = useState(false);
+  const [completionCooldown, setCompletionCooldown] = useState(false);
+  const completionTimeoutRef = useRef<NodeJS.Timeout>();
+  const confettiTimeoutRef = useRef<NodeJS.Timeout>();
 
   // Optional: Add voice feedback
   const speak = useCallback((text: string) => {
@@ -190,8 +194,106 @@ const NumberTwoWorksheet: React.FC = () => {
     }
   }, [currentPath, getRelativePoint, getDistance, progress, lastPoint]);
 
+  const handlePathComplete = useCallback(() => {
+    if (!currentPath || !trackerFunctionsRef.current) return;
+
+    setFilledPaths(prev => [...prev, currentPath.id]);
+    
+    // Different feedback based on path completion
+    if (currentPath.id === 'base') {
+      speak("Excellent! You wrote number two!");
+      
+      if (trackerFunctionsRef.current) {
+        trackerFunctionsRef.current.markAttempted();
+        trackerFunctionsRef.current.markCorrect();
+      }
+      setAttempts(prev => prev + 1);
+      setIsDrawing(false); // Stop drawing only after completing the entire number
+
+      // Debounce the celebration animation
+      if (!confettiTimeoutRef.current) {
+        confettiTimeoutRef.current = setTimeout(() => {
+          // Create falling twos celebration
+          const colors = ['#2563eb', '#7c3aed', '#ec4899', '#10b981', '#f97316', '#ef4444'];
+          const container = document.createElement('div');
+          container.style.position = 'fixed';
+          container.style.top = '0';
+          container.style.left = '0';
+          container.style.width = '100%';
+          container.style.height = '100%';
+          container.style.pointerEvents = 'none';
+          container.style.zIndex = '50';
+          document.body.appendChild(container);
+
+          const root = createRoot(container);
+          root.render(
+            <div className="w-full h-full">
+              {Array.from({ length: 15 }).map((_, i) => (
+                <motion.div
+                  key={i}
+                  initial={{ 
+                    x: Math.random() * window.innerWidth,
+                    y: -50,
+                    rotate: Math.random() * 360,
+                    scale: Math.random() * 0.5 + 0.5
+                  }}
+                  animate={{ 
+                    y: window.innerHeight + 50,
+                    rotate: Math.random() * 720 - 360
+                  }}
+                  transition={{ 
+                    duration: Math.random() * 2 + 2,
+                    ease: "linear",
+                    delay: Math.random() * 0.5
+                  }}
+                  style={{
+                    position: 'absolute',
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    fontSize: '2rem',
+                    fontWeight: 'bold'
+                  }}
+                >
+                  2
+                </motion.div>
+              ))}
+            </div>
+          );
+
+          // Cleanup after animation
+          setTimeout(() => {
+            document.body.removeChild(container);
+            confettiTimeoutRef.current = undefined;
+          }, 4000);
+        }, 500);
+      }
+
+      if (attempts < TOTAL_ATTEMPTS - 1) {
+        setTimeout(() => {
+          setFilledPaths([]);
+          setCurrentPath(NUMBER_TWO.paths[0]);
+          setProgress(0);
+          setLastPoint(0);
+          setIsPathCompleting(false);
+          speak("Let's write number two again!");
+        }, 1500);
+      } else {
+        speak("Amazing! You've learned to write number two! Now let's find all the twos!");
+        setGamePhase('identification');
+      }
+    } else {
+      speak("Good! Keep going!");
+      // Move to next path while maintaining drawing state
+      const nextPath = NUMBER_TWO.paths[1];
+      setCurrentPath(nextPath);
+      setProgress(0);
+      setLastPoint(0);
+      setIsPathCompleting(false);
+      // Keep isDrawing true to allow continuous tracing
+    }
+  }, [currentPath, attempts, speak]);
+
   const handlePointerMove = useCallback((e: React.PointerEvent) => {
-    if (!isDrawing || !svgRef.current || !pathRef.current || !currentPath) return;
+    if (!isDrawing || !svgRef.current || !pathRef.current || !currentPath || isPathCompleting || completionCooldown) return;
 
     const point = getRelativePoint(e, svgRef.current);
     const pathElement = pathRef.current;
@@ -214,115 +316,28 @@ const NumberTwoWorksheet: React.FC = () => {
       setLastPoint(closestPoint);
       setProgress(closestPoint / length);
 
-      if (closestPoint >= length * 0.95) {
+      // Check for path completion
+      if (closestPoint >= length * 0.95 && !isPathCompleting) {
+        setIsPathCompleting(true);
+        setCompletionCooldown(true);
+        completionTimeoutRef.current = setTimeout(() => {
+          setCompletionCooldown(false);
+        }, 1000);
         handlePathComplete();
       }
     }
-  }, [isDrawing, currentPath, lastPoint, getRelativePoint, getDistance]);
-
-  const handlePathComplete = useCallback(() => {
-    if (!currentPath || !trackerFunctionsRef.current) return;
-
-    setFilledPaths(prev => [...prev, currentPath.id]);
-    
-    // Different feedback based on path completion
-    if (currentPath.id === 'base') {
-      speak("Excellent! You wrote number two!");
-    } else {
-      speak("Good start! Now complete the bottom line.");
-    }
-
-    setTimeout(() => {
-      // Move to next path or complete attempt
-      const currentPathIndex = NUMBER_TWO.paths.findIndex(p => p.id === currentPath.id);
-      const nextPath = NUMBER_TWO.paths[currentPathIndex + 1];
-
-      if (nextPath) {
-        setCurrentPath(nextPath);
-        setProgress(0);
-        setLastPoint(0);
-      } else {
-        if (trackerFunctionsRef.current) {
-          trackerFunctionsRef.current.markAttempted();
-          trackerFunctionsRef.current.markCorrect();
-        }
-        setAttempts(prev => prev + 1);
-        
-        // Create falling twos celebration
-        const colors = ['#2563eb', '#7c3aed', '#ec4899', '#10b981', '#f97316', '#ef4444'];
-        const container = document.createElement('div');
-        container.style.position = 'fixed';
-        container.style.top = '0';
-        container.style.left = '0';
-        container.style.width = '100%';
-        container.style.height = '100%';
-        container.style.pointerEvents = 'none';
-        container.style.zIndex = '50';
-        document.body.appendChild(container);
-
-        const root = createRoot(container);
-        root.render(
-          <div className="w-full h-full">
-            {Array.from({ length: 30 }).map((_, i) => (
-              <motion.div
-                key={i}
-                initial={{ 
-                  x: Math.random() * window.innerWidth,
-                  y: -50,
-                  rotate: Math.random() * 360,
-                  scale: Math.random() * 0.5 + 0.5
-                }}
-                animate={{ 
-                  y: window.innerHeight + 50,
-                  rotate: Math.random() * 720 - 360
-                }}
-                transition={{ 
-                  duration: Math.random() * 2 + 2,
-                  ease: "linear",
-                  delay: Math.random() * 0.5
-                }}
-                style={{
-                  position: 'absolute',
-                  color: colors[Math.floor(Math.random() * colors.length)],
-                  fontSize: '2rem',
-                  fontWeight: 'bold'
-                }}
-              >
-                2
-              </motion.div>
-            ))}
-          </div>
-        );
-
-        // Cleanup after animation
-        setTimeout(() => {
-          document.body.removeChild(container);
-        }, 4000);
-
-        if (attempts < TOTAL_ATTEMPTS - 1) {
-          setTimeout(() => {
-            setFilledPaths([]);
-            setCurrentPath(NUMBER_TWO.paths[0]);
-            setProgress(0);
-            setLastPoint(0);
-            speak("Let's write number two again!");
-          }, 1500);
-        } else {
-          speak("Amazing! You've learned to write number two! Now let's find all the twos!");
-          setGamePhase('identification');
-        }
-      }
-    }, 1500);
-
-    setIsDrawing(false);
-  }, [currentPath, attempts, speak]);
+  }, [isDrawing, currentPath, lastPoint, getRelativePoint, getDistance, isPathCompleting, completionCooldown, handlePathComplete]);
 
   const handlePointerUp = useCallback((e: React.PointerEvent) => {
     if (isDrawing && svgRef.current) {
       svgRef.current.releasePointerCapture(e.pointerId);
+      // Only stop drawing if we're not in the middle of completing a path
+      // or transitioning between paths
+      if (!isPathCompleting && !filledPaths.includes('top_curve')) {
+        setIsDrawing(false);
+      }
     }
-    setIsDrawing(false);
-  }, [isDrawing]);
+  }, [isDrawing, isPathCompleting, filledPaths]);
 
   // Shuffle array function
   const shuffleArray = useCallback((array: typeof GRID_ITEMS) => {
@@ -452,6 +467,18 @@ const NumberTwoWorksheet: React.FC = () => {
     return () => clearTimeout(timer);
   }, []);
 
+  // Cleanup timeouts on unmount
+  useEffect(() => {
+    return () => {
+      if (completionTimeoutRef.current) {
+        clearTimeout(completionTimeoutRef.current);
+      }
+      if (confettiTimeoutRef.current) {
+        clearTimeout(confettiTimeoutRef.current);
+      }
+    };
+  }, []);
+
   return (
     <WorksheetTracker
       totalQuestions={10}
@@ -474,223 +501,224 @@ const NumberTwoWorksheet: React.FC = () => {
                   <ScoreDisplay score={score} totalQuestions={100} />
                 </div>
 
-                {gamePhase === 'tracing' && (
-                  <div className="grid md:grid-cols-2 gap-6">
-                    {/* Animation Section */}
-                    <div className="w-full">
-                      <div className="bg-gradient-to-r from-blue-100 via-purple-100 to-pink-100 rounded-2xl p-4 shadow-lg border-2 border-indigo-200">
-                        <h2 className="text-xl font-bold text-center text-indigo-600 mb-4 flex items-center justify-center gap-2">
-                          <span className="text-2xl">✨</span>
-                          Watch How to Write Number 2
-                          <span className="text-2xl">✨</span>
-                        </h2>
-                        <div className="relative w-4/5 mx-auto aspect-square bg-white rounded-xl overflow-hidden border-4 border-dashed border-indigo-200 shadow-inner">
-                          <svg
-                            key={animationKey}
-                            viewBox={NUMBER_TWO.viewBox}
-                            className="w-full h-full"
-                          >
-                            <pattern id="demo-grid" width="20" height="20" patternUnits="userSpaceOnUse">
-                              <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#e0e7ff" strokeWidth="1"/>
-                            </pattern>
-                            <rect width="200" height="200" fill="url(#demo-grid)" className="opacity-50"/>
-                            <circle cx="100" cy="100" r="90" fill="rgba(99, 102, 241, 0.1)"/>
+                {/* Tracing Section */}
+                <div className="grid md:grid-cols-2 gap-6 mb-8">
+                  {/* Animation Section */}
+                  <div className="w-full">
+                    <div className="bg-gradient-to-r from-blue-100 via-purple-100 to-pink-100 rounded-2xl p-4 shadow-lg border-2 border-indigo-200">
+                      <h2 className="text-xl font-bold text-center text-indigo-600 mb-4 flex items-center justify-center gap-2">
+                        <span className="text-2xl">✨</span>
+                        Watch How to Write Number 2
+                        <span className="text-2xl">✨</span>
+                      </h2>
+                      <div className="relative w-4/5 mx-auto aspect-square bg-white rounded-xl overflow-hidden border-4 border-dashed border-indigo-200 shadow-inner">
+                        <svg
+                          key={animationKey}
+                          viewBox={NUMBER_TWO.viewBox}
+                          className="w-full h-full"
+                        >
+                          <pattern id="demo-grid" width="20" height="20" patternUnits="userSpaceOnUse">
+                            <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#e0e7ff" strokeWidth="1"/>
+                          </pattern>
+                          <rect width="200" height="200" fill="url(#demo-grid)" className="opacity-50"/>
+                          <circle cx="100" cy="100" r="90" fill="rgba(99, 102, 241, 0.1)"/>
 
-                            {NUMBER_TWO.paths.map((path) => (
-                              <path
-                                key={`animation-${path.id}-${animationKey}`}
-                                d={path.d}
-                                fill="none"
-                                stroke="#2563eb"
-                                strokeWidth="16"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                className={isAnimating ? "number-path-animation" : ""}
-                                style={{
-                                  animationDelay: `${(path.order - 1) * 2}s`,
-                                  strokeDasharray: "1000",
-                                  strokeDashoffset: isAnimating ? undefined : "0",
-                                  strokeOpacity: isAnimating ? undefined : "1"
-                                }}
-                              />
-                            ))}
+                          {NUMBER_TWO.paths.map((path) => (
+                            <path
+                              key={`animation-${path.id}-${animationKey}`}
+                              d={path.d}
+                              fill="none"
+                              stroke="#2563eb"
+                              strokeWidth="16"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              className={isAnimating ? "number-path-animation" : ""}
+                              style={{
+                                animationDelay: `${(path.order - 1) * 2}s`,
+                                strokeDasharray: "1000",
+                                strokeDashoffset: isAnimating ? undefined : "0",
+                                strokeOpacity: isAnimating ? undefined : "1"
+                              }}
+                            />
+                          ))}
+                        </svg>
+                      </div>
+                      <div className="relative mt-4 flex justify-center">
+                        <button 
+                          onClick={handleReplayAnimation} 
+                          className="bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white font-bold py-2 px-6 rounded-full shadow-lg transition-all duration-200 flex items-center gap-2 transform hover:scale-105"
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fillRule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clipRule="evenodd" />
                           </svg>
-                        </div>
-                        <div className="relative mt-4 flex justify-center">
-                          <button 
-                            onClick={handleReplayAnimation} 
-                            className="bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white font-bold py-2 px-6 rounded-full shadow-lg transition-all duration-200 flex items-center gap-2 transform hover:scale-105"
-                          >
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                              <path fillRule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clipRule="evenodd" />
-                            </svg>
-                            Watch Again!
-                          </button>
-                        </div>
+                          Watch Again!
+                        </button>
                       </div>
                     </div>
+                  </div>
 
-                    {/* Practice Section */}
-                    <div className="w-full">
-                      <div className="bg-gradient-to-r from-pink-100 via-purple-100 to-indigo-100 rounded-2xl p-4 shadow-lg border-2 border-indigo-200">
-                        <div className="mb-4">
-                          <h3 className="text-xl font-bold text-center text-indigo-600 mb-2 flex items-center justify-center gap-2">
-                            <span className="text-2xl">🎨</span>
-                            Pick Your Favorite Color!
-                          </h3>
-                          <div className="flex justify-center gap-3 flex-wrap p-2 bg-white/50 rounded-xl">
-                            {COLOR_OPTIONS.map((color) => (
-                              <motion.button
-                                key={color.value}
-                                onClick={() => setSelectedColor(color.value)}
-                                className={`w-12 h-12 rounded-full ${color.background} shadow-md transform hover:scale-110 transition-transform duration-200
-                                  ${selectedColor === color.value ? 'ring-4 ring-offset-2 ring-indigo-300 scale-110' : ''}
-                                `}
-                                whileHover={{ scale: 1.1 }}
-                                whileTap={{ scale: 0.95 }}
-                              />
-                            ))}
-                          </div>
+                  {/* Practice Section */}
+                  <div className="w-full">
+                    <div className="bg-gradient-to-r from-pink-100 via-purple-100 to-indigo-100 rounded-2xl p-4 shadow-lg border-2 border-indigo-200">
+                      <div className="mb-4">
+                        <h3 className="text-xl font-bold text-center text-indigo-600 mb-2 flex items-center justify-center gap-2">
+                          <span className="text-2xl">🎨</span>
+                          Pick Your Favorite Color!
+                        </h3>
+                        <div className="flex justify-center gap-3 flex-wrap p-2 bg-white/50 rounded-xl">
+                          {COLOR_OPTIONS.map((color) => (
+                            <motion.button
+                              key={color.value}
+                              onClick={() => setSelectedColor(color.value)}
+                              className={`w-12 h-12 rounded-full ${color.background} shadow-md transform hover:scale-110 transition-transform duration-200
+                                ${selectedColor === color.value ? 'ring-4 ring-offset-2 ring-indigo-300 scale-110' : ''}
+                              `}
+                              whileHover={{ scale: 1.1 }}
+                              whileTap={{ scale: 0.95 }}
+                            />
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="bg-white/70 backdrop-blur-sm rounded-xl p-4 shadow-inner">
+                        <div className="flex items-center justify-between mb-2">
+                          <h2 className="text-xl font-bold text-indigo-600 flex items-center gap-2">
+                            <span className="text-2xl">✏️</span>
+                            Your Turn!
+                          </h2>
+                          <p className="text-sm font-bold text-indigo-600 bg-white px-3 py-1 rounded-full shadow">
+                            {attempts === TOTAL_ATTEMPTS ? 
+                              "All done! 🎉" : 
+                              `Try ${attempts + 1} of ${TOTAL_ATTEMPTS} ✨`
+                            }
+                          </p>
                         </div>
 
-                        <div className="bg-white/70 backdrop-blur-sm rounded-xl p-4 shadow-inner">
-                          <div className="flex items-center justify-between mb-2">
-                            <h2 className="text-xl font-bold text-indigo-600 flex items-center gap-2">
-                              <span className="text-2xl">✏️</span>
-                              Your Turn!
-                            </h2>
-                            <p className="text-sm font-bold text-indigo-600 bg-white px-3 py-1 rounded-full shadow">
-                              {attempts === TOTAL_ATTEMPTS ? 
-                                "All done! 🎉" : 
-                                `Try ${attempts + 1} of ${TOTAL_ATTEMPTS} ✨`
-                              }
-                            </p>
-                          </div>
+                        <div className="relative w-full aspect-square max-w-md mx-auto bg-white rounded-xl overflow-hidden border-4 border-dashed border-indigo-200 shadow-lg">
+                          <svg
+                            ref={svgRef}
+                            viewBox={NUMBER_TWO.viewBox}
+                            className="w-full h-full touch-none"
+                            style={{ touchAction: 'none' }}
+                            onPointerDown={handlePointerDown}
+                            onPointerMove={handlePointerMove}
+                            onPointerUp={handlePointerUp}
+                            onPointerLeave={handlePointerUp}
+                            onPointerCancel={handlePointerUp}
+                          >
+                            <pattern id="practice-grid" width="20" height="20" patternUnits="userSpaceOnUse">
+                              <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#e0e7ff" strokeWidth="1"/>
+                            </pattern>
+                            <rect width="200" height="200" fill="url(#practice-grid)" className="opacity-50"/>
+                            <circle cx="100" cy="100" r="90" fill="rgba(99, 102, 241, 0.1)"/>
 
-                          <div className="relative w-full aspect-square max-w-md mx-auto bg-white rounded-xl overflow-hidden border-4 border-dashed border-indigo-200 shadow-lg">
-                            <svg
-                              ref={svgRef}
-                              viewBox={NUMBER_TWO.viewBox}
-                              className="w-full h-full touch-none"
-                              style={{ touchAction: 'none' }}
-                              onPointerDown={handlePointerDown}
-                              onPointerMove={handlePointerMove}
-                              onPointerUp={handlePointerUp}
-                              onPointerLeave={handlePointerUp}
-                              onPointerCancel={handlePointerUp}
-                            >
-                              <pattern id="practice-grid" width="20" height="20" patternUnits="userSpaceOnUse">
-                                <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#e0e7ff" strokeWidth="1"/>
-                              </pattern>
-                              <rect width="200" height="200" fill="url(#practice-grid)" className="opacity-50"/>
-                              <circle cx="100" cy="100" r="90" fill="rgba(99, 102, 241, 0.1)"/>
+                            {/* Guide Paths Layer */}
+                            <g>
+                              {NUMBER_TWO.paths.map((path) => (
+                                <path
+                                  key={`guide-${path.id}`}
+                                  d={path.d}
+                                  fill="none"
+                                  stroke={selectedColor}
+                                  strokeWidth="24"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeOpacity="0.15"
+                                />
+                              ))}
+                            </g>
 
-                              {/* Guide Paths Layer */}
-                              <g>
-                                {NUMBER_TWO.paths.map((path) => (
+                            {/* Completed Paths Layer */}
+                            <g>
+                              {NUMBER_TWO.paths.map((path) => 
+                                filledPaths.includes(path.id) && (
                                   <path
-                                    key={`guide-${path.id}`}
+                                    key={`completed-${path.id}`}
                                     d={path.d}
                                     fill="none"
                                     stroke={selectedColor}
                                     strokeWidth="24"
                                     strokeLinecap="round"
                                     strokeLinejoin="round"
-                                    strokeOpacity="0.15"
                                   />
-                                ))}
-                              </g>
-
-                              {/* Completed Paths Layer */}
+                                )
+                              )}
+                            </g>
+                            
+                            {/* Current Tracing Path Layer */}
+                            {currentPath && (
                               <g>
-                                {NUMBER_TWO.paths.map((path) => 
-                                  filledPaths.includes(path.id) && (
-                                    <path
-                                      key={`completed-${path.id}`}
-                                      d={path.d}
-                                      fill="none"
-                                      stroke={selectedColor}
-                                      strokeWidth="24"
-                                      strokeLinecap="round"
-                                      strokeLinejoin="round"
-                                    />
-                                  )
-                                )}
+                                <path
+                                  ref={pathRef}
+                                  d={currentPath.d}
+                                  fill="none"
+                                  stroke={selectedColor}
+                                  strokeWidth="24"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeDasharray={pathLengths[currentPath.id] || 0}
+                                  strokeDashoffset={
+                                    pathLengths[currentPath.id]
+                                      ? pathLengths[currentPath.id] * (1 - progress)
+                                      : 0
+                                  }
+                                />
                               </g>
-                              
-                              {/* Current Tracing Path Layer */}
-                              {currentPath && (
-                                <g>
-                                  <path
-                                    ref={pathRef}
-                                    d={currentPath.d}
-                                    fill="none"
-                                    stroke={selectedColor}
-                                    strokeWidth="24"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeDasharray={pathLengths[currentPath.id] || 0}
-                                    strokeDashoffset={
-                                      pathLengths[currentPath.id]
-                                        ? pathLengths[currentPath.id] * (1 - progress)
-                                        : 0
-                                    }
-                                  />
-                                </g>
-                              )}
+                            )}
 
-                              {/* Start point with animation */}
-                              {!filledPaths.includes('top_curve') && (
-                                <>
-                                  <circle
-                                    cx="60"
-                                    cy="60"
-                                    r="14"
-                                    className="animate-ping"
-                                    fill={selectedColor}
-                                    fillOpacity="0.2"
-                                  />
-                                  <circle
-                                    cx="60"
-                                    cy="60"
-                                    r="10"
-                                    className="animate-pulse"
-                                    fill={selectedColor}
-                                    fillOpacity="0.5"
-                                  />
-                                </>
-                              )}
+                            {/* Start point with animation */}
+                            {!filledPaths.includes('top_curve') && (
+                              <>
+                                <circle
+                                  cx="60"
+                                  cy="60"
+                                  r="14"
+                                  className="animate-ping"
+                                  fill={selectedColor}
+                                  fillOpacity="0.2"
+                                />
+                                <circle
+                                  cx="60"
+                                  cy="60"
+                                  r="10"
+                                  className="animate-pulse"
+                                  fill={selectedColor}
+                                  fillOpacity="0.5"
+                                />
+                              </>
+                            )}
 
-                              {/* Bottom stroke start indicator */}
-                              {filledPaths.includes('top_curve') && !filledPaths.includes('base') && (
-                                <g className="bottom-start-indicator">
-                                  <circle
-                                    cx="60"
-                                    cy="160"
-                                    r="14"
-                                    fill={selectedColor}
-                                    fillOpacity="0.2"
-                                  />
-                                  <circle
-                                    cx="60"
-                                    cy="160"
-                                    r="10"
-                                    fill={selectedColor}
-                                    fillOpacity="0.5"
-                                  />
-                                </g>
-                              )}
-                            </svg>
-                          </div>
+                            {/* Bottom stroke start indicator */}
+                            {filledPaths.includes('top_curve') && !filledPaths.includes('base') && (
+                              <g className="bottom-start-indicator">
+                                <circle
+                                  cx="60"
+                                  cy="160"
+                                  r="14"
+                                  fill={selectedColor}
+                                  fillOpacity="0.2"
+                                />
+                                <circle
+                                  cx="60"
+                                  cy="160"
+                                  r="10"
+                                  fill={selectedColor}
+                                  fillOpacity="0.5"
+                                />
+                              </g>
+                            )}
+                          </svg>
                         </div>
                       </div>
                     </div>
                   </div>
-                )}
+                </div>
 
-                {gamePhase === 'identification' && (
-                  <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl p-4">
-                    <h2 className="text-lg font-semibold text-indigo-600 mb-4">
+                {/* Identification Section */}
+                <div className={`transition-all duration-500 ${gamePhase === 'identification' ? 'opacity-100' : 'opacity-50 pointer-events-none'}`}>
+                  <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl p-4 mb-6">
+                    <h2 className="text-lg font-semibold text-indigo-600 mb-4 flex items-center gap-2">
+                      <span className="text-2xl">🔍</span>
                       Find and click all five number twos!
                     </h2>
                     <div className="grid grid-cols-4 gap-4 max-w-md mx-auto">
@@ -705,20 +733,22 @@ const NumberTwoWorksheet: React.FC = () => {
                                 : 'bg-red-100 border-2 border-red-500 text-red-700'
                               : 'bg-white hover:bg-indigo-50 text-indigo-600'
                             }
+                            ${gamePhase !== 'identification' ? 'cursor-not-allowed' : ''}
                           `}
-                          whileHover={{ scale: 1.05 }}
-                          whileTap={{ scale: 0.95 }}
-                          disabled={identificationComplete}
+                          whileHover={{ scale: gamePhase === 'identification' ? 1.05 : 1 }}
+                          whileTap={{ scale: gamePhase === 'identification' ? 0.95 : 1 }}
+                          disabled={gamePhase !== 'identification' || identificationComplete}
                         >
                           {item.value}
                         </motion.button>
                       ))}
                     </div>
                   </div>
-                )}
+                </div>
 
-                <div className="mt-8 text-center">
-                  {(attempts === TOTAL_ATTEMPTS || identificationComplete) && (
+                {/* Completion Message */}
+                {identificationComplete && (
+                  <div className="mt-8 text-center">
                     <div className="bg-gradient-to-r from-blue-100 via-purple-100 to-pink-100 rounded-2xl p-6 max-w-2xl mx-auto">
                       <div className="flex flex-col items-center gap-4">
                         <div className="text-3xl">🎉 🌟 🎨</div>
@@ -735,8 +765,8 @@ const NumberTwoWorksheet: React.FC = () => {
                         </div>
                       </div>
                     </div>
-                  )}
-                </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>
