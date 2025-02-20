@@ -1,0 +1,124 @@
+.number-path-animation {
+  stroke-dasharray: 1000;
+  stroke-dashoffset: 1000;
+  animation: drawNumber 6s forwards infinite;
+  animation-timing-function: ease-in-out;
+}
+
+/* Add animation class for resetting */
+.reset-animation {
+  animation: none;
+  stroke-dashoffset: 1000;
+  stroke-opacity: 0.3;
+}
+
+@keyframes drawNumber {
+  0% {
+    stroke-opacity: 0.3;
+    stroke-dashoffset: 1000;
+  }
+  15% {
+    stroke-opacity: 1;
+    stroke-dashoffset: 1000;
+  }
+  65% {
+    stroke-opacity: 1;
+    stroke-dashoffset: 0;
+  }
+  85% {
+    stroke-opacity: 1;
+    stroke-dashoffset: 0;
+  }
+  100% {
+    stroke-opacity: 0;
+    stroke-dashoffset: 0;
+  }
+}
+
+/* Add smooth color transitions */
+path {
+  transition: stroke 0.3s ease-in-out;
+}
+
+circle {
+  transition: fill 0.3s ease-in-out;
+}
+
+/* Add a fun background pattern */
+.practice-background {
+  background-image: radial-gradient(#e0e7ff 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+/* Add a glow effect to the success state */
+.success-glow {
+  filter: drop-shadow(0 0 10px rgba(124, 58, 237, 0.5));
+  animation: glow 1s ease-in-out infinite alternate;
+}
+
+@keyframes glow {
+  from {
+    filter: drop-shadow(0 0 5px rgba(124, 58, 237, 0.5));
+  }
+  to {
+    filter: drop-shadow(0 0 15px rgba(124, 58, 237, 0.8));
+  }
+}
+
+/* Add a bouncing animation for the start point */
+.bounce {
+  animation: bounce 1s ease-in-out infinite;
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+/* Add hover effect for color buttons */
+.color-button {
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.color-button:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Add smooth transitions for identification game buttons */
+.identification-button {
+  transition: all 0.3s ease-in-out;
+}
+
+.identification-button.correct {
+  animation: correctPulse 0.5s ease-in-out;
+}
+
+.identification-button.incorrect {
+  animation: incorrectShake 0.5s ease-in-out;
+}
+
+@keyframes correctPulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+@keyframes incorrectShake {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-5px);
+  }
+  75% {
+    transform: translateX(5px);
+  }
+} 

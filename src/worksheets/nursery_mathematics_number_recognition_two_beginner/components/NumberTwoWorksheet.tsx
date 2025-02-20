@@ -2,44 +2,53 @@ import React, { useState, useRef, useCallback, useEffect } from 'react';
 import WorksheetTracker, { WorksheetSummary } from '../../../components/shared/WorksheetTracker';
 import ScoreDisplay from '../../../components/shared/ScoreDisplay';
 import { motion } from 'framer-motion';
-import './NumberOneWorksheet.css';
+import './NumberTwoWorksheet.css';
 import { createRoot } from 'react-dom/client';
 
 const TOTAL_ATTEMPTS = 5;
-const POINTS_PER_ATTEMPT = 10; // Changed to 10 points per tracing attempt (50 total)
+const POINTS_PER_ATTEMPT = 10; // 10 points per tracing attempt (50 total)
 const POINTS_PER_IDENTIFICATION = 10; // 10 points per correct identification (50 total)
 const TOLERANCE = 15;
 
-// Define the number one path
-const NUMBER_ONE = {
-  value: '1',
+// Define the number two path - curved top, diagonal line, horizontal base
+const NUMBER_TWO = {
+  value: '2',
   viewBox: '0 0 200 200',
   paths: [
-    { id: 'vertical', d: 'M100 40L100 160', order: 1 }
+    { 
+      id: 'top_curve', 
+      d: 'M60 60C60 40 80 30 100 30C120 30 140 40 140 60C140 90 60 140 60 160', 
+      order: 1 
+    },
+    { 
+      id: 'base', 
+      d: 'M60 160L140 160', 
+      order: 2 
+    }
   ]
 };
 
 // Define the grid items for the identification game
 const GRID_ITEMS = [
-  { id: 1, value: '1', isTarget: true },
-  { id: 2, value: '1', isTarget: true },
-  { id: 3, value: '1', isTarget: true },
-  { id: 4, value: '1', isTarget: true },
-  { id: 5, value: '1', isTarget: true },
-  { id: 6, value: '2', isTarget: false },
+  { id: 1, value: '2', isTarget: true },
+  { id: 2, value: '2', isTarget: true },
+  { id: 3, value: '2', isTarget: true },
+  { id: 4, value: '2', isTarget: true },
+  { id: 5, value: '2', isTarget: true },
+  { id: 6, value: '1', isTarget: false },
   { id: 7, value: '7', isTarget: false },
   { id: 8, value: '👻', isTarget: false },
-  { id: 9, value: '4', isTarget: false },
+  { id: 9, value: '5', isTarget: false },
   { id: 10, value: '🌟', isTarget: false },
   { id: 11, value: '3', isTarget: false },
   { id: 12, value: '🎈', isTarget: false },
   { id: 13, value: '6', isTarget: false },
   { id: 14, value: '9', isTarget: false },
   { id: 15, value: '🎨', isTarget: false },
-  { id: 16, value: '5', isTarget: false }
+  { id: 16, value: '4', isTarget: false }
 ];
 
-// Add color options constant at the top with the other constants
+// Add color options constant
 const COLOR_OPTIONS = [
   { name: 'Blue', value: '#2563eb', background: 'bg-blue-500' },
   { name: 'Purple', value: '#7c3aed', background: 'bg-purple-500' },
@@ -56,12 +65,12 @@ interface TrackerFunctions {
   markAttempted: () => void;
 }
 
-const NumberOneWorksheet: React.FC = () => {
+const NumberTwoWorksheet: React.FC = () => {
   const svgRef = useRef<SVGSVGElement>(null);
   const pathRef = useRef<SVGPathElement>(null);
   const [isDrawing, setIsDrawing] = useState(false);
   const [attempts, setAttempts] = useState(0);
-  const [currentPath, setCurrentPath] = useState<{ id: string; d: string } | null>(NUMBER_ONE.paths[0]);
+  const [currentPath, setCurrentPath] = useState<{ id: string; d: string } | null>(NUMBER_TWO.paths[0]);
   const [filledPaths, setFilledPaths] = useState<string[]>([]);
   const [progress, setProgress] = useState(0);
   const [pathLengths, setPathLengths] = useState<Record<string, number>>({});
@@ -89,7 +98,7 @@ const NumberOneWorksheet: React.FC = () => {
   useEffect(() => {
     // Calculate path lengths on mount
     const lengths: Record<string, number> = {};
-    NUMBER_ONE.paths.forEach(path => {
+    NUMBER_TWO.paths.forEach(path => {
       const tempPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
       tempPath.setAttribute('d', path.d);
       lengths[path.id] = tempPath.getTotalLength();
@@ -210,10 +219,18 @@ const NumberOneWorksheet: React.FC = () => {
     setTimeout(() => {
       setShowSuccess(false);
 
-      if (filledPaths.length + 1 === NUMBER_ONE.paths.length) {
+      // Move to next path or complete attempt
+      const currentPathIndex = NUMBER_TWO.paths.findIndex(p => p.id === currentPath.id);
+      const nextPath = NUMBER_TWO.paths[currentPathIndex + 1];
+
+      if (nextPath) {
+        setCurrentPath(nextPath);
+        setProgress(0);
+        setLastPoint(0);
+      } else {
         setAttempts(prev => prev + 1);
         
-        // Create falling ones celebration
+        // Create falling twos celebration
         const colors = ['#2563eb', '#7c3aed', '#ec4899', '#10b981', '#f97316', '#ef4444'];
         const container = document.createElement('div');
         container.style.position = 'fixed';
@@ -253,7 +270,7 @@ const NumberOneWorksheet: React.FC = () => {
                   fontWeight: 'bold'
                 }}
               >
-                1
+                2
               </motion.div>
             ))}
           </div>
@@ -267,23 +284,20 @@ const NumberOneWorksheet: React.FC = () => {
         if (attempts < TOTAL_ATTEMPTS - 1) {
           setTimeout(() => {
             setFilledPaths([]);
-            setCurrentPath(NUMBER_ONE.paths[0]);
+            setCurrentPath(NUMBER_TWO.paths[0]);
             setProgress(0);
             setLastPoint(0);
             speak("Let's do it again! Try to make it even better!");
           }, 1500);
         } else {
-          speak("Great job with the tracing! Now, let's find all the number ones!");
+          speak("Great job with the tracing! Now, let's find all the number twos!");
           setGamePhase('identification');
         }
       }
     }, 1500);
 
     setIsDrawing(false);
-    setCurrentPath(null);
-    setProgress(0);
-    setLastPoint(0);
-  }, [currentPath, filledPaths.length, attempts, speak]);
+  }, [currentPath, attempts, speak]);
 
   const handlePointerUp = useCallback((e: React.PointerEvent) => {
     if (isDrawing && svgRef.current) {
@@ -333,9 +347,9 @@ const NumberOneWorksheet: React.FC = () => {
       
       if (correctSelections.length === 5) {
         setIdentificationComplete(true);
-        speak("Amazing! You found all the ones!");
+        speak("Amazing! You found all the twos!");
         
-        // Create falling ones celebration with more ones and longer duration
+        // Create falling twos celebration with more twos and longer duration
         const colors = ['#2563eb', '#7c3aed', '#ec4899', '#10b981', '#f97316', '#ef4444'];
         const container = document.createElement('div');
         container.style.position = 'fixed';
@@ -375,7 +389,7 @@ const NumberOneWorksheet: React.FC = () => {
                   fontWeight: 'bold'
                 }}
               >
-                1
+                2
               </motion.div>
             ))}
           </div>
@@ -391,7 +405,7 @@ const NumberOneWorksheet: React.FC = () => {
 
   const handleRetry = () => {
     setFilledPaths([]);
-    setCurrentPath(NUMBER_ONE.paths[0]);
+    setCurrentPath(NUMBER_TWO.paths[0]);
     setProgress(0);
     setLastPoint(0);
     setShowSuccess(false);
@@ -429,7 +443,7 @@ const NumberOneWorksheet: React.FC = () => {
                   animate={{ scale: showSuccess ? 1.1 : 1 }}
                   transition={{ duration: 0.3 }}
                 >
-                  {gamePhase === 'tracing' ? "Let's Write Number One!" : "Find All The Ones!"}
+                  {gamePhase === 'tracing' ? "Let's Write Number Two!" : "Find All The Twos!"}
                 </motion.h1>
 
                 {gamePhase === 'tracing' ? (
@@ -439,7 +453,7 @@ const NumberOneWorksheet: React.FC = () => {
                       <h2 className="text-lg font-semibold text-indigo-600 mb-2">Watch How to Write</h2>
                       <div className="relative w-full aspect-[2/1] max-w-md mx-auto bg-white rounded-lg overflow-hidden border-2 border-indigo-100">
                         <svg
-                          viewBox={NUMBER_ONE.viewBox}
+                          viewBox={NUMBER_TWO.viewBox}
                           className="w-full h-full"
                         >
                           <pattern id="demo-grid" width="20" height="20" patternUnits="userSpaceOnUse">
@@ -447,7 +461,7 @@ const NumberOneWorksheet: React.FC = () => {
                           </pattern>
                           <rect width="200" height="200" fill="url(#demo-grid)" />
 
-                          {NUMBER_ONE.paths.map((path) => (
+                          {NUMBER_TWO.paths.map((path) => (
                             <path
                               key={`animation-${path.id}-${animationKey}`}
                               d={path.d}
@@ -457,6 +471,9 @@ const NumberOneWorksheet: React.FC = () => {
                               strokeLinecap="round"
                               strokeLinejoin="round"
                               className="number-path-animation"
+                              style={{
+                                animationDelay: `${path.order * 3}s`
+                              }}
                             />
                           ))}
                         </svg>
@@ -498,7 +515,7 @@ const NumberOneWorksheet: React.FC = () => {
                       <div className="relative w-full aspect-square max-w-md mx-auto bg-white rounded-lg overflow-hidden border-2 border-indigo-100 shadow-lg">
                         <svg
                           ref={svgRef}
-                          viewBox={NUMBER_ONE.viewBox}
+                          viewBox={NUMBER_TWO.viewBox}
                           className="w-full h-full touch-none"
                           style={{ touchAction: 'none' }}
                           onPointerDown={handlePointerDown}
@@ -514,7 +531,7 @@ const NumberOneWorksheet: React.FC = () => {
 
                           {/* Guide Paths Layer */}
                           <g>
-                            {NUMBER_ONE.paths.map((path) => (
+                            {NUMBER_TWO.paths.map((path) => (
                               <path
                                 key={`guide-${path.id}`}
                                 d={path.d}
@@ -530,7 +547,7 @@ const NumberOneWorksheet: React.FC = () => {
 
                           {/* Completed Paths Layer */}
                           <g>
-                            {NUMBER_ONE.paths.map((path) => 
+                            {NUMBER_TWO.paths.map((path) => 
                               filledPaths.includes(path.id) && (
                                 <path
                                   key={`completed-${path.id}`}
@@ -567,10 +584,10 @@ const NumberOneWorksheet: React.FC = () => {
                           )}
 
                           {/* Start point */}
-                          {!filledPaths.includes('vertical') && (
+                          {!filledPaths.includes('curve') && (
                             <circle
-                              cx="100"
-                              cy="40"
+                              cx="60"
+                              cy="60"
                               r="8"
                               className="animate-pulse"
                               fill={selectedColor}
@@ -584,7 +601,7 @@ const NumberOneWorksheet: React.FC = () => {
                 ) : (
                   <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl p-4">
                     <h2 className="text-lg font-semibold text-indigo-600 mb-4">
-                      Find and click all five number ones!
+                      Find and click all five number twos!
                     </h2>
                     <div className="grid grid-cols-4 gap-4 max-w-md mx-auto">
                       {shuffledItems.map((item) => (
@@ -631,4 +648,4 @@ const NumberOneWorksheet: React.FC = () => {
   );
 };
 
-export default NumberOneWorksheet; 
+export default NumberTwoWorksheet; 
