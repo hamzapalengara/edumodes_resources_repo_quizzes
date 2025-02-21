@@ -73,6 +73,9 @@ const NumberSixWorksheet: React.FC = () => {
         const [foundSixes, setFoundSixes] = useState<number[]>([]);
         const [currentColor, setCurrentColor] = useState('#22d3ee');
 
+        // Add completedPractices state
+        const [completedPractices, setCompletedPractices] = useState<boolean[]>(Array(REQUIRED_PRACTICES).fill(false));
+
         // Refs
         const svgRef = useRef<SVGSVGElement>(null);
         const pathRef = useRef<SVGPathElement>(null);
@@ -88,7 +91,7 @@ const NumberSixWorksheet: React.FC = () => {
           }
         }, []);
 
-        // Handle retry
+        // Handle retry - updated to not reset completedPractices
         const handleRetry = useCallback(() => {
           if (practiceCount >= REQUIRED_PRACTICES) {
             speak("Great job! You've completed all required practices!");
@@ -105,7 +108,7 @@ const NumberSixWorksheet: React.FC = () => {
           speak("Let's trace the number 6 again");
         }, [speak, practiceCount]);
 
-        // Modify handlePathComplete to show picking game after tracing
+        // Modify handlePathComplete to use completedPractices
         const handlePathComplete = useCallback(() => {
           const currentPath = NUMBER_SIX.paths[currentPathIndex];
           if (currentPath && !filledPaths.includes(currentPath.id)) {
@@ -122,9 +125,13 @@ const NumberSixWorksheet: React.FC = () => {
               const newPracticeCount = practiceCount + 1;
               setPracticeCount(newPracticeCount);
 
-              // Add points immediately
-              if (newPracticeCount <= REQUIRED_PRACTICES) {
+              // Only award points if this practice hasn't been completed before
+              if (newPracticeCount <= REQUIRED_PRACTICES && !completedPractices[newPracticeCount - 1]) {
                 markCorrect();
+                // Mark this practice as completed
+                const newCompletedPractices = [...completedPractices];
+                newCompletedPractices[newPracticeCount - 1] = true;
+                setCompletedPractices(newCompletedPractices);
               }
 
               if (newPracticeCount < REQUIRED_PRACTICES) {
@@ -146,7 +153,7 @@ const NumberSixWorksheet: React.FC = () => {
               setConfetti(newConfetti);
             }
           }
-        }, [currentPathIndex, filledPaths, speak, practiceCount, markCorrect]);
+        }, [currentPathIndex, filledPaths, speak, practiceCount, markCorrect, completedPractices]);
 
         // Handle number selection in grid
         const handleNumberClick = useCallback((index: number) => {

@@ -89,24 +89,10 @@ const NumberFourWorksheet: React.FC = () => {
           }
         }, []);
 
-        // Handle retry
-        const handleRetry = useCallback(() => {
-          if (practiceCount >= REQUIRED_PRACTICES) {
-            speak("Great job! You've completed all required practices!");
-            return;
-          }
-          
-          setCurrentPathIndex(0);
-          setFilledPaths([]);
-          setProgress(0);
-          setLastPoint(0);
-          setLastValidPoint(null);
-          setShowSuccess(false);
-          setConfetti([]);
-          speak("Let's trace the number 4 again");
-        }, [speak, practiceCount]);
+        // Add new state to track completed practices
+        const [completedPractices, setCompletedPractices] = useState<boolean[]>(Array(REQUIRED_PRACTICES).fill(false));
 
-        // Modify handlePathComplete to show picking game after tracing
+        // Modify handlePathComplete to use completedPractices
         const handlePathComplete = useCallback(() => {
           const currentPath = NUMBER_FOUR.paths[currentPathIndex];
           if (currentPath && !filledPaths.includes(currentPath.id)) {
@@ -123,9 +109,13 @@ const NumberFourWorksheet: React.FC = () => {
               const newPracticeCount = practiceCount + 1;
               setPracticeCount(newPracticeCount);
 
-              // Add points immediately
-              if (newPracticeCount <= REQUIRED_PRACTICES) {
+              // Only award points if this practice hasn't been completed before
+              if (newPracticeCount <= REQUIRED_PRACTICES && !completedPractices[newPracticeCount - 1]) {
                 markCorrect();
+                // Mark this practice as completed
+                const newCompletedPractices = [...completedPractices];
+                newCompletedPractices[newPracticeCount - 1] = true;
+                setCompletedPractices(newCompletedPractices);
               }
 
               if (newPracticeCount < REQUIRED_PRACTICES) {
@@ -147,7 +137,24 @@ const NumberFourWorksheet: React.FC = () => {
               setConfetti(newConfetti);
             }
           }
-        }, [currentPathIndex, filledPaths, speak, practiceCount, markCorrect]);
+        }, [currentPathIndex, filledPaths, speak, practiceCount, markCorrect, completedPractices]);
+
+        // Update handleRetry to not reset completedPractices
+        const handleRetry = useCallback(() => {
+          if (practiceCount >= REQUIRED_PRACTICES) {
+            speak("Great job! You've completed all required practices!");
+            return;
+          }
+          
+          setCurrentPathIndex(0);
+          setFilledPaths([]);
+          setProgress(0);
+          setLastPoint(0);
+          setLastValidPoint(null);
+          setShowSuccess(false);
+          setConfetti([]);
+          speak("Let's trace the number 4 again");
+        }, [speak, practiceCount]);
 
         // Handle number selection in grid
         const handleNumberClick = useCallback((index: number) => {
@@ -664,6 +671,26 @@ const NumberFourWorksheet: React.FC = () => {
                       </button>
                     </div>
                   )}
+
+                  {/* Update the practice display to show completed vs total attempts */}
+                  <div className="inline-flex items-center gap-2 bg-gradient-to-r from-pink-100 to-orange-100 px-4 py-2 rounded-full mt-2">
+                    <span className="text-base font-bold text-pink-600">Progress:</span>
+                    <div className="flex">
+                      {[...Array(REQUIRED_PRACTICES)].map((_, index) => (
+                        <span 
+                          key={index}
+                          className={`text-2xl transform ${
+                            completedPractices[index]
+                              ? 'text-yellow-400 animate-bounce-gentle' 
+                              : 'text-gray-300'
+                          }`}
+                          style={{ animationDelay: `${index * 0.2}s` }}
+                        >
+                          ⭐
+                        </span>
+                      ))}
+                    </div>
+                  </div>
                 </div>
               </div>
             </main>
