@@ -5,7 +5,7 @@ import ScoreDisplay from '../../../components/shared/ScoreDisplay';
 import WorksheetHeader from '../../../components/shared/layout/Header/WorksheetHeader';
 
 const REQUIRED_PRACTICES = 5;
-const TOTAL_QUESTIONS = REQUIRED_PRACTICES + 8; // 5 practices + 8 numbers to find
+const TOTAL_QUESTIONS = REQUIRED_PRACTICES + 9; // 5 practices + 9 numbers to find
 
 interface ConfettiItem {
   id: number;
@@ -16,26 +16,24 @@ interface ConfettiItem {
   type: 'emoji' | 'number';
 }
 
-export const NUMBER_EIGHT = {
-  value: '8',
-  vehicle: 'eight',
-  vehicleEmoji: '⛵',
-  vehicleCount: 8,
+export const NUMBER_NINE = {
+  value: '9',
+  fruit: 'nine',
+  fruitEmoji: '🍇',
+  fruitCount: 9,
   viewBox: '0 0 200 200',
   paths: [
-    { id: 'first_down', d: 'M80 20C60 20 40 40 40 60C40 80 60 100 80 100', order: 1 },
-    { id: 'second_down', d: 'M80 100C100 100 120 120 120 140C120 160 100 180 80 180', order: 2 },
-    { id: 'second_up', d: 'M80 180C60 180 40 160 40 140C40 120 60 100 80 100', order: 3 },
-    { id: 'first_up', d: 'M80 100C100 100 120 80 120 60C120 40 100 20 80 20', order: 4 }
+    { id: 'circle', d: 'M120 80C120 60 100 40 80 40C60 40 40 60 40 80C40 100 60 120 80 120C100 120 120 100 120 80', order: 1 },
+    { id: 'line', d: 'M120 80L120 180', order: 2 }
   ]
 };
 
-// Modified NUMBER_GRID to include number 8 with sea vehicles
-export const NUMBER_GRID = [
-  '1 🚤', '8 ⛵', '3 🛥️', '2 🚢', '8 ⛵',
-  '3 🚤', '4 🛥️', '8 ⛵', '4 🚢', '9 🚤',
-  '8 ⛵', '2 🛥️', '5 🚢', '8 ⛵', '1 🚤',
-  '8 ⛵', '7 🛥️', '8 ⛵', '8 ⛵', '4 🚢'
+// Modify NUMBER_GRID to include 9 number 9s with grapes
+const NUMBER_GRID = [
+  '1 🍎', '9 🍇', '7 🍌', '2 🍊', '9 🍇',
+  '3 🍐', '9 🍇', '9 🍇', '6 🍎', '9 🍇',
+  '5 🍌', '9 🍇', '7 🍇', '9 🍇', '1 🍎',
+  '8 🍊', '9 🍇', '6 🍌', '9 🍇', '4 🍓'
 ];
 
 // Add presetColors constant at the top of the file, after other imports
@@ -48,7 +46,7 @@ const presetColors = [
   { color: '#EC4899', name: 'Pink' },    // Pink-500
 ] as const;
 
-const NumberEightWorksheet: React.FC = () => {
+const NumberNineWorksheet: React.FC = () => {
   // Handle summary generation
   const handleSummaryGenerated = (summary: WorksheetSummary) => {
     console.log('Worksheet Summary:', summary);
@@ -72,7 +70,7 @@ const NumberEightWorksheet: React.FC = () => {
         const [lastValidPoint, setLastValidPoint] = useState<{ x: number; y: number } | null>(null);
         const [practiceCount, setPracticeCount] = useState(0);
         const [isCompleted, setIsCompleted] = useState(false);
-        const [foundSixes, setFoundSixes] = useState<number[]>([]);
+        const [foundNines, setFoundNines] = useState<number[]>([]);
         const [currentColor, setCurrentColor] = useState('#22d3ee');
 
         // Refs
@@ -104,21 +102,21 @@ const NumberEightWorksheet: React.FC = () => {
           setLastValidPoint(null);
           setShowSuccess(false);
           setConfetti([]);
-          speak("Let's trace the number 8 again");
+          speak("Let's trace the number 9 again");
         }, [speak, practiceCount]);
 
         // Modify handlePathComplete to show picking game after tracing
         const handlePathComplete = useCallback(() => {
-          const currentPath = NUMBER_EIGHT.paths[currentPathIndex];
+          const currentPath = NUMBER_NINE.paths[currentPathIndex];
           if (currentPath && !filledPaths.includes(currentPath.id)) {
             setFilledPaths(prev => [...prev, currentPath.id]);
             
-            if (currentPathIndex < NUMBER_EIGHT.paths.length - 1) {
+            if (currentPathIndex < NUMBER_NINE.paths.length - 1) {
               setCurrentPathIndex(prev => prev + 1);
               setLastPoint(0);
               setProgress(0);
               setLastValidPoint(null);
-              speak("Number 8. Let's trace the next part.");
+              speak("Number 9. Let's trace the next part.");
             } else {
               setShowSuccess(true);
               const newPracticeCount = practiceCount + 1;
@@ -130,9 +128,9 @@ const NumberEightWorksheet: React.FC = () => {
               }
 
               if (newPracticeCount < REQUIRED_PRACTICES) {
-                speak(`Number 8! You've completed it ${newPracticeCount} time${newPracticeCount > 1 ? 's' : ''}. ${REQUIRED_PRACTICES - newPracticeCount} more to go!`);
+                speak(`Number 9! You've completed it ${newPracticeCount} time${newPracticeCount > 1 ? 's' : ''}. ${REQUIRED_PRACTICES - newPracticeCount} more to go!`);
               } else {
-                speak("Number 8! You've completed all five practices! Now let's find all the number eights in the grid below!");
+                speak("Number 9! You've completed all five practices! Now let's find all the number nines in the grid below!");
                 setIsCompleted(true);
               }
               
@@ -152,20 +150,20 @@ const NumberEightWorksheet: React.FC = () => {
 
         // Handle number selection in grid
         const handleNumberClick = useCallback((index: number) => {
-          if (foundSixes.includes(index)) return;
+          if (foundNines.includes(index)) return;
           
-          if (NUMBER_GRID[index] === '8 ⛵') {
-            setFoundSixes(prev => [...prev, index]);
+          if (NUMBER_GRID[index] === '9 🍇') {
+            setFoundNines(prev => [...prev, index]);
             markCorrect();
-            speak("Correct! You found a number 8!");
+            speak("Correct! You found a number 9!");
             
-            if (foundSixes.length + 1 === 8) {
-              speak("Amazing! You've found all the number eights!");
+            if (foundNines.length + 1 === 9) {
+              speak("Amazing! You've found all the number nines!");
             }
           } else {
-            speak("That's not a 8, try again!");
+            speak("That's not a 9, try again!");
           }
-        }, [foundSixes, markCorrect, speak]);
+        }, [foundNines, markCorrect, speak]);
 
         // Modify reset timer to wait for voice feedback
         useEffect(() => {
@@ -185,18 +183,18 @@ const NumberEightWorksheet: React.FC = () => {
 
         // Calculate path length
         useEffect(() => {
-          if (pathRef.current && NUMBER_EIGHT.paths[currentPathIndex]?.id) {
+          if (pathRef.current && NUMBER_NINE.paths[currentPathIndex]?.id) {
             const length = pathRef.current.getTotalLength();
             setPathLengths(prev => ({
               ...prev,
-              [NUMBER_EIGHT.paths[currentPathIndex].id]: length
+              [NUMBER_NINE.paths[currentPathIndex].id]: length
             }));
           }
         }, [currentPathIndex]);
 
         // Initial instruction
         useEffect(() => {
-          speak("Let's trace the number 8");
+          speak("Let's trace the number 9");
         }, [speak]);
 
         // Find closest point on path
@@ -235,7 +233,7 @@ const NumberEightWorksheet: React.FC = () => {
           const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
 
           // Improved coordinate conversion with viewport scaling
-          const viewBox = { width: 200, height: 200 }; // Matches NUMBER_EIGHT.viewBox
+          const viewBox = { width: 200, height: 200 }; // Matches NUMBER_NINE.viewBox
           const svgX = ((clientX - svgRect.left) / svgRect.width) * viewBox.width;
           const svgY = ((clientY - svgRect.top) / svgRect.height) * viewBox.height;
 
@@ -343,7 +341,7 @@ const NumberEightWorksheet: React.FC = () => {
           setIsAnimating(true);
           
           // Play each stroke in sequence
-          for (let i = 0; i < NUMBER_EIGHT.paths.length; i++) {
+          for (let i = 0; i < NUMBER_NINE.paths.length; i++) {
             await controls.start(`stroke${i}`);
             await new Promise(resolve => setTimeout(resolve, 500)); // Pause between strokes
           }
@@ -357,7 +355,7 @@ const NumberEightWorksheet: React.FC = () => {
         }, [playAnimation]);
 
         return (
-          <div className="min-h-screen bg-gradient-to-br from-white via-gray-50 to-gray-100 relative overflow-hidden">
+          <div className="min-h-screen bg-gradient-to-br from-indigo-100 via-purple-100 to-pink-100 bg-[url('/fruits-bg.png')] bg-cover bg-center bg-blend-soft-light relative overflow-hidden">
             {/* Decorative background elements */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none">
               <div className="absolute top-0 left-0 w-64 h-64 bg-gradient-to-br from-cyan-100/40 to-teal-100/40 rounded-full blur-3xl transform -translate-x-1/2 -translate-y-1/2"></div>
@@ -368,13 +366,13 @@ const NumberEightWorksheet: React.FC = () => {
             <WorksheetHeader />
 
             {/* Score and Title Section */}
-            <div className="bg-white/80 backdrop-blur-md shadow-lg border border-gray-200">
+            <div className="bg-white/30 backdrop-blur-md shadow-lg border border-white/50">
               <div className="max-w-4xl mx-auto px-2 py-2 md:px-4 md:py-3 flex flex-col items-stretch gap-2">
                 <div className="w-full flex justify-center items-center">
                   <ScoreDisplay score={score} totalQuestions={TOTAL_QUESTIONS * 10} />
                 </div>
-                <h2 className="text-xl md:text-2xl lg:text-3xl font-bold text-gray-800 text-center">
-                  Number Eight with Sea Vehicles
+                <h2 className="text-xl md:text-2xl lg:text-3xl font-bold text-indigo-900 text-center">
+                  Number Nine with Grapes
                 </h2>
               </div>
             </div>
@@ -394,13 +392,13 @@ const NumberEightWorksheet: React.FC = () => {
 
                   {/* Number Display */}
                   <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 md:gap-6 mb-2 md:mb-4">
-                    <div className="text-4xl sm:text-5xl font-bold text-gray-800">{NUMBER_EIGHT.value}</div>
+                    <div className="text-4xl sm:text-5xl font-bold text-gray-800">{NUMBER_NINE.value}</div>
                     <div className="flex flex-wrap justify-center gap-1 items-center max-w-[200px] sm:max-w-none">
-                      {[...Array(NUMBER_EIGHT.vehicleCount)].map((_, index) => (
-                        <div key={index} className="text-2xl sm:text-3xl filter drop-shadow-md">{NUMBER_EIGHT.vehicleEmoji}</div>
+                      {[...Array(NUMBER_NINE.fruitCount)].map((_, index) => (
+                        <div key={index} className="text-2xl sm:text-3xl filter drop-shadow-md">{NUMBER_NINE.fruitEmoji}</div>
                       ))}
                     </div>
-                    <div className="text-lg sm:text-xl font-medium text-gray-800 capitalize">{NUMBER_EIGHT.vehicle}</div>
+                    <div className="text-lg sm:text-xl font-medium text-gray-800 capitalize">{NUMBER_NINE.fruit}</div>
                   </div>
 
                   {/* Main Content Grid */}
@@ -409,17 +407,17 @@ const NumberEightWorksheet: React.FC = () => {
                     <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-4 md:p-6 border border-gray-200 shadow-lg">
                       <div className="text-center mb-4">
                         <h3 className="text-lg md:text-xl font-bold text-cyan-400">Watch and Learn</h3>
-                        <p className="text-sm text-cyan-300">See how to write number 8</p>
+                        <p className="text-sm text-cyan-300">See how to write number 9</p>
                       </div>
 
                       {/* Demonstration SVG */}
                       <div className="relative aspect-square max-w-[250px] mx-auto">
                         <svg
-                          viewBox={NUMBER_EIGHT.viewBox}
+                          viewBox={NUMBER_NINE.viewBox}
                           className="w-full h-full"
                         >
                           {/* Guide paths */}
-                          {NUMBER_EIGHT.paths.map((path) => (
+                          {NUMBER_NINE.paths.map((path) => (
                             <path
                               key={`guide-${path.id}`}
                               d={path.d}
@@ -432,7 +430,7 @@ const NumberEightWorksheet: React.FC = () => {
                           ))}
                           
                           {/* Animated paths */}
-                          {NUMBER_EIGHT.paths.map((path, index) => (
+                          {NUMBER_NINE.paths.map((path, index) => (
                             <motion.path
                               key={`demo-${path.id}`}
                               d={path.d}
@@ -454,7 +452,7 @@ const NumberEightWorksheet: React.FC = () => {
                           ))}
                           
                           {/* Moving dot */}
-                          {NUMBER_EIGHT.paths.map((path, index) => (
+                          {NUMBER_NINE.paths.map((path, index) => (
                             <motion.circle
                               key={`dot-${path.id}`}
                               r="8"
@@ -499,7 +497,7 @@ const NumberEightWorksheet: React.FC = () => {
                     <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-4 md:p-6 border border-gray-200 shadow-lg">
                       <div className="text-center mb-4">
                         <h3 className="text-lg md:text-xl font-bold text-cyan-400">Your Turn!</h3>
-                        <p className="text-sm text-cyan-300 mb-1">Trace the number 8 here</p>
+                        <p className="text-sm text-cyan-300 mb-1">Trace the number 9 here</p>
                         <div className="inline-flex items-center gap-2 bg-cyan-500/20 px-3 py-1 rounded-full">
                           <span className="text-sm font-medium text-cyan-300">Practice:</span>
                           <span className="text-sm font-bold text-cyan-300">{practiceCount} / {REQUIRED_PRACTICES}</span>
@@ -512,7 +510,7 @@ const NumberEightWorksheet: React.FC = () => {
                       >
                         <svg
                           ref={svgRef}
-                          viewBox={NUMBER_EIGHT.viewBox}
+                          viewBox={NUMBER_NINE.viewBox}
                           className="w-full h-full touch-none"
                           onMouseDown={handleTouchStart}
                           onMouseUp={() => setIsDrawing(false)}
@@ -526,7 +524,7 @@ const NumberEightWorksheet: React.FC = () => {
                           onTouchMove={handleDrawing}
                         >
                           {/* Guide paths */}
-                          {NUMBER_EIGHT.paths.map((path, index) => {
+                          {NUMBER_NINE.paths.map((path, index) => {
                             const isCurrentPath = index === currentPathIndex;
                             const isCompletedPath = filledPaths.includes(path.id);
                             
@@ -599,9 +597,9 @@ const NumberEightWorksheet: React.FC = () => {
                       {/* Instructions */}
                       <div className="mt-4 text-center">
                         <p className="text-sm font-medium text-cyan-400">
-                          {currentPathIndex === 0 && "Start with the top circle ➡️"}
-                          {currentPathIndex === 1 && "Now draw the bottom circle ➡️"}
-                          {currentPathIndex >= NUMBER_EIGHT.paths.length && "Great job! Try again! 🎉"}
+                          {currentPathIndex === 0 && "Start with the circle ⭕"}
+                          {currentPathIndex === 1 && "Now draw the vertical line ⬇️"}
+                          {currentPathIndex >= NUMBER_NINE.paths.length && "Great job! Try again! 🎉"}
                         </p>
                       </div>
 
@@ -643,29 +641,29 @@ const NumberEightWorksheet: React.FC = () => {
                     )}
 
                     <div className="text-center mb-4">
-                      <h3 className="text-lg md:text-xl font-bold text-cyan-400">Find the Number 8s!</h3>
-                      <p className="text-sm text-cyan-300 mb-2">Click on all the number 8s you can find</p>
+                      <h3 className="text-lg md:text-xl font-bold text-cyan-400">Find the Number 9s!</h3>
+                      <p className="text-sm text-cyan-300 mb-2">Click on all the number 9s you can find</p>
                       <div className="inline-flex items-center gap-2 bg-cyan-500/20 px-3 py-1 rounded-full">
                         <span className="text-sm font-medium text-cyan-300">Found:</span>
-                        <span className="text-sm font-bold text-cyan-300">{foundSixes.length} / 8</span>
+                        <span className="text-sm font-bold text-cyan-300">{foundNines.length} / 9</span>
                       </div>
                     </div>
 
                     {/* Number Grid */}
-                    <div className="grid grid-cols-4 gap-0.5 md:gap-2 w-full max-w-sm mx-auto">
+                    <div className="grid grid-cols-5 gap-2 max-w-[350px] mx-auto">
                       {NUMBER_GRID.map((number, index) => (
                         <button
                           key={index}
                           onClick={() => isCompleted && handleNumberClick(index)}
-                          disabled={!isCompleted || foundSixes.includes(index)}
+                          disabled={!isCompleted || foundNines.includes(index)}
                           className={`
                             aspect-square w-full text-xl font-bold rounded-lg
                             flex items-center justify-center transition-all
-                            ${foundSixes.includes(index)
-                              ? 'bg-cyan-500 text-white cursor-not-allowed'
+                            ${foundNines.includes(index)
+                              ? 'bg-green-500 text-white cursor-not-allowed'
                               : isCompleted
-                                ? 'bg-blue-800 hover:bg-cyan-500/20 active:bg-cyan-500/30 text-cyan-400'
-                                : 'bg-blue-800/50 text-cyan-400/50 cursor-not-allowed'
+                                ? 'bg-white hover:bg-indigo-100 active:bg-indigo-200 text-indigo-900'
+                                : 'bg-white/50 text-indigo-900/50 cursor-not-allowed'
                             }
                           `}
                         >
@@ -674,10 +672,10 @@ const NumberEightWorksheet: React.FC = () => {
                       ))}
                     </div>
 
-                    {foundSixes.length === 8 && (
+                    {foundNines.length === 9 && (
                       <div className="mt-4 text-center">
-                        <p className="text-cyan-400 font-semibold">
-                          🎉 Fantastic! You've found all the number 8s! 🎉
+                        <p className="text-green-600 font-semibold">
+                          🎉 Fantastic! You've found all the number 9s! 🎉
                         </p>
                       </div>
                     )}
@@ -717,7 +715,7 @@ const NumberEightWorksheet: React.FC = () => {
                               fontWeight: 'bold',
                             }}
                           >
-                            {item.type === 'emoji' ? NUMBER_EIGHT.vehicleEmoji : NUMBER_EIGHT.value}
+                            {item.type === 'emoji' ? NUMBER_NINE.fruitEmoji : NUMBER_NINE.value}
                           </motion.div>
                         ))}
                       </div>
@@ -746,4 +744,4 @@ const NumberEightWorksheet: React.FC = () => {
   );
 };
 
-export default NumberEightWorksheet;
+export default NumberNineWorksheet;
