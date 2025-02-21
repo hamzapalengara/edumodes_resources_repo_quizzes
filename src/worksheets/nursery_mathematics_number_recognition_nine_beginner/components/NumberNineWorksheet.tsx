@@ -23,8 +23,8 @@ export const NUMBER_NINE = {
   fruitCount: 9,
   viewBox: '0 0 200 200',
   paths: [
-    { id: 'circle', d: 'M120 80C120 60 100 40 80 40C60 40 40 60 40 80C40 100 60 120 80 120C100 120 120 100 120 80', order: 1 },
-    { id: 'line', d: 'M120 80L120 180', order: 2 }
+    { id: 'circle', d: 'M140 60C140 40 120 20 100 20C80 20 60 40 60 60C60 80 80 100 100 100C120 100 140 80 140 60', order: 1 },
+    { id: 'line', d: 'M140 60L140 160', order: 2 }
   ]
 };
 
@@ -494,132 +494,130 @@ const NumberNineWorksheet: React.FC = () => {
                     </div>
 
                     {/* Tracing Practice Section */}
-                    <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-4 md:p-6 border border-gray-200 shadow-lg">
-                      <div className="text-center mb-4">
-                        <h3 className="text-lg md:text-xl font-bold text-cyan-400">Your Turn!</h3>
-                        <p className="text-sm text-cyan-300 mb-1">Trace the number 9 here</p>
-                        <div className="inline-flex items-center gap-2 bg-cyan-500/20 px-3 py-1 rounded-full">
-                          <span className="text-sm font-medium text-cyan-300">Practice:</span>
-                          <span className="text-sm font-bold text-cyan-300">{practiceCount} / {REQUIRED_PRACTICES}</span>
+                    <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-2 md:p-4 border border-white/50 shadow-lg">
+                      <div className="text-center mb-2">
+                        <h3 className="text-lg md:text-xl font-bold text-indigo-900">Your Turn!</h3>
+                        <div className="inline-flex items-center gap-2 bg-indigo-100 px-3 py-1 rounded-full">
+                          <span className="text-sm font-medium text-indigo-900">Practice:</span>
+                          <span className="text-sm font-bold text-indigo-900">{practiceCount} / {REQUIRED_PRACTICES}</span>
                         </div>
                       </div>
 
-                      {/* Tracing Area */}
-                      <div 
-                        className="relative aspect-square max-w-[350px] mx-auto flex gap-2"
-                      >
-                        <svg
-                          ref={svgRef}
-                          viewBox={NUMBER_NINE.viewBox}
-                          className="w-full h-full touch-none"
-                          onMouseDown={handleTouchStart}
-                          onMouseUp={() => setIsDrawing(false)}
-                          onMouseLeave={() => setIsDrawing(false)}
-                          onTouchStart={handleTouchStart}
-                          onTouchEnd={(e) => {
-                            e.preventDefault();
-                            setIsDrawing(false);
-                          }}
-                          onMouseMove={handleDrawing}
-                          onTouchMove={handleDrawing}
-                        >
-                          {/* Guide paths */}
-                          {NUMBER_NINE.paths.map((path, index) => {
-                            const isCurrentPath = index === currentPathIndex;
-                            const isCompletedPath = filledPaths.includes(path.id);
+                      {/* Tracing Area with Touch Control - Maximized size */}
+                      <div className="relative flex items-start gap-2">
+                        {/* SVG Container - Expanded */}
+                        <div className="relative flex-grow min-h-[calc(100vw-6rem)] md:min-h-0">
+                          <svg
+                            ref={svgRef}
+                            viewBox={NUMBER_NINE.viewBox}
+                            className="w-full h-full aspect-square touch-none"
+                            style={{ maxHeight: 'calc(100vh - 400px)' }}
+                            onMouseDown={(e) => { 
+                              e.preventDefault();
+                              setIsDrawing(true); 
+                              markAttempted(); 
+                            }}
+                            onMouseUp={() => setIsDrawing(false)}
+                            onMouseLeave={() => setIsDrawing(false)}
+                            onTouchStart={handleTouchStart}
+                            onTouchEnd={(e) => {
+                              e.preventDefault();
+                              setIsDrawing(false);
+                            }}
+                            onMouseMove={handleDrawing}
+                            onTouchMove={handleDrawing}
+                          >
+                            {/* Background decoration */}
+                            {/* Removing the background circle */}
                             
-                            return (
-                              <g key={path.id}>
-                                {/* Guide Path */}
-                                <path
-                                  d={path.d}
-                                  fill="none"
-                                  stroke={isCompletedPath ? currentColor : `${currentColor}33`}
-                                  strokeWidth="24"
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                />
-                                
-                                {/* Active Path */}
-                                {isCurrentPath && (
+                            {NUMBER_NINE.paths.map((path, index) => {
+                              const isCurrentPath = index === currentPathIndex;
+                              const isCompletedPath = filledPaths.includes(path.id);
+                              
+                              return (
+                                <g key={path.id}>
+                                  {/* Guide Path */}
                                   <path
-                                    ref={pathRef}
                                     d={path.d}
                                     fill="none"
-                                    stroke={currentColor}
+                                    stroke={isCompletedPath ? currentColor : "rgba(99, 102, 241, 0.2)"}
                                     strokeWidth="24"
                                     strokeLinecap="round"
                                     strokeLinejoin="round"
-                                    strokeDasharray={pathLengths[path.id] || 0}
-                                    strokeDashoffset={pathLengths[path.id] ? pathLengths[path.id] - (pathLengths[path.id] * progress / 100) : 0}
                                   />
-                                )}
-                                
-                                {/* Start point */}
-                                {isCurrentPath && !isCompletedPath && (
-                                  <circle
-                                    ref={el => {
-                                      if (el) {
-                                        const pathElement = document.createElementNS("http://www.w3.org/2000/svg", "path");
-                                        pathElement.setAttribute("d", path.d);
-                                        const point = pathElement.getPointAtLength(0);
-                                        el.setAttribute('cx', point.x.toString());
-                                        el.setAttribute('cy', point.y.toString());
-                                      }
-                                    }}
-                                    r="10"
-                                    className="animate-pulse"
-                                    fill={currentColor}
-                                  />
-                                )}
-                              </g>
-                            );
-                          })}
-                        </svg>
 
-                        {/* Color Palette */}
-                        <div className="flex flex-col gap-2 justify-start items-center py-2">
-                          {presetColors.map((preset) => (
+                                  {/* Active Path */}
+                                  {isCurrentPath && (
+                                    <path
+                                      ref={pathRef}
+                                      d={path.d}
+                                      fill="none"
+                                      stroke={currentColor}
+                                      strokeWidth="24"
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      strokeDasharray={pathLengths[path.id] || 0}
+                                      strokeDashoffset={pathLengths[path.id] ? pathLengths[path.id] - (pathLengths[path.id] * progress / 100) : 0}
+                                    />
+                                  )}
+                                  
+                                  {/* Start point */}
+                                  {isCurrentPath && (
+                                    <circle
+                                      ref={el => {
+                                        if (el) {
+                                          const pathElement = document.createElementNS("http://www.w3.org/2000/svg", "path");
+                                          pathElement.setAttribute("d", path.d);
+                                          const point = pathElement.getPointAtLength(lastPoint);
+                                          el.setAttribute('cx', point.x.toString());
+                                          el.setAttribute('cy', point.y.toString());
+                                        }
+                                      }}
+                                      r="10"
+                                      className="animate-pulse"
+                                      fill={currentColor}
+                                    />
+                                  )}
+                                </g>
+                              );
+                            })}
+                          </svg>
+
+                          {/* Retry Button */}
+                          <button
+                            onClick={handleRetry}
+                            className="absolute top-2 right-2 bg-white rounded-full p-2 shadow-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                            aria-label="Retry"
+                          >
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                            </svg>
+                          </button>
+                        </div>
+
+                        {/* Color Picker - Right Side - Kept in original position */}
+                        <div className="w-12 flex flex-col gap-2">
+                          {presetColors.map(({ color, name }) => (
                             <button
-                              key={preset.color}
-                              onClick={() => setCurrentColor(preset.color)}
-                              className={`w-8 h-8 rounded-full shadow-md transition-all transform hover:scale-110 ${
-                                currentColor === preset.color ? 'ring-2 ring-offset-2 ring-cyan-400' : ''
+                              key={color}
+                              className={`w-8 h-8 rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+                                currentColor === color ? 'ring-2 ring-offset-2 ring-blue-500' : ''
                               }`}
-                              style={{ backgroundColor: preset.color }}
-                              title={preset.name}
-                              aria-label={`Select ${preset.name} color`}
+                              style={{ backgroundColor: color }}
+                              onClick={() => setCurrentColor(color)}
+                              aria-label={`Select ${name}`}
                             />
                           ))}
                         </div>
                       </div>
 
                       {/* Instructions */}
-                      <div className="mt-4 text-center">
-                        <p className="text-sm font-medium text-cyan-400">
-                          {currentPathIndex === 0 && "Start with the circle ⭕"}
-                          {currentPathIndex === 1 && "Now draw the vertical line ⬇️"}
+                      <div className="mt-2 text-center">
+                        <p className="text-sm font-medium text-indigo-700">
+                          {currentPathIndex === 0 && "Draw the circle first ⭕"}
+                          {currentPathIndex === 1 && "Now add the vertical line ⬇️"}
                           {currentPathIndex >= NUMBER_NINE.paths.length && "Great job! Try again! 🎉"}
                         </p>
-                      </div>
-
-                      {/* Retry Current Attempt Button */}
-                      <div className="flex justify-center mt-4">
-                        <button
-                          onClick={() => {
-                            setCurrentPathIndex(0);
-                            setFilledPaths([]);
-                            setProgress(0);
-                            setLastPoint(0);
-                            setLastValidPoint(null);
-                            setShowSuccess(false);
-                            speak("Let's try this attempt again");
-                          }}
-                          className="bg-gray-100 hover:bg-gray-200 text-cyan-500 px-6 py-2 rounded-full text-sm font-medium shadow-md flex items-center gap-2 transition-all transform hover:-translate-y-0.5 hover:shadow-lg"
-                        >
-                          <span className="text-lg">🔄</span>
-                          Retry Current Attempt
-                        </button>
                       </div>
                     </div>
                   </div>
