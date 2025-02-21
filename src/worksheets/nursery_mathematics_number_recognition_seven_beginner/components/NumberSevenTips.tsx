@@ -1,110 +1,150 @@
 import React from 'react';
+import WorksheetHeader from '../../../components/shared/layout/Header/WorksheetHeader';
 import { NUMBER_SEVEN } from './NumberSevenWorksheet';
 
 const NumberSevenTips: React.FC = () => {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#8BC34A] via-[#4CAF50] to-[#2E7D32] relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-900 relative overflow-hidden">
       {/* Decorative background elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-0 left-0 w-64 h-64 bg-gradient-to-br from-[#FFA000]/40 to-[#FFD54F]/40 rounded-full blur-3xl transform -translate-x-1/2 -translate-y-1/2"></div>
-        <div className="absolute top-1/4 right-0 w-96 h-96 bg-gradient-to-bl from-[#81C784]/40 to-[#A5D6A7]/40 rounded-full blur-3xl transform translate-x-1/2 -translate-y-1/2"></div>
-        <div className="absolute bottom-0 left-1/3 w-80 h-80 bg-gradient-to-tr from-[#4FC3F7]/40 to-[#81D4FA]/40 rounded-full blur-3xl transform -translate-x-1/2 translate-y-1/2"></div>
+        <div className="absolute top-0 left-0 w-64 h-64 bg-gradient-to-br from-orange-500/30 to-amber-400/30 rounded-full blur-3xl transform -translate-x-1/2 -translate-y-1/2"></div>
+        <div className="absolute top-1/4 right-0 w-96 h-96 bg-gradient-to-bl from-zinc-700/30 to-zinc-600/30 rounded-full blur-3xl transform translate-x-1/2 -translate-y-1/2"></div>
+        <div className="absolute bottom-0 left-1/3 w-80 h-80 bg-gradient-to-tr from-orange-400/30 to-amber-300/30 rounded-full blur-3xl transform -translate-x-1/2 translate-y-1/2"></div>
       </div>
 
-      <div className="px-0 md:px-4 w-full">
-        <div className="max-w-4xl mx-auto">
-          <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-4 md:p-6 border border-[#A5D6A7]/50 shadow-lg">
-            <h1 className="text-2xl font-bold text-center text-[#2E7D32] mb-4">Tips for Writing Number 7</h1>
+      <WorksheetHeader />
 
-            {/* Visual Example */}
-            <div className="mb-6">
-              <h2 className="text-xl font-semibold text-[#2E7D32] mb-3">Visual Guide</h2>
-              <div className="aspect-square relative max-w-sm mx-auto">
-                <svg viewBox={NUMBER_SEVEN.viewBox} className="w-full h-full">
-                  {NUMBER_SEVEN.paths.map((path) => (
-                    <g key={path.id}>
-                      <path
-                        d={path.d}
-                        fill="none"
-                        stroke="#C8E6C9"
-                        strokeWidth="10"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                      <path
-                        d={path.d}
-                        fill="none"
-                        stroke="#4CAF50"
-                        strokeWidth="10"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeDasharray="5,5"
-                      />
-                    </g>
+      {/* Title Section */}
+      <div className="bg-zinc-800/80 backdrop-blur-md shadow-lg border border-zinc-700">
+        <h2 className="text-2xl md:text-3xl font-bold text-white text-center py-3">
+          Tips for Writing Number 7
+        </h2>
+      </div>
+
+      {/* Main Content */}
+      <main className="px-0">
+        <div className="bg-zinc-800/20 backdrop-blur-md p-2 md:p-4 mb-2 md:mb-4 shadow-lg border border-zinc-700/50">
+          <div className="max-w-4xl mx-auto">
+            {/* Example Section */}
+            <div className="bg-zinc-900/80 backdrop-blur-sm rounded-2xl p-4 md:p-6 border border-zinc-700/50 shadow-lg mb-6">
+              <h3 className="text-xl font-bold text-orange-500 mb-4">Number 7 Example</h3>
+              <div className="flex flex-col sm:flex-row items-center gap-4 justify-center">
+                <div className="text-6xl font-bold text-orange-500">{NUMBER_SEVEN.value}</div>
+                <div className="flex gap-2 flex-wrap justify-center">
+                  {[...Array(NUMBER_SEVEN.vehicleCount)].map((_, index) => (
+                    <span key={index} className="text-4xl">{NUMBER_SEVEN.vehicleEmoji}</span>
                   ))}
-                </svg>
+                </div>
               </div>
             </div>
 
-            {/* Key Tips */}
-            <div className="mb-6">
-              <h2 className="text-xl font-semibold text-[#2E7D32] mb-3">Key Tips</h2>
-              <ul className="space-y-3">
-                <li className="flex items-start gap-2">
-                  <span className="text-[#4CAF50] font-bold">1.</span>
+            {/* Writing Tips */}
+            <div className="bg-zinc-900/80 backdrop-blur-sm rounded-2xl p-4 md:p-6 border border-zinc-700/50 shadow-lg mb-6">
+              <h3 className="text-xl font-bold text-orange-500 mb-4">Writing Tips</h3>
+              <ul className="space-y-4">
+                <li className="flex items-start gap-3">
+                  <span className="text-2xl">✏️</span>
                   <div>
-                    <p className="font-medium text-[#2E7D32]">Start with the Horizontal Line</p>
-                    <p className="text-[#1B5E20]">Draw a straight line from left to right at the top.</p>
+                    <h4 className="font-semibold text-orange-400">Start at the Top</h4>
+                    <p className="text-orange-300">Begin with a straight horizontal line at the top.</p>
                   </div>
                 </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-[#4CAF50] font-bold">2.</span>
+                <li className="flex items-start gap-3">
+                  <span className="text-2xl">↘️</span>
                   <div>
-                    <p className="font-medium text-[#2E7D32]">Add the Diagonal Line</p>
-                    <p className="text-[#1B5E20]">Draw a straight line diagonally down from the right end.</p>
+                    <h4 className="font-semibold text-orange-400">Diagonal Line</h4>
+                    <p className="text-orange-300">Draw a straight diagonal line from the right end of the top line.</p>
+                  </div>
+                </li>
+                <li className="flex items-start gap-3">
+                  <span className="text-2xl">📏</span>
+                  <div>
+                    <h4 className="font-semibold text-orange-400">Keep it Straight</h4>
+                    <p className="text-orange-300">Make sure both lines are straight and meet at a clear angle.</p>
                   </div>
                 </li>
               </ul>
             </div>
 
             {/* Common Mistakes */}
-            <div className="mb-6 bg-[#E8F5E9] rounded-xl p-4">
-              <h2 className="text-xl font-semibold text-[#2E7D32] mb-3">Common Mistakes to Avoid</h2>
-              <ul className="list-disc pl-6 space-y-2 text-[#1B5E20]">
-                <li>Making the horizontal line too short or slanted</li>
-                <li>Drawing the diagonal line at the wrong angle</li>
-                <li>Starting the diagonal line from the wrong point</li>
-                <li>Making the lines wavy instead of straight</li>
-                <li>Not connecting the lines properly at the top right</li>
+            <div className="bg-zinc-900/80 backdrop-blur-sm rounded-2xl p-4 md:p-6 border border-zinc-700/50 shadow-lg mb-6">
+              <h3 className="text-xl font-bold text-orange-500 mb-4">Watch Out For</h3>
+              <ul className="space-y-4">
+                <li className="flex items-start gap-3">
+                  <span className="text-2xl">⚠️</span>
+                  <div>
+                    <h4 className="font-semibold text-orange-400">Curved Lines</h4>
+                    <p className="text-orange-300">Avoid making curved lines - keep them straight!</p>
+                  </div>
+                </li>
+                <li className="flex items-start gap-3">
+                  <span className="text-2xl">⚠️</span>
+                  <div>
+                    <h4 className="font-semibold text-orange-400">Wrong Angle</h4>
+                    <p className="text-orange-300">Make sure the diagonal line isn't too steep or too flat.</p>
+                  </div>
+                </li>
               </ul>
             </div>
 
             {/* Practice Tips */}
-            <div className="mb-6 bg-[#E8F5E9] rounded-xl p-4">
-              <h2 className="text-xl font-semibold text-[#2E7D32] mb-3">Practice Tips</h2>
-              <ul className="list-disc pl-6 space-y-2 text-[#1B5E20]">
-                <li>Practice drawing straight lines separately first</li>
-                <li>Use grid paper to keep lines straight</li>
-                <li>Think of the number 7 as an angle bracket</li>
-                <li>Keep the horizontal line level</li>
-                <li>Make sure the diagonal line is steady</li>
+            <div className="bg-zinc-900/80 backdrop-blur-sm rounded-2xl p-4 md:p-6 border border-zinc-700/50 shadow-lg mb-6">
+              <h3 className="text-xl font-bold text-orange-500 mb-4">Practice Tips</h3>
+              <ul className="space-y-4">
+                <li className="flex items-start gap-3">
+                  <span className="text-2xl">🎯</span>
+                  <div>
+                    <h4 className="font-semibold text-orange-400">Follow the Dots</h4>
+                    <p className="text-orange-300">Use the glowing dots as your guide for where to start each stroke.</p>
+                  </div>
+                </li>
+                <li className="flex items-start gap-3">
+                  <span className="text-2xl">🔄</span>
+                  <div>
+                    <h4 className="font-semibold text-orange-400">Practice Order</h4>
+                    <p className="text-orange-300">Always practice the strokes in order: horizontal line first, then diagonal line.</p>
+                  </div>
+                </li>
+                <li className="flex items-start gap-3">
+                  <span className="text-2xl">🏍️</span>
+                  <div>
+                    <h4 className="font-semibold text-orange-400">Count the Motorcycles</h4>
+                    <p className="text-orange-300">Remember that 7 represents seven motorcycles - count them to reinforce the number!</p>
+                  </div>
+                </li>
               </ul>
             </div>
 
             {/* Fun Facts */}
-            <div className="bg-[#E8F5E9] rounded-xl p-4">
-              <h2 className="text-xl font-semibold text-[#2E7D32] mb-3">Fun Facts about Number 7</h2>
-              <ul className="list-disc pl-6 space-y-2 text-[#1B5E20]">
-                <li>There are 7 days in a week</li>
-                <li>A rainbow has 7 colors</li>
-                <li>There are 7 continents on Earth</li>
-                <li>A mango tree can produce fruit for over 7 decades</li>
-                <li>Seven is considered a lucky number in many cultures</li>
+            <div className="bg-zinc-900/80 backdrop-blur-sm rounded-2xl p-4 md:p-6 border border-zinc-700/50 shadow-lg">
+              <h3 className="text-xl font-bold text-orange-500 mb-4">Fun Facts About 7</h3>
+              <ul className="space-y-4">
+                <li className="flex items-start gap-3">
+                  <span className="text-2xl">🌈</span>
+                  <div>
+                    <h4 className="font-semibold text-orange-400">Lucky Number</h4>
+                    <p className="text-orange-300">Seven is considered a lucky number in many cultures!</p>
+                  </div>
+                </li>
+                <li className="flex items-start gap-3">
+                  <span className="text-2xl">📅</span>
+                  <div>
+                    <h4 className="font-semibold text-orange-400">Days of the Week</h4>
+                    <p className="text-orange-300">There are seven days in a week.</p>
+                  </div>
+                </li>
+                <li className="flex items-start gap-3">
+                  <span className="text-2xl">🏍️</span>
+                  <div>
+                    <h4 className="font-semibold text-orange-400">Motorcycle Fun</h4>
+                    <p className="text-orange-300">Count seven motorcycles zooming by - vroom vroom!</p>
+                  </div>
+                </li>
               </ul>
             </div>
           </div>
         </div>
-      </div>
+      </main>
     </div>
   );
 };

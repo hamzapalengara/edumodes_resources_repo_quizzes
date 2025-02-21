@@ -18,9 +18,9 @@ interface ConfettiItem {
 
 export const NUMBER_SEVEN = {
   value: '7',
-  fruit: 'seven',
-  fruitEmoji: '🥭',
-  fruitCount: 7,
+  vehicle: 'seven',
+  vehicleEmoji: '🏍️',
+  vehicleCount: 7,
   viewBox: '0 0 200 200',
   paths: [
     { id: 'horizontal', d: 'M60 40L140 40', order: 1 },
@@ -28,12 +28,12 @@ export const NUMBER_SEVEN = {
   ]
 };
 
-// Modified NUMBER_GRID to include number 7 with mangoes
+// Modified NUMBER_GRID to include number 7 with vehicles
 export const NUMBER_GRID = [
-  '1 🥭', '7 🥭', '3 🍌', '2 🍊', '7 🥭',
-  '3 🍐', '8 🥝', '7 🥭', '4 🥭', '9 🍊',
-  '7 🥭', '2 🍐', '5 🥝', '7 🥭', '1 🥭',
-  '8 🍊', '3 🍐', '7 🥭', '9 🍓', '4 🍓'
+  '1 🚗', '7 🏍️', '3 🚙', '2 🚓', '7 🏍️',
+  '3 🚕', '8 🚗', '7 🏍️', '4 🚙', '9 🚓',
+  '7 🏍️', '2 🚕', '5 🚗', '7 🏍️', '1 🚙',
+  '8 🚓', '7 🏍️', '3 🚕', '7 🏍️', '4 🚗'
 ];
 
 const NumberSevenWorksheet: React.FC = () => {
@@ -141,7 +141,7 @@ const NumberSevenWorksheet: React.FC = () => {
         const handleNumberClick = useCallback((index: number) => {
           if (foundSixes.includes(index)) return;
           
-          if (NUMBER_GRID[index] === '7 🥭') {
+          if (NUMBER_GRID[index] === '7 🏍️') {
             setFoundSixes(prev => [...prev, index]);
             markCorrect();
             speak("Correct! You found a number 7!");
@@ -273,35 +273,35 @@ const NumberSevenWorksheet: React.FC = () => {
         }, [playAnimation]);
 
         return (
-          <div className="min-h-screen bg-gradient-to-br from-[#8BC34A] via-[#4CAF50] to-[#2E7D32] relative overflow-hidden">
+          <div className="min-h-screen bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-900 relative overflow-hidden">
             {/* Decorative background elements */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none">
-              <div className="absolute top-0 left-0 w-64 h-64 bg-gradient-to-br from-[#FFA000]/40 to-[#FFD54F]/40 rounded-full blur-3xl transform -translate-x-1/2 -translate-y-1/2"></div>
-              <div className="absolute top-1/4 right-0 w-96 h-96 bg-gradient-to-bl from-[#81C784]/40 to-[#A5D6A7]/40 rounded-full blur-3xl transform translate-x-1/2 -translate-y-1/2"></div>
-              <div className="absolute bottom-0 left-1/3 w-80 h-80 bg-gradient-to-tr from-[#4FC3F7]/40 to-[#81D4FA]/40 rounded-full blur-3xl transform -translate-x-1/2 translate-y-1/2"></div>
+              <div className="absolute top-0 left-0 w-64 h-64 bg-gradient-to-br from-orange-500/30 to-amber-400/30 rounded-full blur-3xl transform -translate-x-1/2 -translate-y-1/2"></div>
+              <div className="absolute top-1/4 right-0 w-96 h-96 bg-gradient-to-bl from-zinc-700/30 to-zinc-600/30 rounded-full blur-3xl transform translate-x-1/2 -translate-y-1/2"></div>
+              <div className="absolute bottom-0 left-1/3 w-80 h-80 bg-gradient-to-tr from-orange-400/30 to-amber-300/30 rounded-full blur-3xl transform -translate-x-1/2 translate-y-1/2"></div>
             </div>
 
             <WorksheetHeader />
 
             {/* Score and Title Section */}
-            <div className="bg-[#795548]/30 backdrop-blur-md shadow-lg border border-[#8D6E63]/50">
+            <div className="bg-zinc-800/80 backdrop-blur-md shadow-lg border border-zinc-700">
               <div className="max-w-4xl mx-auto px-2 py-2 md:px-4 md:py-3 flex flex-col items-stretch gap-2">
                 <div className="w-full flex justify-center items-center">
                   <ScoreDisplay score={score} totalQuestions={TOTAL_QUESTIONS * 10} />
                 </div>
                 <h2 className="text-xl md:text-2xl lg:text-3xl font-bold text-white text-center">
-                  Number Seven with Mangoes
+                  Number Seven with Motorcycles
                 </h2>
               </div>
             </div>
 
             {/* Main Content */}
             <main className="px-0">
-              <div className="bg-[#4CAF50]/20 backdrop-blur-md p-2 md:p-4 mb-2 md:mb-4 shadow-lg border border-[#81C784]/50">
+              <div className="bg-zinc-800/20 backdrop-blur-md p-2 md:p-4 mb-2 md:mb-4 shadow-lg border border-zinc-700/50">
                 <div className="max-w-4xl mx-auto">
                   {/* Practice Complete Message */}
                   {isCompleted && (
-                    <div className="bg-[#FFA000]/20 border-2 border-[#FFD54F] rounded-xl p-4 mb-4 text-center">
+                    <div className="bg-orange-500/20 border-2 border-orange-400 rounded-xl p-4 mb-4 text-center">
                       <p className="text-white font-semibold">
                         🎉 Congratulations! You've completed all 5 practices! 🎉
                       </p>
@@ -312,20 +312,20 @@ const NumberSevenWorksheet: React.FC = () => {
                   <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 md:gap-6 mb-2 md:mb-4">
                     <div className="text-4xl sm:text-5xl font-bold text-white">{NUMBER_SEVEN.value}</div>
                     <div className="flex flex-wrap justify-center gap-1 items-center max-w-[200px] sm:max-w-none">
-                      {[...Array(NUMBER_SEVEN.fruitCount)].map((_, index) => (
-                        <div key={index} className="text-2xl sm:text-3xl filter drop-shadow-md">{NUMBER_SEVEN.fruitEmoji}</div>
+                      {[...Array(NUMBER_SEVEN.vehicleCount)].map((_, index) => (
+                        <div key={index} className="text-2xl sm:text-3xl filter drop-shadow-md">{NUMBER_SEVEN.vehicleEmoji}</div>
                       ))}
                     </div>
-                    <div className="text-lg sm:text-xl font-medium text-white capitalize">{NUMBER_SEVEN.fruit}</div>
+                    <div className="text-lg sm:text-xl font-medium text-white capitalize">{NUMBER_SEVEN.vehicle}</div>
                   </div>
 
                   {/* Main Content Grid */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
                     {/* Demonstration Section */}
-                    <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-4 md:p-6 border border-[#A5D6A7]/50 shadow-lg">
+                    <div className="bg-zinc-900/80 backdrop-blur-sm rounded-2xl p-4 md:p-6 border border-zinc-700/50 shadow-lg">
                       <div className="text-center mb-4">
-                        <h3 className="text-lg md:text-xl font-bold text-[#2E7D32]">Watch and Learn</h3>
-                        <p className="text-sm text-[#4CAF50]">See how to write number 7</p>
+                        <h3 className="text-lg md:text-xl font-bold text-orange-500">Watch and Learn</h3>
+                        <p className="text-sm text-orange-400">See how to write number 7</p>
                       </div>
 
                       {/* Demonstration SVG */}
@@ -340,7 +340,7 @@ const NumberSevenWorksheet: React.FC = () => {
                               key={`guide-${path.id}`}
                               d={path.d}
                               fill="none"
-                              stroke="rgba(99, 102, 241, 0.2)"
+                              stroke="rgba(234, 88, 12, 0.2)"
                               strokeWidth="24"
                               strokeLinecap="round"
                               strokeLinejoin="round"
@@ -353,7 +353,7 @@ const NumberSevenWorksheet: React.FC = () => {
                               key={`demo-${path.id}`}
                               d={path.d}
                               fill="none"
-                              stroke="#4F46E5"
+                              stroke="#f97316"
                               strokeWidth="24"
                               strokeLinecap="round"
                               strokeLinejoin="round"
@@ -374,7 +374,7 @@ const NumberSevenWorksheet: React.FC = () => {
                             <motion.circle
                               key={`dot-${path.id}`}
                               r="8"
-                              fill="#EC4899"
+                              fill="#f97316"
                               initial={{ offsetDistance: "0%" }}
                               animate={controls}
                               variants={{
@@ -401,8 +401,8 @@ const NumberSevenWorksheet: React.FC = () => {
                             playAnimation();
                           }}
                           disabled={isAnimating}
-                          className={`bg-indigo-500 text-white px-6 py-2 rounded-full text-base font-medium shadow-md flex items-center gap-2 transition-all ${
-                            isAnimating ? 'opacity-50 cursor-not-allowed' : 'hover:bg-indigo-600 hover:shadow-lg transform hover:-translate-y-0.5'
+                          className={`bg-orange-500 text-white px-6 py-2 rounded-full text-base font-medium shadow-md flex items-center gap-2 transition-all ${
+                            isAnimating ? 'opacity-50 cursor-not-allowed' : 'hover:bg-orange-600 hover:shadow-lg transform hover:-translate-y-0.5'
                           }`}
                         >
                           <span className="text-xl">▶️</span>
@@ -412,26 +412,24 @@ const NumberSevenWorksheet: React.FC = () => {
                     </div>
 
                     {/* Tracing Practice Section */}
-                    <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-4 md:p-6 border border-[#A5D6A7]/50 shadow-lg">
+                    <div className="bg-zinc-900/80 backdrop-blur-sm rounded-2xl p-4 md:p-6 border border-zinc-700/50 shadow-lg">
                       <div className="text-center mb-4">
-                        <h3 className="text-lg md:text-xl font-bold text-[#2E7D32]">Your Turn!</h3>
-                        <p className="text-sm text-[#4CAF50] mb-1">Trace the number 7 here</p>
-                        <div className="inline-flex items-center gap-2 bg-[#E8F5E9] px-3 py-1 rounded-full">
-                          <span className="text-sm font-medium text-[#2E7D32]">Practice:</span>
-                          <span className="text-sm font-bold text-[#2E7D32]">{practiceCount} / {REQUIRED_PRACTICES}</span>
+                        <h3 className="text-lg md:text-xl font-bold text-orange-500">Your Turn!</h3>
+                        <p className="text-sm text-orange-400 mb-1">Trace the number 7 here</p>
+                        <div className="inline-flex items-center gap-2 bg-orange-500/20 px-3 py-1 rounded-full">
+                          <span className="text-sm font-medium text-orange-400">Practice:</span>
+                          <span className="text-sm font-bold text-orange-400">{practiceCount} / {REQUIRED_PRACTICES}</span>
                         </div>
                       </div>
 
                       {/* Tracing Area with Touch Control - Increased size */}
                       <div 
-                        className="relative aspect-square max-w-[350px] mx-auto touch-none"
-                        onTouchStart={(e) => e.preventDefault()}
-                        onTouchMove={(e) => e.preventDefault()}
+                        className="relative aspect-square max-w-[350px] mx-auto"
                       >
                         <svg
                           ref={svgRef}
                           viewBox={NUMBER_SEVEN.viewBox}
-                          className="w-full h-full"
+                          className="w-full h-full touch-none"
                           onMouseDown={(e) => { 
                             e.preventDefault();
                             setIsDrawing(true); 
@@ -462,7 +460,7 @@ const NumberSevenWorksheet: React.FC = () => {
                                 <path
                                   d={path.d}
                                   fill="none"
-                                  stroke={isCompletedPath ? "#4F46E5" : "rgba(99, 102, 241, 0.2)"}
+                                  stroke={isCompletedPath ? "#f97316" : "rgba(234, 88, 12, 0.2)"}
                                   strokeWidth="24"
                                   strokeLinecap="round"
                                   strokeLinejoin="round"
@@ -474,7 +472,7 @@ const NumberSevenWorksheet: React.FC = () => {
                                     ref={pathRef}
                                     d={path.d}
                                     fill="none"
-                                    stroke="#4F46E5"
+                                    stroke="#f97316"
                                     strokeWidth="24"
                                     strokeLinecap="round"
                                     strokeLinejoin="round"
@@ -497,7 +495,7 @@ const NumberSevenWorksheet: React.FC = () => {
                                     }}
                                     r="10"
                                     className="animate-pulse"
-                                    fill="#4F46E5"
+                                    fill="#f97316"
                                   />
                                 )}
                               </g>
@@ -508,7 +506,7 @@ const NumberSevenWorksheet: React.FC = () => {
 
                       {/* Instructions */}
                       <div className="mt-4 text-center">
-                        <p className="text-sm font-medium text-indigo-700">
+                        <p className="text-sm font-medium text-orange-400">
                           {currentPathIndex === 0 && "Start with the horizontal line ➡️"}
                           {currentPathIndex === 1 && "Now draw the diagonal line ➡️"}
                           {currentPathIndex >= NUMBER_SEVEN.paths.length && "Great job! Try again! 🎉"}
@@ -518,10 +516,10 @@ const NumberSevenWorksheet: React.FC = () => {
                   </div>
 
                   {/* Number Picking Game Section - Always visible but conditionally active */}
-                  <div className="mt-8 bg-white/80 backdrop-blur-sm rounded-2xl p-4 md:p-6 border border-[#A5D6A7]/50 shadow-lg relative">
+                  <div className="mt-8 bg-zinc-900/80 backdrop-blur-sm rounded-2xl p-4 md:p-6 border border-zinc-700/50 shadow-lg relative">
                     {/* Locked Overlay - Show when not completed tracing */}
                     {!isCompleted && (
-                      <div className="absolute inset-0 bg-[#4CAF50]/30 backdrop-blur-[2px] rounded-2xl flex flex-col items-center justify-center z-10">
+                      <div className="absolute inset-0 bg-zinc-900/80 backdrop-blur-[2px] rounded-2xl flex flex-col items-center justify-center z-10">
                         <div className="text-4xl mb-2">🔒</div>
                         <p className="text-white font-semibold text-center px-4">
                           Complete {REQUIRED_PRACTICES} tracing practices to unlock!
@@ -534,11 +532,11 @@ const NumberSevenWorksheet: React.FC = () => {
                     )}
 
                     <div className="text-center mb-4">
-                      <h3 className="text-lg md:text-xl font-bold text-[#2E7D32]">Find the Number 7s!</h3>
-                      <p className="text-sm text-[#4CAF50] mb-2">Click on all the number 7s you can find</p>
-                      <div className="inline-flex items-center gap-2 bg-[#E8F5E9] px-3 py-1 rounded-full">
-                        <span className="text-sm font-medium text-[#2E7D32]">Found:</span>
-                        <span className="text-sm font-bold text-[#2E7D32]">{foundSixes.length} / 7</span>
+                      <h3 className="text-lg md:text-xl font-bold text-orange-500">Find the Number 7s!</h3>
+                      <p className="text-sm text-orange-400 mb-2">Click on all the number 7s you can find</p>
+                      <div className="inline-flex items-center gap-2 bg-orange-500/20 px-3 py-1 rounded-full">
+                        <span className="text-sm font-medium text-orange-400">Found:</span>
+                        <span className="text-sm font-bold text-orange-400">{foundSixes.length} / 7</span>
                       </div>
                     </div>
 
@@ -553,10 +551,10 @@ const NumberSevenWorksheet: React.FC = () => {
                             aspect-square w-full text-xl font-bold rounded-lg
                             flex items-center justify-center transition-all
                             ${foundSixes.includes(index)
-                              ? 'bg-[#4CAF50] text-white cursor-not-allowed'
+                              ? 'bg-orange-500 text-white cursor-not-allowed'
                               : isCompleted
-                                ? 'bg-white hover:bg-[#E8F5E9] active:bg-[#C8E6C9] text-[#2E7D32]'
-                                : 'bg-white/50 text-[#2E7D32]/50 cursor-not-allowed'
+                                ? 'bg-zinc-800 hover:bg-orange-500/20 active:bg-orange-500/30 text-orange-400'
+                                : 'bg-zinc-800/50 text-orange-400/50 cursor-not-allowed'
                             }
                           `}
                         >
@@ -567,7 +565,7 @@ const NumberSevenWorksheet: React.FC = () => {
 
                     {foundSixes.length === 7 && (
                       <div className="mt-4 text-center">
-                        <p className="text-green-600 font-semibold">
+                        <p className="text-orange-400 font-semibold">
                           🎉 Fantastic! You've found all the number 7s! 🎉
                         </p>
                       </div>
@@ -608,7 +606,7 @@ const NumberSevenWorksheet: React.FC = () => {
                               fontWeight: 'bold',
                             }}
                           >
-                            {item.type === 'emoji' ? NUMBER_SEVEN.fruitEmoji : NUMBER_SEVEN.value}
+                            {item.type === 'emoji' ? NUMBER_SEVEN.vehicleEmoji : NUMBER_SEVEN.value}
                           </motion.div>
                         ))}
                       </div>
@@ -620,7 +618,7 @@ const NumberSevenWorksheet: React.FC = () => {
                     <div className="flex justify-center mt-4">
                       <button
                         disabled
-                        className="px-6 py-2 rounded-full bg-green-500 text-white text-base font-semibold flex items-center gap-2 shadow-md opacity-50 cursor-not-allowed"
+                        className="px-6 py-2 rounded-full bg-orange-500 text-white text-base font-semibold flex items-center gap-2 shadow-md opacity-50 cursor-not-allowed"
                       >
                         <span className="text-xl">🌟</span>
                         All Practices Complete!
