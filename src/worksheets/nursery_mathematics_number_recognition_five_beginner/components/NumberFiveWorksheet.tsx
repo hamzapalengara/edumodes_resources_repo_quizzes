@@ -37,6 +37,16 @@ const NUMBER_GRID = [
   '8 🍊', '3 🍐', '6 🍌', '9 🍇', '4 🍓'
 ];
 
+// Add presetColors constant after the NUMBER_GRID definition
+const presetColors = [
+  { color: '#0EA5E9', name: 'Blue' },    // Cyan-500
+  { color: '#22C55E', name: 'Green' },   // Green-500
+  { color: '#EF4444', name: 'Red' },     // Red-500
+  { color: '#F59E0B', name: 'Orange' },  // Amber-500
+  { color: '#6366F1', name: 'Indigo' },  // Indigo-500
+  { color: '#EC4899', name: 'Pink' },    // Pink-500
+] as const;
+
 const NumberFiveWorksheet: React.FC = () => {
   // Handle summary generation
   const handleSummaryGenerated = (summary: WorksheetSummary) => {
@@ -62,6 +72,7 @@ const NumberFiveWorksheet: React.FC = () => {
         const [practiceCount, setPracticeCount] = useState(0);
         const [isCompleted, setIsCompleted] = useState(false);
         const [foundFives, setFoundFives] = useState<number[]>([]);
+        const [currentColor, setCurrentColor] = useState('#22d3ee'); // Add color state
 
         // Refs
         const svgRef = useRef<SVGSVGElement>(null);
@@ -427,89 +438,114 @@ const NumberFiveWorksheet: React.FC = () => {
                       </div>
 
                       {/* Tracing Area with Touch Control - Increased size */}
-                      <div 
-                        className="relative aspect-square max-w-[350px] mx-auto touch-none"
-                        onTouchStart={(e) => e.preventDefault()}
-                        onTouchMove={(e) => e.preventDefault()}
-                      >
-                        <svg
-                          ref={svgRef}
-                          viewBox={NUMBER_FIVE.viewBox}
-                          className="w-full h-full"
-                          onMouseDown={(e) => { 
-                            e.preventDefault();
-                            setIsDrawing(true); 
-                            markAttempted(); 
-                          }}
-                          onMouseUp={() => setIsDrawing(false)}
-                          onMouseLeave={() => setIsDrawing(false)}
-                          onTouchStart={(e) => { 
-                            e.preventDefault();
-                            setIsDrawing(true); 
-                            markAttempted(); 
-                          }}
-                          onTouchEnd={(e) => {
-                            e.preventDefault();
-                            setIsDrawing(false);
-                          }}
-                          onMouseMove={handleDrawing}
-                          onTouchMove={handleDrawing}
-                        >
-                          {/* Background decoration */}
-                          <circle cx="100" cy="100" r="80" fill="rgba(99, 102, 241, 0.1)" />
-                          
-                          {NUMBER_FIVE.paths.map((path, index) => {
-                            const isCurrentPath = index === currentPathIndex;
-                            const isCompletedPath = filledPaths.includes(path.id);
+                      <div className="relative flex items-start gap-4">
+                        {/* SVG Container */}
+                        <div className="relative flex-grow">
+                          <svg
+                            ref={svgRef}
+                            viewBox={NUMBER_FIVE.viewBox}
+                            className="w-full max-w-[300px] mx-auto touch-none"
+                            onMouseDown={(e) => { 
+                              e.preventDefault();
+                              setIsDrawing(true); 
+                              markAttempted(); 
+                            }}
+                            onMouseUp={() => setIsDrawing(false)}
+                            onMouseLeave={() => setIsDrawing(false)}
+                            onTouchStart={(e) => { 
+                              e.preventDefault();
+                              setIsDrawing(true); 
+                              markAttempted(); 
+                            }}
+                            onTouchEnd={(e) => {
+                              e.preventDefault();
+                              setIsDrawing(false);
+                            }}
+                            onMouseMove={handleDrawing}
+                            onTouchMove={handleDrawing}
+                          >
+                            {/* Background decoration */}
+                            <circle cx="100" cy="100" r="80" fill="rgba(99, 102, 241, 0.1)" />
                             
-                            return (
-                              <g key={path.id}>
-                                {/* Guide Path */}
-                                <path
-                                  d={path.d}
-                                  fill="none"
-                                  stroke={isCompletedPath ? "#4F46E5" : "rgba(99, 102, 241, 0.2)"}
-                                  strokeWidth="24"
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                />
-                                
-                                {/* Active Path */}
-                                {isCurrentPath && (
+                            {NUMBER_FIVE.paths.map((path, index) => {
+                              const isCurrentPath = index === currentPathIndex;
+                              const isCompletedPath = filledPaths.includes(path.id);
+                              
+                              return (
+                                <g key={path.id}>
+                                  {/* Guide Path */}
                                   <path
-                                    ref={pathRef}
                                     d={path.d}
                                     fill="none"
-                                    stroke="#4F46E5"
+                                    stroke={isCompletedPath ? currentColor : "rgba(99, 102, 241, 0.2)"}
                                     strokeWidth="24"
                                     strokeLinecap="round"
                                     strokeLinejoin="round"
-                                    strokeDasharray={pathLengths[path.id] || 0}
-                                    strokeDashoffset={pathLengths[path.id] ? pathLengths[path.id] - (pathLengths[path.id] * progress / 100) : 0}
                                   />
-                                )}
-                                
-                                {/* Start point */}
-                                {isCurrentPath && (
-                                  <circle
-                                    ref={el => {
-                                      if (el) {
-                                        const pathElement = document.createElementNS("http://www.w3.org/2000/svg", "path");
-                                        pathElement.setAttribute("d", path.d);
-                                        const point = pathElement.getPointAtLength(lastPoint);
-                                        el.setAttribute('cx', point.x.toString());
-                                        el.setAttribute('cy', point.y.toString());
-                                      }
-                                    }}
-                                    r="10"
-                                    className="animate-pulse"
-                                    fill="#4F46E5"
-                                  />
-                                )}
-                              </g>
-                            );
-                          })}
-                        </svg>
+
+                                  {/* Active Path */}
+                                  {isCurrentPath && (
+                                    <path
+                                      ref={pathRef}
+                                      d={path.d}
+                                      fill="none"
+                                      stroke={currentColor}
+                                      strokeWidth="24"
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      strokeDasharray={pathLengths[path.id] || 0}
+                                      strokeDashoffset={pathLengths[path.id] ? pathLengths[path.id] - (pathLengths[path.id] * progress / 100) : 0}
+                                    />
+                                  )}
+                                  
+                                  {/* Start point */}
+                                  {isCurrentPath && (
+                                    <circle
+                                      ref={el => {
+                                        if (el) {
+                                          const pathElement = document.createElementNS("http://www.w3.org/2000/svg", "path");
+                                          pathElement.setAttribute("d", path.d);
+                                          const point = pathElement.getPointAtLength(lastPoint);
+                                          el.setAttribute('cx', point.x.toString());
+                                          el.setAttribute('cy', point.y.toString());
+                                        }
+                                      }}
+                                      r="10"
+                                      className="animate-pulse"
+                                      fill={currentColor}
+                                    />
+                                  )}
+                                </g>
+                              );
+                            })}
+                          </svg>
+
+                          {/* Retry Button */}
+                          <button
+                            onClick={handleRetry}
+                            className="absolute top-2 right-2 bg-white rounded-full p-2 shadow-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                            aria-label="Retry"
+                          >
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                            </svg>
+                          </button>
+                        </div>
+
+                        {/* Color Picker - Right Side */}
+                        <div className="w-12 flex flex-col gap-2">
+                          {presetColors.map(({ color, name }) => (
+                            <button
+                              key={color}
+                              className={`w-8 h-8 rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+                                currentColor === color ? 'ring-2 ring-offset-2 ring-blue-500' : ''
+                              }`}
+                              style={{ backgroundColor: color }}
+                              onClick={() => setCurrentColor(color)}
+                              aria-label={`Select ${name}`}
+                            />
+                          ))}
+                        </div>
                       </div>
 
                       {/* Instructions */}
