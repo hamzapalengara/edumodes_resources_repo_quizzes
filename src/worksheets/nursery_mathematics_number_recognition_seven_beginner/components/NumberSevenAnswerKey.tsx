@@ -1,8 +1,8 @@
 import React from 'react';
 import WorksheetHeader from '../../../components/shared/layout/Header/WorksheetHeader';
-import { NUMBER_SIX, NUMBER_GRID } from './NumberSixWorksheet';
+import { NUMBER_SEVEN, NUMBER_GRID } from './NumberSevenWorksheet';
 
-const NumberSixAnswerKey: React.FC = () => {
+const NumberSevenAnswerKey: React.FC = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#8BC34A] via-[#4CAF50] to-[#2E7D32] relative overflow-hidden">
       {/* Decorative background elements */}
@@ -17,7 +17,7 @@ const NumberSixAnswerKey: React.FC = () => {
       {/* Title Section */}
       <div className="bg-[#795548]/30 backdrop-blur-md shadow-lg border border-[#8D6E63]/50">
         <h2 className="text-2xl md:text-3xl font-bold text-white text-center py-3">
-          Number Six with Mangoes
+          Number Seven with Mangoes
         </h2>
       </div>
 
@@ -25,16 +25,16 @@ const NumberSixAnswerKey: React.FC = () => {
       <main className="px-0">
         <div className="bg-[#4CAF50]/20 backdrop-blur-md p-2 md:p-4 mb-2 md:mb-4 shadow-lg border border-[#81C784]/50">
           <div className="max-w-4xl mx-auto">
-            <h3 className="text-lg md:text-xl font-bold text-white mb-2 md:mb-4">Number 6 Tracing Guide</h3>
+            <h3 className="text-lg md:text-xl font-bold text-white mb-2 md:mb-4">Number 7 Tracing Guide</h3>
             
             <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-4 md:p-6 border border-[#A5D6A7]/50 shadow-lg">
               {/* Number Display */}
               <div className="flex flex-col sm:flex-row items-center gap-4 mb-6">
-                <span className="text-5xl md:text-6xl font-bold text-[#2E7D32]">{NUMBER_SIX.value}</span>
+                <span className="text-5xl md:text-6xl font-bold text-[#2E7D32]">{NUMBER_SEVEN.value}</span>
                 <div className="flex gap-2">
-                  {[...Array(NUMBER_SIX.fruitCount)].map((_, index) => (
+                  {[...Array(NUMBER_SEVEN.fruitCount)].map((_, index) => (
                     <span key={index} className="text-3xl md:text-4xl filter drop-shadow-md">
-                      {NUMBER_SIX.fruitEmoji}
+                      {NUMBER_SEVEN.fruitEmoji}
                     </span>
                   ))}
                 </div>
@@ -44,11 +44,11 @@ const NumberSixAnswerKey: React.FC = () => {
               <div className="mb-6">
                 <h4 className="text-base md:text-lg font-semibold text-[#2E7D32] mb-3">Correct Stroke Order</h4>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-4">
-                  {NUMBER_SIX.paths.map((path, index) => (
+                  {NUMBER_SEVEN.paths.map((path, index) => (
                     <div key={path.id} className="bg-[#E8F5E9] p-2 md:p-4 rounded-lg">
                       <div className="aspect-square relative">
-                        <svg viewBox={NUMBER_SIX.viewBox} className="w-full h-full">
-                          {NUMBER_SIX.paths.map((guidePath) => (
+                        <svg viewBox={NUMBER_SEVEN.viewBox} className="w-full h-full">
+                          {NUMBER_SEVEN.paths.map((guidePath) => (
                             <path
                               key={`guide-${guidePath.id}`}
                               d={guidePath.d}
@@ -59,7 +59,7 @@ const NumberSixAnswerKey: React.FC = () => {
                               strokeLinejoin="round"
                             />
                           ))}
-                          {NUMBER_SIX.paths.slice(0, index + 1).map((activePath) => (
+                          {NUMBER_SEVEN.paths.slice(0, index + 1).map((activePath) => (
                             <path
                               key={`active-${activePath.id}`}
                               d={activePath.d}
@@ -73,8 +73,8 @@ const NumberSixAnswerKey: React.FC = () => {
                         </svg>
                       </div>
                       <p className="text-center mt-2 font-medium text-[#2E7D32]">
-                        {index === 0 && "Step 1: Draw the curved line down"}
-                        {index === 1 && "Step 2: Draw the circle at the bottom"}
+                        {index === 0 && "Step 1: Draw the horizontal line"}
+                        {index === 1 && "Step 2: Draw the diagonal line down"}
                       </p>
                     </div>
                   ))}
@@ -92,15 +92,15 @@ const NumberSixAnswerKey: React.FC = () => {
                 </li>
                 <li className="flex items-center gap-2">
                   <span className="text-xl md:text-2xl">📏</span>
-                  <span>Keep your lines smooth and steady.</span>
+                  <span>Keep your lines straight and steady.</span>
                 </li>
                 <li className="flex items-center gap-2">
                   <span className="text-xl md:text-2xl">🔄</span>
-                  <span>Practice each stroke until you're comfortable before moving to the next.</span>
+                  <span>Complete the horizontal line before drawing the diagonal.</span>
                 </li>
                 <li className="flex items-center gap-2">
                   <span className="text-xl md:text-2xl">🥭</span>
-                  <span>Remember: The number 6 represents six mangoes!</span>
+                  <span>Remember: The number 7 represents seven mangoes!</span>
                 </li>
               </ul>
             </div>
@@ -108,13 +108,13 @@ const NumberSixAnswerKey: React.FC = () => {
             {/* Number Grid Answers */}
             <div className="mt-8 bg-white/80 backdrop-blur-sm rounded-2xl p-4 md:p-6 border border-[#A5D6A7]/50 shadow-lg">
               <h5 className="text-xl font-semibold text-[#2E7D32] mb-3">Number Finding Game Answers</h5>
-              <p className="mb-4 text-[#1B5E20]">There are 6 number sixes in the grid:</p>
+              <p className="mb-4 text-[#1B5E20]">There are 7 number sevens in the grid:</p>
               <div className="grid grid-cols-4 gap-0.5 md:gap-2 w-full max-w-sm mx-auto bg-[#E8F5E9] p-2 rounded-lg">
                 {NUMBER_GRID.map((item: string, index: number) => (
                   <div
                     key={index}
                     className={`w-full aspect-square flex items-center justify-center text-xl font-bold rounded-lg
-                      ${item === '6 🥭' ? 'bg-[#4CAF50] text-white' : 'bg-white text-[#2E7D32]'}`}
+                      ${item === '7 🥭' ? 'bg-[#4CAF50] text-white' : 'bg-white text-[#2E7D32]'}`}
                   >
                     {item}
                   </div>
@@ -124,13 +124,13 @@ const NumberSixAnswerKey: React.FC = () => {
 
             {/* Tips */}
             <div className="mt-8 bg-white/80 backdrop-blur-sm rounded-2xl p-4 md:p-6 border border-[#A5D6A7]/50 shadow-lg">
-              <h5 className="text-xl font-semibold text-[#2E7D32] mb-3">Tips for Writing Number 6</h5>
+              <h5 className="text-xl font-semibold text-[#2E7D32] mb-3">Tips for Writing Number 7</h5>
               <ul className="list-disc pl-6 space-y-2 text-[#1B5E20]">
-                <li>Start from the top with a smooth curved line going down</li>
-                <li>Complete with a circle at the bottom that connects smoothly</li>
-                <li>Make sure the circle is proportional to the curved line</li>
-                <li>Keep the connection point between the curve and circle smooth</li>
-                <li>Practice the fluid motion of both strokes</li>
+                <li>Start with a straight horizontal line at the top</li>
+                <li>Draw the diagonal line from right to left</li>
+                <li>Keep the diagonal line straight and steady</li>
+                <li>Make sure the horizontal line is level</li>
+                <li>Practice the angle of the diagonal line</li>
               </ul>
             </div>
           </div>
@@ -140,4 +140,4 @@ const NumberSixAnswerKey: React.FC = () => {
   );
 };
 
-export default NumberSixAnswerKey; 
+export default NumberSevenAnswerKey; 

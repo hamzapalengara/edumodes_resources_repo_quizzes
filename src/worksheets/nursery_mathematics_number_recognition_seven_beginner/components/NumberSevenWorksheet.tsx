@@ -16,27 +16,27 @@ interface ConfettiItem {
   type: 'emoji' | 'number';
 }
 
-export const NUMBER_SIX = {
-  value: '6',
-  fruit: 'six',
+export const NUMBER_SEVEN = {
+  value: '7',
+  fruit: 'seven',
   fruitEmoji: '🥭',
-  fruitCount: 6,
+  fruitCount: 7,
   viewBox: '0 0 200 200',
   paths: [
-    { id: 'curve_down', d: 'M90 40C95 40 95 45 90 50C85 60 75 90 70 140', order: 1 },
-    { id: 'circle', d: 'M70 140C70 170 85 180 100 180S130 170 130 140C130 110 115 100 100 100C85 100 70 110 70 140', order: 2 }
+    { id: 'horizontal', d: 'M60 40L140 40', order: 1 },
+    { id: 'diagonal', d: 'M140 40L80 180', order: 2 }
   ]
 };
 
-// Modified NUMBER_GRID to include number 6 with mangoes
+// Modified NUMBER_GRID to include number 7 with mangoes
 export const NUMBER_GRID = [
-  '1 🥭', '6 🥭', '7 🍌', '2 🍊', '6 🥭',
-  '3 🍐', '8 🥝', '6 🥭', '4 🥭', '9 🍊',
-  '6 🥭', '2 🍐', '7 🥝', '6 🥭', '1 🥭',
-  '8 🍊', '3 🍐', '6 🥭', '9 ��', '4 🍓'
+  '1 🥭', '7 🥭', '3 🍌', '2 🍊', '7 🥭',
+  '3 🍐', '8 🥝', '7 🥭', '4 🥭', '9 🍊',
+  '7 🥭', '2 🍐', '5 🥝', '7 🥭', '1 🥭',
+  '8 🍊', '3 🍐', '7 🥭', '9 🍓', '4 🍓'
 ];
 
-const NumberSixWorksheet: React.FC = () => {
+const NumberSevenWorksheet: React.FC = () => {
   // Handle summary generation
   const handleSummaryGenerated = (summary: WorksheetSummary) => {
     console.log('Worksheet Summary:', summary);
@@ -91,21 +91,21 @@ const NumberSixWorksheet: React.FC = () => {
           setLastValidPoint(null);
           setShowSuccess(false);
           setConfetti([]);
-          speak("Let's trace the number 6 again");
+          speak("Let's trace the number 7 again");
         }, [speak, practiceCount]);
 
         // Modify handlePathComplete to show picking game after tracing
         const handlePathComplete = useCallback(() => {
-          const currentPath = NUMBER_SIX.paths[currentPathIndex];
+          const currentPath = NUMBER_SEVEN.paths[currentPathIndex];
           if (currentPath && !filledPaths.includes(currentPath.id)) {
             setFilledPaths(prev => [...prev, currentPath.id]);
             
-            if (currentPathIndex < NUMBER_SIX.paths.length - 1) {
+            if (currentPathIndex < NUMBER_SEVEN.paths.length - 1) {
               setCurrentPathIndex(prev => prev + 1);
               setLastPoint(0);
               setProgress(0);
               setLastValidPoint(null);
-              speak("Number 6. Let's trace the next part.");
+              speak("Number 7. Let's trace the next part.");
             } else {
               setShowSuccess(true);
               const newPracticeCount = practiceCount + 1;
@@ -117,9 +117,9 @@ const NumberSixWorksheet: React.FC = () => {
               }
 
               if (newPracticeCount < REQUIRED_PRACTICES) {
-                speak(`Number 6! You've completed it ${newPracticeCount} time${newPracticeCount > 1 ? 's' : ''}. ${REQUIRED_PRACTICES - newPracticeCount} more to go!`);
+                speak(`Number 7! You've completed it ${newPracticeCount} time${newPracticeCount > 1 ? 's' : ''}. ${REQUIRED_PRACTICES - newPracticeCount} more to go!`);
               } else {
-                speak("Number 6! You've completed all five practices! Now let's find all the number sixes in the grid below!");
+                speak("Number 7! You've completed all five practices! Now let's find all the number sevens in the grid below!");
                 setIsCompleted(true);
               }
               
@@ -141,16 +141,16 @@ const NumberSixWorksheet: React.FC = () => {
         const handleNumberClick = useCallback((index: number) => {
           if (foundSixes.includes(index)) return;
           
-          if (NUMBER_GRID[index] === '6 🥭') {
+          if (NUMBER_GRID[index] === '7 🥭') {
             setFoundSixes(prev => [...prev, index]);
             markCorrect();
-            speak("Correct! You found a number 6!");
+            speak("Correct! You found a number 7!");
             
-            if (foundSixes.length + 1 === 6) {
-              speak("Amazing! You've found all the number sixes!");
+            if (foundSixes.length + 1 === 7) {
+              speak("Amazing! You've found all the number sevens!");
             }
           } else {
-            speak("That's not a 6, try again!");
+            speak("That's not a 7, try again!");
           }
         }, [foundSixes, markCorrect, speak]);
 
@@ -172,18 +172,18 @@ const NumberSixWorksheet: React.FC = () => {
 
         // Calculate path length
         useEffect(() => {
-          if (pathRef.current && NUMBER_SIX.paths[currentPathIndex]?.id) {
+          if (pathRef.current && NUMBER_SEVEN.paths[currentPathIndex]?.id) {
             const length = pathRef.current.getTotalLength();
             setPathLengths(prev => ({
               ...prev,
-              [NUMBER_SIX.paths[currentPathIndex].id]: length
+              [NUMBER_SEVEN.paths[currentPathIndex].id]: length
             }));
           }
         }, [currentPathIndex]);
 
         // Initial instruction
         useEffect(() => {
-          speak("Let's trace the number 6");
+          speak("Let's trace the number 7");
         }, [speak]);
 
         // Find closest point on path
@@ -259,7 +259,7 @@ const NumberSixWorksheet: React.FC = () => {
           setIsAnimating(true);
           
           // Play each stroke in sequence
-          for (let i = 0; i < NUMBER_SIX.paths.length; i++) {
+          for (let i = 0; i < NUMBER_SEVEN.paths.length; i++) {
             await controls.start(`stroke${i}`);
             await new Promise(resolve => setTimeout(resolve, 500)); // Pause between strokes
           }
@@ -290,7 +290,7 @@ const NumberSixWorksheet: React.FC = () => {
                   <ScoreDisplay score={score} totalQuestions={TOTAL_QUESTIONS * 10} />
                 </div>
                 <h2 className="text-xl md:text-2xl lg:text-3xl font-bold text-white text-center">
-                  Number Six with Mangoes
+                  Number Seven with Mangoes
                 </h2>
               </div>
             </div>
@@ -310,13 +310,13 @@ const NumberSixWorksheet: React.FC = () => {
 
                   {/* Number Display */}
                   <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 md:gap-6 mb-2 md:mb-4">
-                    <div className="text-4xl sm:text-5xl font-bold text-white">{NUMBER_SIX.value}</div>
+                    <div className="text-4xl sm:text-5xl font-bold text-white">{NUMBER_SEVEN.value}</div>
                     <div className="flex flex-wrap justify-center gap-1 items-center max-w-[200px] sm:max-w-none">
-                      {[...Array(NUMBER_SIX.fruitCount)].map((_, index) => (
-                        <div key={index} className="text-2xl sm:text-3xl filter drop-shadow-md">{NUMBER_SIX.fruitEmoji}</div>
+                      {[...Array(NUMBER_SEVEN.fruitCount)].map((_, index) => (
+                        <div key={index} className="text-2xl sm:text-3xl filter drop-shadow-md">{NUMBER_SEVEN.fruitEmoji}</div>
                       ))}
                     </div>
-                    <div className="text-lg sm:text-xl font-medium text-white capitalize">{NUMBER_SIX.fruit}</div>
+                    <div className="text-lg sm:text-xl font-medium text-white capitalize">{NUMBER_SEVEN.fruit}</div>
                   </div>
 
                   {/* Main Content Grid */}
@@ -325,17 +325,17 @@ const NumberSixWorksheet: React.FC = () => {
                     <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-4 md:p-6 border border-[#A5D6A7]/50 shadow-lg">
                       <div className="text-center mb-4">
                         <h3 className="text-lg md:text-xl font-bold text-[#2E7D32]">Watch and Learn</h3>
-                        <p className="text-sm text-[#4CAF50]">See how to write number 6</p>
+                        <p className="text-sm text-[#4CAF50]">See how to write number 7</p>
                       </div>
 
                       {/* Demonstration SVG */}
                       <div className="relative aspect-square max-w-[250px] mx-auto">
                         <svg
-                          viewBox={NUMBER_SIX.viewBox}
+                          viewBox={NUMBER_SEVEN.viewBox}
                           className="w-full h-full"
                         >
                           {/* Guide paths */}
-                          {NUMBER_SIX.paths.map((path) => (
+                          {NUMBER_SEVEN.paths.map((path) => (
                             <path
                               key={`guide-${path.id}`}
                               d={path.d}
@@ -348,7 +348,7 @@ const NumberSixWorksheet: React.FC = () => {
                           ))}
                           
                           {/* Animated paths */}
-                          {NUMBER_SIX.paths.map((path, index) => (
+                          {NUMBER_SEVEN.paths.map((path, index) => (
                             <motion.path
                               key={`demo-${path.id}`}
                               d={path.d}
@@ -370,7 +370,7 @@ const NumberSixWorksheet: React.FC = () => {
                           ))}
                           
                           {/* Moving dot */}
-                          {NUMBER_SIX.paths.map((path, index) => (
+                          {NUMBER_SEVEN.paths.map((path, index) => (
                             <motion.circle
                               key={`dot-${path.id}`}
                               r="8"
@@ -415,7 +415,7 @@ const NumberSixWorksheet: React.FC = () => {
                     <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-4 md:p-6 border border-[#A5D6A7]/50 shadow-lg">
                       <div className="text-center mb-4">
                         <h3 className="text-lg md:text-xl font-bold text-[#2E7D32]">Your Turn!</h3>
-                        <p className="text-sm text-[#4CAF50] mb-1">Trace the number 6 here</p>
+                        <p className="text-sm text-[#4CAF50] mb-1">Trace the number 7 here</p>
                         <div className="inline-flex items-center gap-2 bg-[#E8F5E9] px-3 py-1 rounded-full">
                           <span className="text-sm font-medium text-[#2E7D32]">Practice:</span>
                           <span className="text-sm font-bold text-[#2E7D32]">{practiceCount} / {REQUIRED_PRACTICES}</span>
@@ -430,7 +430,7 @@ const NumberSixWorksheet: React.FC = () => {
                       >
                         <svg
                           ref={svgRef}
-                          viewBox={NUMBER_SIX.viewBox}
+                          viewBox={NUMBER_SEVEN.viewBox}
                           className="w-full h-full"
                           onMouseDown={(e) => { 
                             e.preventDefault();
@@ -452,7 +452,7 @@ const NumberSixWorksheet: React.FC = () => {
                           onTouchMove={handleDrawing}
                         >
                           {/* Guide paths */}
-                          {NUMBER_SIX.paths.map((path, index) => {
+                          {NUMBER_SEVEN.paths.map((path, index) => {
                             const isCurrentPath = index === currentPathIndex;
                             const isCompletedPath = filledPaths.includes(path.id);
                             
@@ -509,9 +509,9 @@ const NumberSixWorksheet: React.FC = () => {
                       {/* Instructions */}
                       <div className="mt-4 text-center">
                         <p className="text-sm font-medium text-indigo-700">
-                          {currentPathIndex === 0 && "Start with the curved line down ➡️"}
-                          {currentPathIndex === 1 && "Now draw the circle at the bottom ⭕"}
-                          {currentPathIndex >= NUMBER_SIX.paths.length && "Great job! Try again! 🎉"}
+                          {currentPathIndex === 0 && "Start with the horizontal line ➡️"}
+                          {currentPathIndex === 1 && "Now draw the diagonal line ➡️"}
+                          {currentPathIndex >= NUMBER_SEVEN.paths.length && "Great job! Try again! 🎉"}
                         </p>
                       </div>
                     </div>
@@ -534,11 +534,11 @@ const NumberSixWorksheet: React.FC = () => {
                     )}
 
                     <div className="text-center mb-4">
-                      <h3 className="text-lg md:text-xl font-bold text-[#2E7D32]">Find the Number 6s!</h3>
-                      <p className="text-sm text-[#4CAF50] mb-2">Click on all the number 6s you can find</p>
+                      <h3 className="text-lg md:text-xl font-bold text-[#2E7D32]">Find the Number 7s!</h3>
+                      <p className="text-sm text-[#4CAF50] mb-2">Click on all the number 7s you can find</p>
                       <div className="inline-flex items-center gap-2 bg-[#E8F5E9] px-3 py-1 rounded-full">
                         <span className="text-sm font-medium text-[#2E7D32]">Found:</span>
-                        <span className="text-sm font-bold text-[#2E7D32]">{foundSixes.length} / 6</span>
+                        <span className="text-sm font-bold text-[#2E7D32]">{foundSixes.length} / 7</span>
                       </div>
                     </div>
 
@@ -565,10 +565,10 @@ const NumberSixWorksheet: React.FC = () => {
                       ))}
                     </div>
 
-                    {foundSixes.length === 6 && (
+                    {foundSixes.length === 7 && (
                       <div className="mt-4 text-center">
                         <p className="text-green-600 font-semibold">
-                          🎉 Fantastic! You've found all the number 6s! 🎉
+                          🎉 Fantastic! You've found all the number 7s! 🎉
                         </p>
                       </div>
                     )}
@@ -608,7 +608,7 @@ const NumberSixWorksheet: React.FC = () => {
                               fontWeight: 'bold',
                             }}
                           >
-                            {item.type === 'emoji' ? NUMBER_SIX.fruitEmoji : NUMBER_SIX.value}
+                            {item.type === 'emoji' ? NUMBER_SEVEN.fruitEmoji : NUMBER_SEVEN.value}
                           </motion.div>
                         ))}
                       </div>
@@ -637,4 +637,4 @@ const NumberSixWorksheet: React.FC = () => {
   );
 };
 
-export default NumberSixWorksheet; 
+export default NumberSevenWorksheet; 

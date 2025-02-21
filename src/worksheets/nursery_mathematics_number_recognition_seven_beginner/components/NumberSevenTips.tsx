@@ -1,7 +1,7 @@
 import React from 'react';
-import { NUMBER_SIX } from './NumberSixWorksheet';
+import { NUMBER_SEVEN } from './NumberSevenWorksheet';
 
-const NumberSixTips: React.FC = () => {
+const NumberSevenTips: React.FC = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#8BC34A] via-[#4CAF50] to-[#2E7D32] relative overflow-hidden">
       {/* Decorative background elements */}
@@ -14,14 +14,14 @@ const NumberSixTips: React.FC = () => {
       <div className="px-0 md:px-4 w-full">
         <div className="max-w-4xl mx-auto">
           <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-4 md:p-6 border border-[#A5D6A7]/50 shadow-lg">
-            <h1 className="text-2xl font-bold text-center text-[#2E7D32] mb-4">Tips for Writing Number 6</h1>
+            <h1 className="text-2xl font-bold text-center text-[#2E7D32] mb-4">Tips for Writing Number 7</h1>
 
             {/* Visual Example */}
             <div className="mb-6">
               <h2 className="text-xl font-semibold text-[#2E7D32] mb-3">Visual Guide</h2>
               <div className="aspect-square relative max-w-sm mx-auto">
-                <svg viewBox={NUMBER_SIX.viewBox} className="w-full h-full">
-                  {NUMBER_SIX.paths.map((path) => (
+                <svg viewBox={NUMBER_SEVEN.viewBox} className="w-full h-full">
+                  {NUMBER_SEVEN.paths.map((path) => (
                     <g key={path.id}>
                       <path
                         d={path.d}
@@ -53,15 +53,15 @@ const NumberSixTips: React.FC = () => {
                 <li className="flex items-start gap-2">
                   <span className="text-[#4CAF50] font-bold">1.</span>
                   <div>
-                    <p className="font-medium text-[#2E7D32]">Start with the Curved Line</p>
-                    <p className="text-[#1B5E20]">Begin from the top and curve down to the left in a smooth motion.</p>
+                    <p className="font-medium text-[#2E7D32]">Start with the Horizontal Line</p>
+                    <p className="text-[#1B5E20]">Draw a straight line from left to right at the top.</p>
                   </div>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-[#4CAF50] font-bold">2.</span>
                   <div>
-                    <p className="font-medium text-[#2E7D32]">Complete the Circle</p>
-                    <p className="text-[#1B5E20]">Draw a circle at the bottom, connecting it smoothly with the curved line.</p>
+                    <p className="font-medium text-[#2E7D32]">Add the Diagonal Line</p>
+                    <p className="text-[#1B5E20]">Draw a straight line diagonally down from the right end.</p>
                   </div>
                 </li>
               </ul>
@@ -71,11 +71,11 @@ const NumberSixTips: React.FC = () => {
             <div className="mb-6 bg-[#E8F5E9] rounded-xl p-4">
               <h2 className="text-xl font-semibold text-[#2E7D32] mb-3">Common Mistakes to Avoid</h2>
               <ul className="list-disc pl-6 space-y-2 text-[#1B5E20]">
-                <li>Making the initial curve too steep or too shallow</li>
-                <li>Not connecting the circle smoothly with the curve</li>
-                <li>Making the circle too round or too flat</li>
-                <li>Starting from the wrong direction</li>
-                <li>Making the circle too big or too small compared to the curve</li>
+                <li>Making the horizontal line too short or slanted</li>
+                <li>Drawing the diagonal line at the wrong angle</li>
+                <li>Starting the diagonal line from the wrong point</li>
+                <li>Making the lines wavy instead of straight</li>
+                <li>Not connecting the lines properly at the top right</li>
               </ul>
             </div>
 
@@ -83,23 +83,23 @@ const NumberSixTips: React.FC = () => {
             <div className="mb-6 bg-[#E8F5E9] rounded-xl p-4">
               <h2 className="text-xl font-semibold text-[#2E7D32] mb-3">Practice Tips</h2>
               <ul className="list-disc pl-6 space-y-2 text-[#1B5E20]">
-                <li>Practice the curved line motion separately first</li>
-                <li>Use grid paper to keep the size consistent</li>
-                <li>Think of the number 6 as a hook with a loop</li>
-                <li>Practice drawing smooth circles</li>
-                <li>Focus on making the connection point smooth</li>
+                <li>Practice drawing straight lines separately first</li>
+                <li>Use grid paper to keep lines straight</li>
+                <li>Think of the number 7 as an angle bracket</li>
+                <li>Keep the horizontal line level</li>
+                <li>Make sure the diagonal line is steady</li>
               </ul>
             </div>
 
-            {/* Real-World Examples */}
+            {/* Fun Facts */}
             <div className="bg-[#E8F5E9] rounded-xl p-4">
-              <h2 className="text-xl font-semibold text-[#2E7D32] mb-3">Fun Facts about Number 6</h2>
+              <h2 className="text-xl font-semibold text-[#2E7D32] mb-3">Fun Facts about Number 7</h2>
               <ul className="list-disc pl-6 space-y-2 text-[#1B5E20]">
-                <li>A mango tree can grow up to 6 meters in 6 years</li>
-                <li>A snowflake has 6 sides</li>
-                <li>There are 6 strings on a guitar</li>
-                <li>A cube has 6 faces</li>
-                <li>Half a dozen mangoes is 6 mangoes</li>
+                <li>There are 7 days in a week</li>
+                <li>A rainbow has 7 colors</li>
+                <li>There are 7 continents on Earth</li>
+                <li>A mango tree can produce fruit for over 7 decades</li>
+                <li>Seven is considered a lucky number in many cultures</li>
               </ul>
             </div>
           </div>
@@ -109,4 +109,4 @@ const NumberSixTips: React.FC = () => {
   );
 };
 
-export default NumberSixTips; 
+export default NumberSevenTips; 

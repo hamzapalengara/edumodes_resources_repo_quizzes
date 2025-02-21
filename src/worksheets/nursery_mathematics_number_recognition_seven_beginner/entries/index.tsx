@@ -3,10 +3,10 @@ import { lazy, Suspense } from 'react';
 import { createRoot } from 'react-dom/client';
 
 // Lazy load components
-const Worksheet = lazy(() => import('../components/NumberSixWorksheet'));
-const AnswerKey = lazy(() => import('../components/NumberSixAnswerKey'));
-const Tips = lazy(() => import('../components/NumberSixTips'));
-const Thumbnail = lazy(() => import('../components/NumberSixThumbnail'));
+const Worksheet = lazy(() => import('../components/NumberSevenWorksheet'));
+const AnswerKey = lazy(() => import('../components/NumberSevenAnswerKey'));
+const Tips = lazy(() => import('../components/NumberSevenTips'));
+const Thumbnail = lazy(() => import('../components/NumberSevenThumbnail'));
 
 // Required type declaration for worksheet view
 declare global {
