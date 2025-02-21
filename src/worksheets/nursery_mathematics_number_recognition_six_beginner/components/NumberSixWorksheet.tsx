@@ -7,6 +7,16 @@ import WorksheetHeader from '../../../components/shared/layout/Header/WorksheetH
 const REQUIRED_PRACTICES = 5;
 const TOTAL_QUESTIONS = REQUIRED_PRACTICES + 6; // 5 practices + 6 numbers to find
 
+// Add presetColors constant
+const presetColors = [
+  { color: '#0EA5E9', name: 'Blue' },    // Cyan-500
+  { color: '#22C55E', name: 'Green' },   // Green-500
+  { color: '#EF4444', name: 'Red' },     // Red-500
+  { color: '#F59E0B', name: 'Orange' },  // Amber-500
+  { color: '#6366F1', name: 'Indigo' },  // Indigo-500
+  { color: '#EC4899', name: 'Pink' },    // Pink-500
+] as const;
+
 interface ConfettiItem {
   id: number;
   x: number;
@@ -33,7 +43,7 @@ export const NUMBER_GRID = [
   '1 🥭', '6 🥭', '7 🍌', '2 🍊', '6 🥭',
   '3 🍐', '8 🥝', '6 🥭', '4 🥭', '9 🍊',
   '6 🥭', '2 🍐', '7 🥝', '6 🥭', '1 🥭',
-  '8 🍊', '3 🍐', '6 🥭', '9 ��', '4 🍓'
+  '8 🍊', '3 🍐', '6 🥭', '9 🍓', '4 🍓'
 ];
 
 const NumberSixWorksheet: React.FC = () => {
@@ -61,6 +71,7 @@ const NumberSixWorksheet: React.FC = () => {
         const [practiceCount, setPracticeCount] = useState(0);
         const [isCompleted, setIsCompleted] = useState(false);
         const [foundSixes, setFoundSixes] = useState<number[]>([]);
+        const [currentColor, setCurrentColor] = useState('#22d3ee');
 
         // Refs
         const svgRef = useRef<SVGSVGElement>(null);
@@ -273,23 +284,23 @@ const NumberSixWorksheet: React.FC = () => {
         }, [playAnimation]);
 
         return (
-          <div className="min-h-screen bg-gradient-to-br from-[#8BC34A] via-[#4CAF50] to-[#2E7D32] relative overflow-hidden">
+          <div className="min-h-screen bg-gradient-to-br from-white via-gray-50 to-gray-100 relative overflow-hidden">
             {/* Decorative background elements */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none">
-              <div className="absolute top-0 left-0 w-64 h-64 bg-gradient-to-br from-[#FFA000]/40 to-[#FFD54F]/40 rounded-full blur-3xl transform -translate-x-1/2 -translate-y-1/2"></div>
-              <div className="absolute top-1/4 right-0 w-96 h-96 bg-gradient-to-bl from-[#81C784]/40 to-[#A5D6A7]/40 rounded-full blur-3xl transform translate-x-1/2 -translate-y-1/2"></div>
-              <div className="absolute bottom-0 left-1/3 w-80 h-80 bg-gradient-to-tr from-[#4FC3F7]/40 to-[#81D4FA]/40 rounded-full blur-3xl transform -translate-x-1/2 translate-y-1/2"></div>
+              <div className="absolute top-0 left-0 w-64 h-64 bg-gradient-to-br from-cyan-100/40 to-teal-100/40 rounded-full blur-3xl transform -translate-x-1/2 -translate-y-1/2"></div>
+              <div className="absolute top-1/4 right-0 w-96 h-96 bg-gradient-to-bl from-blue-100/40 to-cyan-100/40 rounded-full blur-3xl transform translate-x-1/2 -translate-y-1/2"></div>
+              <div className="absolute bottom-0 left-1/3 w-80 h-80 bg-gradient-to-tr from-teal-100/40 to-cyan-100/40 rounded-full blur-3xl transform -translate-x-1/2 translate-y-1/2"></div>
             </div>
 
             <WorksheetHeader />
 
             {/* Score and Title Section */}
-            <div className="bg-[#795548]/30 backdrop-blur-md shadow-lg border border-[#8D6E63]/50">
+            <div className="bg-white/80 backdrop-blur-md shadow-lg border border-gray-200">
               <div className="max-w-4xl mx-auto px-2 py-2 md:px-4 md:py-3 flex flex-col items-stretch gap-2">
                 <div className="w-full flex justify-center items-center">
                   <ScoreDisplay score={score} totalQuestions={TOTAL_QUESTIONS * 10} />
                 </div>
-                <h2 className="text-xl md:text-2xl lg:text-3xl font-bold text-white text-center">
+                <h2 className="text-xl md:text-2xl lg:text-3xl font-bold text-gray-800 text-center">
                   Number Six with Mangoes
                 </h2>
               </div>
@@ -297,11 +308,11 @@ const NumberSixWorksheet: React.FC = () => {
 
             {/* Main Content */}
             <main className="px-0">
-              <div className="bg-[#4CAF50]/20 backdrop-blur-md p-2 md:p-4 mb-2 md:mb-4 shadow-lg border border-[#81C784]/50">
+              <div className="bg-white/60 backdrop-blur-md p-2 md:p-4 mb-2 md:mb-4 shadow-lg border border-gray-200">
                 <div className="max-w-4xl mx-auto">
                   {/* Practice Complete Message */}
                   {isCompleted && (
-                    <div className="bg-[#FFA000]/20 border-2 border-[#FFD54F] rounded-xl p-4 mb-4 text-center">
+                    <div className="bg-cyan-500/20 border-2 border-cyan-400 rounded-xl p-4 mb-4 text-center">
                       <p className="text-white font-semibold">
                         🎉 Congratulations! You've completed all 5 practices! 🎉
                       </p>
@@ -310,22 +321,22 @@ const NumberSixWorksheet: React.FC = () => {
 
                   {/* Number Display */}
                   <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 md:gap-6 mb-2 md:mb-4">
-                    <div className="text-4xl sm:text-5xl font-bold text-white">{NUMBER_SIX.value}</div>
+                    <div className="text-4xl sm:text-5xl font-bold text-gray-800">{NUMBER_SIX.value}</div>
                     <div className="flex flex-wrap justify-center gap-1 items-center max-w-[200px] sm:max-w-none">
                       {[...Array(NUMBER_SIX.fruitCount)].map((_, index) => (
                         <div key={index} className="text-2xl sm:text-3xl filter drop-shadow-md">{NUMBER_SIX.fruitEmoji}</div>
                       ))}
                     </div>
-                    <div className="text-lg sm:text-xl font-medium text-white capitalize">{NUMBER_SIX.fruit}</div>
+                    <div className="text-lg sm:text-xl font-medium text-gray-800 capitalize">{NUMBER_SIX.fruit}</div>
                   </div>
 
                   {/* Main Content Grid */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
                     {/* Demonstration Section */}
-                    <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-4 md:p-6 border border-[#A5D6A7]/50 shadow-lg">
+                    <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-4 md:p-6 border border-gray-200 shadow-lg">
                       <div className="text-center mb-4">
-                        <h3 className="text-lg md:text-xl font-bold text-[#2E7D32]">Watch and Learn</h3>
-                        <p className="text-sm text-[#4CAF50]">See how to write number 6</p>
+                        <h3 className="text-lg md:text-xl font-bold text-cyan-400">Watch and Learn</h3>
+                        <p className="text-sm text-cyan-300">See how to write number 6</p>
                       </div>
 
                       {/* Demonstration SVG */}
@@ -412,33 +423,37 @@ const NumberSixWorksheet: React.FC = () => {
                     </div>
 
                     {/* Tracing Practice Section */}
-                    <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-4 md:p-6 border border-[#A5D6A7]/50 shadow-lg">
+                    <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-4 md:p-6 border border-gray-200 shadow-lg">
                       <div className="text-center mb-4">
-                        <h3 className="text-lg md:text-xl font-bold text-[#2E7D32]">Your Turn!</h3>
-                        <p className="text-sm text-[#4CAF50] mb-1">Trace the number 6 here</p>
-                        <div className="inline-flex items-center gap-2 bg-[#E8F5E9] px-3 py-1 rounded-full">
-                          <span className="text-sm font-medium text-[#2E7D32]">Practice:</span>
-                          <span className="text-sm font-bold text-[#2E7D32]">{practiceCount} / {REQUIRED_PRACTICES}</span>
+                        <h3 className="text-lg md:text-xl font-bold text-cyan-400">Your Turn!</h3>
+                        <p className="text-sm text-cyan-300 mb-1">Trace the number 6 here</p>
+                        <div className="inline-flex items-center gap-2 bg-gray-200 px-3 py-1 rounded-full">
+                          <span className="text-sm font-medium text-cyan-400">Practice:</span>
+                          <span className="text-sm font-bold text-cyan-400">{practiceCount} / {REQUIRED_PRACTICES}</span>
                         </div>
                       </div>
 
-                      {/* Tracing Area with Touch Control - Increased size */}
+                      {/* Tracing Area */}
                       <div 
-                        className="relative aspect-square max-w-[350px] mx-auto touch-none"
-                        onTouchStart={(e) => e.preventDefault()}
-                        onTouchMove={(e) => e.preventDefault()}
+                        className="relative aspect-square max-w-[350px] mx-auto flex gap-2"
                       >
                         <svg
                           ref={svgRef}
                           viewBox={NUMBER_SIX.viewBox}
-                          className="w-full h-full"
+                          className="w-full h-full touch-none"
                           onMouseDown={(e) => { 
                             e.preventDefault();
                             setIsDrawing(true); 
                             markAttempted(); 
                           }}
-                          onMouseUp={() => setIsDrawing(false)}
-                          onMouseLeave={() => setIsDrawing(false)}
+                          onMouseUp={(e) => {
+                            e.preventDefault();
+                            setIsDrawing(false);
+                          }}
+                          onMouseLeave={(e) => {
+                            e.preventDefault();
+                            setIsDrawing(false);
+                          }}
                           onTouchStart={(e) => { 
                             e.preventDefault();
                             setIsDrawing(true); 
@@ -462,7 +477,7 @@ const NumberSixWorksheet: React.FC = () => {
                                 <path
                                   d={path.d}
                                   fill="none"
-                                  stroke={isCompletedPath ? "#4F46E5" : "rgba(99, 102, 241, 0.2)"}
+                                  stroke={isCompletedPath ? currentColor : `${currentColor}33`}
                                   strokeWidth="24"
                                   strokeLinecap="round"
                                   strokeLinejoin="round"
@@ -474,7 +489,7 @@ const NumberSixWorksheet: React.FC = () => {
                                     ref={pathRef}
                                     d={path.d}
                                     fill="none"
-                                    stroke="#4F46E5"
+                                    stroke={currentColor}
                                     strokeWidth="24"
                                     strokeLinecap="round"
                                     strokeLinejoin="round"
@@ -484,44 +499,79 @@ const NumberSixWorksheet: React.FC = () => {
                                 )}
                                 
                                 {/* Start point */}
-                                {isCurrentPath && (
+                                {isCurrentPath && !isCompletedPath && (
                                   <circle
                                     ref={el => {
                                       if (el) {
                                         const pathElement = document.createElementNS("http://www.w3.org/2000/svg", "path");
                                         pathElement.setAttribute("d", path.d);
-                                        const point = pathElement.getPointAtLength(lastPoint);
+                                        const point = pathElement.getPointAtLength(0);
                                         el.setAttribute('cx', point.x.toString());
                                         el.setAttribute('cy', point.y.toString());
                                       }
                                     }}
                                     r="10"
                                     className="animate-pulse"
-                                    fill="#4F46E5"
+                                    fill={currentColor}
                                   />
                                 )}
                               </g>
                             );
                           })}
                         </svg>
+
+                        {/* Color Palette */}
+                        <div className="flex flex-col gap-2 justify-start items-center py-2">
+                          {presetColors.map((preset) => (
+                            <button
+                              key={preset.color}
+                              onClick={() => setCurrentColor(preset.color)}
+                              className={`w-8 h-8 rounded-full shadow-md transition-all transform hover:scale-110 ${
+                                currentColor === preset.color ? 'ring-2 ring-offset-2 ring-cyan-400' : ''
+                              }`}
+                              style={{ backgroundColor: preset.color }}
+                              title={preset.name}
+                              aria-label={`Select ${preset.name} color`}
+                            />
+                          ))}
+                        </div>
                       </div>
 
                       {/* Instructions */}
                       <div className="mt-4 text-center">
-                        <p className="text-sm font-medium text-indigo-700">
-                          {currentPathIndex === 0 && "Start with the curved line down ➡️"}
-                          {currentPathIndex === 1 && "Now draw the circle at the bottom ⭕"}
+                        <p className="text-sm font-medium text-cyan-400">
+                          {currentPathIndex === 0 && "Start with the curve down ➡️"}
+                          {currentPathIndex === 1 && "Now draw the circle ➡️"}
                           {currentPathIndex >= NUMBER_SIX.paths.length && "Great job! Try again! 🎉"}
                         </p>
+                      </div>
+
+                      {/* Retry Current Attempt Button */}
+                      <div className="flex justify-center mt-4">
+                        <button
+                          onClick={() => {
+                            setCurrentPathIndex(0);
+                            setFilledPaths([]);
+                            setProgress(0);
+                            setLastPoint(0);
+                            setLastValidPoint(null);
+                            setShowSuccess(false);
+                            speak("Let's try this attempt again");
+                          }}
+                          className="bg-gray-100 hover:bg-gray-200 text-cyan-500 px-6 py-2 rounded-full text-sm font-medium shadow-md flex items-center gap-2 transition-all transform hover:-translate-y-0.5 hover:shadow-lg"
+                        >
+                          <span className="text-lg">🔄</span>
+                          Retry Current Attempt
+                        </button>
                       </div>
                     </div>
                   </div>
 
                   {/* Number Picking Game Section - Always visible but conditionally active */}
-                  <div className="mt-8 bg-white/80 backdrop-blur-sm rounded-2xl p-4 md:p-6 border border-[#A5D6A7]/50 shadow-lg relative">
+                  <div className="mt-8 bg-white/80 backdrop-blur-sm rounded-2xl p-4 md:p-6 border border-gray-200 shadow-lg relative">
                     {/* Locked Overlay - Show when not completed tracing */}
                     {!isCompleted && (
-                      <div className="absolute inset-0 bg-[#4CAF50]/30 backdrop-blur-[2px] rounded-2xl flex flex-col items-center justify-center z-10">
+                      <div className="absolute inset-0 bg-cyan-500/30 backdrop-blur-[2px] rounded-2xl flex flex-col items-center justify-center z-10">
                         <div className="text-4xl mb-2">🔒</div>
                         <p className="text-white font-semibold text-center px-4">
                           Complete {REQUIRED_PRACTICES} tracing practices to unlock!
@@ -534,11 +584,11 @@ const NumberSixWorksheet: React.FC = () => {
                     )}
 
                     <div className="text-center mb-4">
-                      <h3 className="text-lg md:text-xl font-bold text-[#2E7D32]">Find the Number 6s!</h3>
-                      <p className="text-sm text-[#4CAF50] mb-2">Click on all the number 6s you can find</p>
-                      <div className="inline-flex items-center gap-2 bg-[#E8F5E9] px-3 py-1 rounded-full">
-                        <span className="text-sm font-medium text-[#2E7D32]">Found:</span>
-                        <span className="text-sm font-bold text-[#2E7D32]">{foundSixes.length} / 6</span>
+                      <h3 className="text-lg md:text-xl font-bold text-cyan-400">Find the Number 6s!</h3>
+                      <p className="text-sm text-cyan-300 mb-2">Click on all the number 6s you can find</p>
+                      <div className="inline-flex items-center gap-2 bg-gray-200 px-3 py-1 rounded-full">
+                        <span className="text-sm font-medium text-cyan-400">Found:</span>
+                        <span className="text-sm font-bold text-cyan-400">{foundSixes.length} / 6</span>
                       </div>
                     </div>
 
@@ -553,10 +603,10 @@ const NumberSixWorksheet: React.FC = () => {
                             aspect-square w-full text-xl font-bold rounded-lg
                             flex items-center justify-center transition-all
                             ${foundSixes.includes(index)
-                              ? 'bg-[#4CAF50] text-white cursor-not-allowed'
+                              ? 'bg-cyan-500 text-white cursor-not-allowed'
                               : isCompleted
-                                ? 'bg-white hover:bg-[#E8F5E9] active:bg-[#C8E6C9] text-[#2E7D32]'
-                                : 'bg-white/50 text-[#2E7D32]/50 cursor-not-allowed'
+                                ? 'bg-white hover:bg-gray-200 active:bg-gray-300 text-cyan-400'
+                                : 'bg-gray-200 text-cyan-400/50 cursor-not-allowed'
                             }
                           `}
                         >
@@ -567,7 +617,7 @@ const NumberSixWorksheet: React.FC = () => {
 
                     {foundSixes.length === 6 && (
                       <div className="mt-4 text-center">
-                        <p className="text-green-600 font-semibold">
+                        <p className="text-cyan-500 font-semibold">
                           🎉 Fantastic! You've found all the number 6s! 🎉
                         </p>
                       </div>
@@ -620,7 +670,7 @@ const NumberSixWorksheet: React.FC = () => {
                     <div className="flex justify-center mt-4">
                       <button
                         disabled
-                        className="px-6 py-2 rounded-full bg-green-500 text-white text-base font-semibold flex items-center gap-2 shadow-md opacity-50 cursor-not-allowed"
+                        className="px-6 py-2 rounded-full bg-cyan-500 text-white text-base font-semibold flex items-center gap-2 shadow-md opacity-50 cursor-not-allowed"
                       >
                         <span className="text-xl">🌟</span>
                         All Practices Complete!

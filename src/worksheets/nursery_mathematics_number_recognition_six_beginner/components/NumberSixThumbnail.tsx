@@ -1,62 +1,88 @@
 import React from 'react';
-import { NUMBER_SIX } from './NumberSixWorksheet';
+import { motion } from 'framer-motion';
+
+const NUMBER_SIX = {
+  value: '6',
+  fruitEmoji: '🥭',
+  viewBox: '0 0 200 200',
+  paths: [
+    { id: 'curve_down', d: 'M90 40C95 40 95 45 90 50C85 60 75 90 70 140', order: 1 },
+    { id: 'circle', d: 'M70 140C70 170 85 180 100 180S130 170 130 140C130 110 115 100 100 100C85 100 70 110 70 140', order: 2 }
+  ]
+};
 
 const NumberSixThumbnail: React.FC = () => {
   return (
-    <div className="w-[500px] h-[375px] bg-gradient-to-br from-pink-100 to-yellow-100 flex items-center justify-center p-10">
-      <div className="w-[420px] h-[240px] bg-white rounded-lg shadow-lg p-6">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-3">
-            <div className="text-5xl font-bold text-[#2E7D32]">{NUMBER_SIX.value}</div>
-            <div className="flex gap-1">
-              {[...Array(3)].map((_, i) => (
-                <div key={i} className="text-3xl">{NUMBER_SIX.fruitEmoji}</div>
-              ))}
-            </div>
-          </div>
-        </div>
-        
-        <div className="grid grid-cols-2 gap-6">
-          {/* Tracing Preview */}
-          <div className="aspect-square relative bg-[#E8F5E9]/50 rounded-lg p-2">
+    // Outer container: 500x375 (4:3)
+    <div className="w-[500px] h-[375px] bg-gradient-to-br from-pink-100 via-pink-50 to-yellow-100 flex items-center justify-center">
+      {/* Inner container: 420x240 */}
+      <div className="w-[420px] h-[240px] bg-white rounded-2xl shadow-lg p-4 flex gap-6">
+        {/* Left side - Number demonstration */}
+        <div className="flex-1 flex flex-col items-center justify-center">
+          <h1 className="text-2xl font-bold text-gray-800 mb-2 text-center font-system">
+            Number 6 with Mangoes
+          </h1>
+          <div className="relative w-24 h-24">
             <svg viewBox={NUMBER_SIX.viewBox} className="w-full h-full">
-              <path
-                d={NUMBER_SIX.paths[0].d}
-                fill="none"
-                stroke="#4CAF50"
-                strokeWidth="12"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeDasharray="8,8"
-              />
-              <path
-                d={NUMBER_SIX.paths[1].d}
-                fill="none"
-                stroke="#4CAF50"
-                strokeWidth="12"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeDasharray="8,8"
-              />
+              {/* Guide paths */}
+              {NUMBER_SIX.paths.map((path) => (
+                <path
+                  key={`guide-${path.id}`}
+                  d={path.d}
+                  fill="none"
+                  stroke="rgba(34, 211, 238, 0.2)"
+                  strokeWidth="24"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              ))}
+              {/* Solid paths */}
+              {NUMBER_SIX.paths.map((path) => (
+                <path
+                  key={`solid-${path.id}`}
+                  d={path.d}
+                  fill="none"
+                  stroke="#0EA5E9"
+                  strokeWidth="24"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              ))}
             </svg>
           </div>
-
-          {/* Number Grid Preview */}
-          <div className="grid grid-cols-3 gap-1.5">
-            {['2', '6 🥭', '4', '6 🥭', '3', '6 🥭', '5', '6 🥭', '1'].map((item, index) => (
-              <div
-                key={index}
-                className={`aspect-square flex items-center justify-center text-base font-bold rounded-lg
-                  ${item.startsWith('6') ? 'bg-[#E8F5E9] text-[#2E7D32]' : 'bg-gray-50 text-gray-500'}`}
-              >
-                {item}
-              </div>
-            ))}
+          <div className="text-sm text-cyan-600 mt-2 font-system">
+            1 → 6
           </div>
         </div>
 
-        <div className="mt-4 text-center">
-          <h2 className="text-lg font-semibold text-[#2E7D32]">Trace and Find Number 6 with Mangoes</h2>
+        {/* Right side - Preview */}
+        <div className="flex-1 flex flex-col items-center justify-center">
+          <div className="grid grid-cols-2 gap-2">
+            {/* Mango emojis in a 2x2 grid */}
+            {[...Array(4)].map((_, index) => (
+              <motion.div
+                key={index}
+                className="w-12 h-12 bg-cyan-50 rounded-lg flex items-center justify-center text-2xl"
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ 
+                  scale: 1, 
+                  opacity: 1,
+                  y: [0, -5, 0],
+                  rotate: [-5, 5, -5]
+                }}
+                transition={{
+                  duration: 2,
+                  repeat: Infinity,
+                  delay: index * 0.2,
+                }}
+              >
+                {NUMBER_SIX.fruitEmoji}
+              </motion.div>
+            ))}
+          </div>
+          <div className="mt-4 text-sm text-cyan-600 font-system">
+            Trace & Find
+          </div>
         </div>
       </div>
     </div>
