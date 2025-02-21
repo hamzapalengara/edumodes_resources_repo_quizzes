@@ -25,7 +25,7 @@ export const NUMBER_FIVE = {
   paths: [
     { id: 'top_line', d: 'M120 40L40 40', order: 1 },
     { id: 'vertical', d: 'M40 40L40 100', order: 2 },
-    { id: 'curve', d: 'M40 100C60 100 120 100 120 130C120 160 80 160 40 160', order: 3 }
+    { id: 'curve', d: 'M40 100C40 100 60 100 90 100C120 100 140 120 140 140C140 160 120 180 90 180L40 180', order: 3 }
   ]
 };
 
