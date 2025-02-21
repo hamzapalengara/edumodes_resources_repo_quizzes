@@ -23,9 +23,9 @@ export const NUMBER_FOUR = {
   fruitCount: 4,
   viewBox: '0 0 200 200',
   paths: [
-    { id: 'diagonal', d: 'M100 40L40 100', order: 1 },
-    { id: 'horizontal', d: 'M40 100L120 100', order: 2 },
-    { id: 'vertical', d: 'M100 40L100 160', order: 3 }
+    { id: 'diagonal', d: 'M120 40L60 100', order: 1 },
+    { id: 'horizontal', d: 'M60 100L140 100', order: 2 },
+    { id: 'vertical', d: 'M120 40L120 160', order: 3 }
   ]
 };
 
@@ -346,9 +346,6 @@ const NumberFourWorksheet: React.FC = () => {
                           viewBox={NUMBER_FOUR.viewBox}
                           className="w-full h-full"
                         >
-                          {/* Background decoration */}
-                          <circle cx="100" cy="100" r="80" fill="rgba(99, 102, 241, 0.1)" />
-                          
                           {/* Guide paths */}
                           {NUMBER_FOUR.paths.map((path) => (
                             <path
@@ -427,24 +424,35 @@ const NumberFourWorksheet: React.FC = () => {
                     </div>
 
                     {/* Tracing Practice Section */}
-                    <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-4 md:p-6 border border-white/50 shadow-lg">
+                    <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-4 md:p-6 border border-gray-200 shadow-lg">
                       <div className="text-center mb-4">
-                        <h3 className="text-lg md:text-xl font-bold text-indigo-900">Your Turn!</h3>
-                        <p className="text-sm text-indigo-700 mb-1">Trace the number 4 here</p>
-                        <div className="inline-flex items-center gap-2 bg-indigo-100 px-3 py-1 rounded-full">
-                          <span className="text-sm font-medium text-indigo-900">Practice:</span>
-                          <span className="text-sm font-bold text-indigo-900">{practiceCount} / {REQUIRED_PRACTICES}</span>
+                        <h3 className="text-lg md:text-xl font-bold text-cyan-400">Your Turn!</h3>
+                        <div className="inline-flex items-center gap-2 bg-cyan-500/20 px-3 py-1 rounded-full">
+                          <span className="text-sm font-medium text-cyan-300">Practice:</span>
+                          <span className="text-sm font-bold text-cyan-300">{practiceCount} / {REQUIRED_PRACTICES}</span>
                         </div>
                       </div>
 
-                      {/* Tracing Area with Touch Control - Increased size */}
-                      <div className="relative flex items-start gap-4">
-                        {/* SVG Container */}
-                        <div className="relative flex-grow">
+                      {/* Tracing Area with Touch Control - Maximized size */}
+                      <div className="relative flex items-start gap-2">
+                        {/* Retry Button - Moved outside SVG */}
+                        <button
+                          onClick={handleRetry}
+                          className="absolute top-0 right-14 bg-white rounded-full p-2 shadow-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 z-10"
+                          aria-label="Retry"
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                          </svg>
+                        </button>
+
+                        {/* SVG Container - Expanded */}
+                        <div className="relative flex-grow min-h-[calc(100vw-6rem)] md:min-h-0">
                           <svg
                             ref={svgRef}
                             viewBox={NUMBER_FOUR.viewBox}
-                            className="w-full max-w-[300px] mx-auto touch-none"
+                            className="w-full h-full aspect-square touch-none"
+                            style={{ maxHeight: 'calc(100vh - 400px)' }}
                             onMouseDown={(e) => { 
                               e.preventDefault();
                               setIsDrawing(true); 
@@ -464,9 +472,6 @@ const NumberFourWorksheet: React.FC = () => {
                             onMouseMove={handleDrawing}
                             onTouchMove={handleDrawing}
                           >
-                            {/* Background decoration */}
-                            <circle cx="100" cy="100" r="80" fill="rgba(99, 102, 241, 0.1)" />
-                            
                             {NUMBER_FOUR.paths.map((path, index) => {
                               const isCurrentPath = index === currentPathIndex;
                               const isCompletedPath = filledPaths.includes(path.id);
@@ -519,17 +524,6 @@ const NumberFourWorksheet: React.FC = () => {
                               );
                             })}
                           </svg>
-
-                          {/* Retry Button */}
-                          <button
-                            onClick={handleRetry}
-                            className="absolute top-2 right-2 bg-white rounded-full p-2 shadow-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                            aria-label="Retry"
-                          >
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                            </svg>
-                          </button>
                         </div>
 
                         {/* Color Picker - Right Side */}

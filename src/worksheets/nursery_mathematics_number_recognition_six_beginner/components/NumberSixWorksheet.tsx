@@ -33,8 +33,8 @@ export const NUMBER_SIX = {
   fruitCount: 6,
   viewBox: '0 0 200 200',
   paths: [
-    { id: 'curve_down', d: 'M90 40C95 40 95 45 90 50C85 60 75 90 70 140', order: 1 },
-    { id: 'circle', d: 'M70 140C70 170 85 180 100 180S130 170 130 140C130 110 115 100 100 100C85 100 70 110 70 140', order: 2 }
+    { id: 'curve_down', d: 'M100 40C95 40 95 45 90 50C85 60 75 90 70 140', order: 1 },
+    { id: 'circle', d: 'M70 140C70 170 85 180 100 180S130 170 130 140C130 110 115 100 100 100C85 100', order: 2 }
   ]
 };
 
@@ -426,143 +426,128 @@ const NumberSixWorksheet: React.FC = () => {
                     <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-4 md:p-6 border border-gray-200 shadow-lg">
                       <div className="text-center mb-4">
                         <h3 className="text-lg md:text-xl font-bold text-cyan-400">Your Turn!</h3>
-                        <p className="text-sm text-cyan-300 mb-1">Trace the number 6 here</p>
-                        <div className="inline-flex items-center gap-2 bg-gray-200 px-3 py-1 rounded-full">
-                          <span className="text-sm font-medium text-cyan-400">Practice:</span>
-                          <span className="text-sm font-bold text-cyan-400">{practiceCount} / {REQUIRED_PRACTICES}</span>
+                        <div className="inline-flex items-center gap-2 bg-cyan-500/20 px-3 py-1 rounded-full">
+                          <span className="text-sm font-medium text-cyan-300">Practice:</span>
+                          <span className="text-sm font-bold text-cyan-300">{practiceCount} / {REQUIRED_PRACTICES}</span>
                         </div>
                       </div>
 
-                      {/* Tracing Area */}
-                      <div 
-                        className="relative aspect-square max-w-[350px] mx-auto flex gap-2"
-                      >
-                        <svg
-                          ref={svgRef}
-                          viewBox={NUMBER_SIX.viewBox}
-                          className="w-full h-full touch-none"
-                          onMouseDown={(e) => { 
-                            e.preventDefault();
-                            setIsDrawing(true); 
-                            markAttempted(); 
-                          }}
-                          onMouseUp={(e) => {
-                            e.preventDefault();
-                            setIsDrawing(false);
-                          }}
-                          onMouseLeave={(e) => {
-                            e.preventDefault();
-                            setIsDrawing(false);
-                          }}
-                          onTouchStart={(e) => { 
-                            e.preventDefault();
-                            setIsDrawing(true); 
-                            markAttempted(); 
-                          }}
-                          onTouchEnd={(e) => {
-                            e.preventDefault();
-                            setIsDrawing(false);
-                          }}
-                          onMouseMove={handleDrawing}
-                          onTouchMove={handleDrawing}
+                      {/* Tracing Area with Touch Control - Maximized size */}
+                      <div className="relative flex items-start gap-2">
+                        {/* Retry Button - Moved outside SVG */}
+                        <button
+                          onClick={handleRetry}
+                          className="absolute top-0 right-14 bg-white rounded-full p-2 shadow-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 z-10"
+                          aria-label="Retry"
                         >
-                          {/* Guide paths */}
-                          {NUMBER_SIX.paths.map((path, index) => {
-                            const isCurrentPath = index === currentPathIndex;
-                            const isCompletedPath = filledPaths.includes(path.id);
-                            
-                            return (
-                              <g key={path.id}>
-                                {/* Guide Path */}
-                                <path
-                                  d={path.d}
-                                  fill="none"
-                                  stroke={isCompletedPath ? currentColor : `${currentColor}33`}
-                                  strokeWidth="24"
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                />
-                                
-                                {/* Active Path */}
-                                {isCurrentPath && (
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                          </svg>
+                        </button>
+
+                        {/* SVG Container - Expanded */}
+                        <div className="relative flex-grow min-h-[calc(100vw-6rem)] md:min-h-0">
+                          <svg
+                            ref={svgRef}
+                            viewBox={NUMBER_SIX.viewBox}
+                            className="w-full h-full aspect-square touch-none"
+                            style={{ maxHeight: 'calc(100vh - 400px)' }}
+                            onMouseDown={(e) => { 
+                              e.preventDefault();
+                              setIsDrawing(true); 
+                              markAttempted(); 
+                            }}
+                            onMouseUp={() => setIsDrawing(false)}
+                            onMouseLeave={() => setIsDrawing(false)}
+                            onTouchStart={(e) => { 
+                              e.preventDefault();
+                              setIsDrawing(true); 
+                              markAttempted(); 
+                            }}
+                            onTouchEnd={(e) => {
+                              e.preventDefault();
+                              setIsDrawing(false);
+                            }}
+                            onMouseMove={handleDrawing}
+                            onTouchMove={handleDrawing}
+                          >
+                            {NUMBER_SIX.paths.map((path, index) => {
+                              const isCurrentPath = index === currentPathIndex;
+                              const isCompletedPath = filledPaths.includes(path.id);
+                              
+                              return (
+                                <g key={path.id}>
+                                  {/* Guide Path */}
                                   <path
-                                    ref={pathRef}
                                     d={path.d}
                                     fill="none"
-                                    stroke={currentColor}
+                                    stroke={isCompletedPath ? currentColor : "rgba(99, 102, 241, 0.2)"}
                                     strokeWidth="24"
                                     strokeLinecap="round"
                                     strokeLinejoin="round"
-                                    strokeDasharray={pathLengths[path.id] || 0}
-                                    strokeDashoffset={pathLengths[path.id] ? pathLengths[path.id] - (pathLengths[path.id] * progress / 100) : 0}
                                   />
-                                )}
-                                
-                                {/* Start point */}
-                                {isCurrentPath && !isCompletedPath && (
-                                  <circle
-                                    ref={el => {
-                                      if (el) {
-                                        const pathElement = document.createElementNS("http://www.w3.org/2000/svg", "path");
-                                        pathElement.setAttribute("d", path.d);
-                                        const point = pathElement.getPointAtLength(0);
-                                        el.setAttribute('cx', point.x.toString());
-                                        el.setAttribute('cy', point.y.toString());
-                                      }
-                                    }}
-                                    r="10"
-                                    className="animate-pulse"
-                                    fill={currentColor}
-                                  />
-                                )}
-                              </g>
-                            );
-                          })}
-                        </svg>
 
-                        {/* Color Palette */}
-                        <div className="flex flex-col gap-2 justify-start items-center py-2">
-                          {presetColors.map((preset) => (
+                                  {/* Active Path */}
+                                  {isCurrentPath && (
+                                    <path
+                                      ref={pathRef}
+                                      d={path.d}
+                                      fill="none"
+                                      stroke={currentColor}
+                                      strokeWidth="24"
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      strokeDasharray={pathLengths[path.id] || 0}
+                                      strokeDashoffset={pathLengths[path.id] ? pathLengths[path.id] - (pathLengths[path.id] * progress / 100) : 0}
+                                    />
+                                  )}
+                                  
+                                  {/* Start point */}
+                                  {isCurrentPath && (
+                                    <circle
+                                      ref={el => {
+                                        if (el) {
+                                          const pathElement = document.createElementNS("http://www.w3.org/2000/svg", "path");
+                                          pathElement.setAttribute("d", path.d);
+                                          const point = pathElement.getPointAtLength(lastPoint);
+                                          el.setAttribute('cx', point.x.toString());
+                                          el.setAttribute('cy', point.y.toString());
+                                        }
+                                      }}
+                                      r="10"
+                                      className="animate-pulse"
+                                      fill={currentColor}
+                                    />
+                                  )}
+                                </g>
+                              );
+                            })}
+                          </svg>
+                        </div>
+
+                        {/* Color Picker - Right Side */}
+                        <div className="w-12 flex flex-col gap-2">
+                          {presetColors.map(({ color, name }) => (
                             <button
-                              key={preset.color}
-                              onClick={() => setCurrentColor(preset.color)}
-                              className={`w-8 h-8 rounded-full shadow-md transition-all transform hover:scale-110 ${
-                                currentColor === preset.color ? 'ring-2 ring-offset-2 ring-cyan-400' : ''
+                              key={color}
+                              className={`w-8 h-8 rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+                                currentColor === color ? 'ring-2 ring-offset-2 ring-blue-500' : ''
                               }`}
-                              style={{ backgroundColor: preset.color }}
-                              title={preset.name}
-                              aria-label={`Select ${preset.name} color`}
+                              style={{ backgroundColor: color }}
+                              onClick={() => setCurrentColor(color)}
+                              aria-label={`Select ${name}`}
                             />
                           ))}
                         </div>
                       </div>
 
                       {/* Instructions */}
-                      <div className="mt-4 text-center">
-                        <p className="text-sm font-medium text-cyan-400">
-                          {currentPathIndex === 0 && "Start with the curve down ➡️"}
-                          {currentPathIndex === 1 && "Now draw the circle ➡️"}
+                      <div className="mt-2 text-center">
+                        <p className="text-sm font-medium text-indigo-700">
+                          {currentPathIndex === 0 && "Start with the curve down ↓"}
+                          {currentPathIndex === 1 && "Now complete the circle ⭕"}
                           {currentPathIndex >= NUMBER_SIX.paths.length && "Great job! Try again! 🎉"}
                         </p>
-                      </div>
-
-                      {/* Retry Current Attempt Button */}
-                      <div className="flex justify-center mt-4">
-                        <button
-                          onClick={() => {
-                            setCurrentPathIndex(0);
-                            setFilledPaths([]);
-                            setProgress(0);
-                            setLastPoint(0);
-                            setLastValidPoint(null);
-                            setShowSuccess(false);
-                            speak("Let's try this attempt again");
-                          }}
-                          className="bg-gray-100 hover:bg-gray-200 text-cyan-500 px-6 py-2 rounded-full text-sm font-medium shadow-md flex items-center gap-2 transition-all transform hover:-translate-y-0.5 hover:shadow-lg"
-                        >
-                          <span className="text-lg">🔄</span>
-                          Retry Current Attempt
-                        </button>
                       </div>
                     </div>
                   </div>
