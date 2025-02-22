@@ -34,8 +34,10 @@ module.exports = {
       animation: {
         'celebration': 'celebration 0.5s ease-out',
         'wiggle': 'wiggle 1s ease-in-out infinite',
-        'train': 'train 15s linear',
-        'smoke': 'smoke 2s infinite'
+        'train': 'train 18s linear',
+        'smoke-1': 'smoke-1 3s infinite',
+        'smoke-2': 'smoke-2 3s infinite 0.5s',
+        'smoke-3': 'smoke-3 3s infinite 1s'
       },
       keyframes: {
         celebration: {
@@ -56,8 +58,16 @@ module.exports = {
           '0%': { transform: 'translateX(100%)' },
           '100%': { transform: 'translateX(-120%)' }
         },
-        smoke: {
+        'smoke-1': {
+          '0%': { transform: 'translateY(0) scale(1)', opacity: '0.8' },
+          '100%': { transform: 'translateY(-40px) scale(2)', opacity: '0' }
+        },
+        'smoke-2': {
           '0%': { transform: 'translateY(0) scale(1)', opacity: '0.6' },
+          '100%': { transform: 'translateY(-30px) scale(1.8)', opacity: '0' }
+        },
+        'smoke-3': {
+          '0%': { transform: 'translateY(0) scale(1)', opacity: '0.4' },
           '100%': { transform: 'translateY(-20px) scale(1.5)', opacity: '0' }
         }
       },
