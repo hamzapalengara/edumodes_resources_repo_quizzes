@@ -1,0 +1,45 @@
+import React from 'react';
+
+const ObjectCountingFiveThumbnail: React.FC = () => {
+  return (
+    <div className="w-[500px] h-[375px] bg-gradient-to-br from-pink-100 via-pink-50 to-blue-100 flex items-center justify-center p-8">
+      <div className="w-[420px] h-[240px] bg-white/60 rounded-2xl shadow-xl p-6 flex flex-col items-center justify-center gap-4 relative overflow-hidden border border-pink-200">
+        {/* Background Decorations */}
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute top-0 left-0 w-32 h-32 bg-gradient-to-br from-pink-200/40 to-blue-200/40 rounded-full blur-2xl transform -translate-x-1/2 -translate-y-1/2"></div>
+          <div className="absolute bottom-0 right-0 w-48 h-48 bg-gradient-to-bl from-blue-200/40 to-pink-200/40 rounded-full blur-2xl transform translate-x-1/2 translate-y-1/2"></div>
+        </div>
+
+        {/* Content */}
+        <div className="relative z-10 text-center">
+          <h1 className="text-2xl font-bold text-pink-900 mb-2">
+            Count Objects and Match Numbers
+          </h1>
+          <p className="text-blue-800 font-medium mb-4">
+            Count and Choose the Right Number (1-5)
+          </p>
+
+          {/* Preview Elements */}
+          <div className="flex items-center justify-center gap-4">
+            <div className="flex gap-2 text-3xl">
+              <span>🦋</span>
+              <span>🦋</span>
+              <span>🦋</span>
+            </div>
+            <span className="text-2xl text-pink-400">➡️</span>
+            <div className="grid grid-cols-2 gap-2">
+              <div className="w-12 h-12 bg-white/80 rounded-lg shadow-md flex items-center justify-center text-xl font-bold text-pink-800 border border-pink-200">
+                2
+              </div>
+              <div className="w-12 h-12 bg-blue-100 rounded-lg shadow-md flex items-center justify-center text-xl font-bold text-blue-800 border-2 border-blue-200">
+                3
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default ObjectCountingFiveThumbnail; 
