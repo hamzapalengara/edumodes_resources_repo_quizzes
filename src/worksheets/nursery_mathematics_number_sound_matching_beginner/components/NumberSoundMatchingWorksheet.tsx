@@ -67,9 +67,13 @@ const NumberSoundMatchingWorksheet: React.FC = () => {
           if (!isWorksheetCompleted) {
             const currentQuestion = QUESTIONS[currentQuestionIndex];
             const timer = setTimeout(() => {
-              speak(`Listen and find number ${currentQuestion.word}`);
-            }, 1000);
-            return () => clearTimeout(timer);
+              speak(`Find number ${currentQuestion.word}`);
+            }, 1500); // Increased delay to ensure proper initialization
+            return () => {
+              clearTimeout(timer);
+              window.speechSynthesis.cancel(); // Cancel any ongoing speech
+              setIsPlaying(false); // Reset playing state
+            };
           }
         }, [currentQuestionIndex, speak, isWorksheetCompleted]);
 
@@ -125,7 +129,7 @@ const NumberSoundMatchingWorksheet: React.FC = () => {
               }
             }, 2000);
           } else {
-            speak(`Try again! Listen carefully for number ${currentQuestion.word}`);
+            speak(`Try again! Find number ${currentQuestion.word}`);
           }
         }, [currentQuestionIndex, completedQuestions, markCorrect, markAttempted, speak, isWorksheetCompleted]);
 
@@ -133,7 +137,7 @@ const NumberSoundMatchingWorksheet: React.FC = () => {
         const playCurrentNumber = useCallback(() => {
           if (!isPlaying && !isWorksheetCompleted) {
             const currentQuestion = QUESTIONS[currentQuestionIndex];
-            speak(`Listen and find number ${currentQuestion.word}`);
+            speak(`Find number ${currentQuestion.word}`);
           }
         }, [currentQuestionIndex, speak, isPlaying, isWorksheetCompleted]);
 

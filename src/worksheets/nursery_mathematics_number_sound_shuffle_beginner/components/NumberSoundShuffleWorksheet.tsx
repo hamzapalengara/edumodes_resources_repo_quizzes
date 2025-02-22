@@ -78,7 +78,7 @@ const NumberSoundShuffleWorksheet: React.FC = () => {
           if (!isWorksheetCompleted) {
             const currentQuestion = questions[currentQuestionIndex];
             const timer = setTimeout(() => {
-              speak(`Listen and find number ${currentQuestion.word}`);
+              speak(`Find number ${currentQuestion.word}`);
             }, 1500); // Increased delay to ensure proper initialization
             return () => {
               clearTimeout(timer);
@@ -140,7 +140,7 @@ const NumberSoundShuffleWorksheet: React.FC = () => {
               }
             }, 2000);
           } else {
-            speak(`Try again! Listen carefully for number ${currentQuestion.word}`);
+            speak(`Try again! Find number ${currentQuestion.word}`);
           }
         }, [currentQuestionIndex, completedQuestions, markCorrect, markAttempted, speak, isWorksheetCompleted, questions]);
 
@@ -148,7 +148,7 @@ const NumberSoundShuffleWorksheet: React.FC = () => {
         const playCurrentNumber = useCallback(() => {
           if (!isPlaying && !isWorksheetCompleted) {
             const currentQuestion = questions[currentQuestionIndex];
-            speak(`Listen and find number ${currentQuestion.word}`);
+            speak(`Find number ${currentQuestion.word}`);
           }
         }, [currentQuestionIndex, speak, isPlaying, isWorksheetCompleted, questions]);
 
