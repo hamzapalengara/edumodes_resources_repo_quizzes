@@ -2,9 +2,9 @@
 description: Use these rules when creating quizz resources
 globs: 
 ---
-Lets create a new worksheet
+Let's create a new quiz
 
-# Worksheet Set Creation Request, Mobile first design approach, No horizontal margins/padding and no horizontal 
+# Quiz Creation Request, Mobile first design approach, No horizontal margins/padding and no horizontal 
 scrolling should be there
 
 # CRITICAL MOBILE DESIGN REQUIREMENTS
@@ -38,10 +38,10 @@ Wait for the following information
 2. File Structure:
    [grade]_[subject]_[topic]_[difficulty]/
    ├── components/
-   │   ├── [Prefix]Worksheet.tsx
-   │   ├── [Prefix]AnswerKey.tsx
-   │   ├── [Prefix]Tips.tsx
-   │   └── [Prefix]Thumbnail.tsx
+   │   ├── [Prefix]Worksheet.tsx      # Main quiz interface
+   │   ├── [Prefix]AnswerKey.tsx      # Solution reference
+   │   ├── [Prefix]Tips.tsx           # Quiz help
+   │   └── [Prefix]Thumbnail.tsx      # Preview image
    ├── entries/
    │   └── index.tsx
    ├── title.txt
@@ -101,29 +101,28 @@ Wait for the following information
      ```typescript
      import WorksheetTracker, { WorksheetSummary } from '../../../components/shared/WorksheetTracker';
      ```
-   - Wrap entire worksheet content in WorksheetTracker:
+   - Wrap entire quiz content in WorksheetTracker:
      ```typescript
      <WorksheetTracker
        totalQuestions={number_of_questions}
        pointsPerQuestion={points_per_question}
        onSummaryGenerated={handleSummaryGenerated}
      >
-       {({ addPoints, markCorrect, markAttempted, markIncorrect, score }) => (
-         // Worksheet content
+       {({ markCorrect, markAttempted, markIncorrect, score }) => (
+         // Quiz content
        )}
      </WorksheetTracker>
      ```
    - Implement summary handler:
      ```typescript
      const handleSummaryGenerated = (summary: WorksheetSummary) => {
-       console.log('Worksheet Summary:', summary);
+       console.log('Quiz Summary:', summary);
      };
      ```
    - Use tracker functions appropriately:
      - `markAttempted()`: When user attempts a question
-     - `markCorrect()`: When answer is correct (MUST check if not already marked correct)
+     - `markCorrect()`: When answer is correct (MUST check if not already marked correct, automatically adds points)
      - `markIncorrect()`: When answer is wrong
-     - `addPoints()`: When points should be awarded
      - Use `score` from tracker for display
 
 2. ScoreDisplay Integration:
@@ -131,7 +130,7 @@ Wait for the following information
      ```typescript
      import ScoreDisplay from '../../../components/shared/ScoreDisplay';
      ```
-   - Place at top of worksheet content:
+   - Place at top of quiz content:
      ```typescript
      <div className="bg-blue-50 p-4 shadow-md mb-4">
        <div className="max-w-4xl mx-auto">
@@ -181,7 +180,7 @@ Wait for the following information
 4. Important Considerations:
    - Always use WorksheetTracker's score state, don't maintain separate score state
    - Call markAttempted() before checking if answer is correct
-   - Call both addPoints() and markCorrect() when answer is correct
+   - Use markCorrect() for correct answers (points are added automatically)
    - Ensure totalQuestions and pointsPerQuestion align with desired total score
    - Test score tracking thoroughly before proceeding to other components
    - Implement proper completion tracking to prevent double-counting
@@ -191,19 +190,19 @@ Wait for the following information
 2. Create and implement components in this order:
    a. Main Worksheet ([Prefix]Worksheet.tsx)
       - Mobile first design approach, No horizontal margins/padding on root containers
-      - Core interactive learning content
+      - Core quiz mechanics and interactions
       - Student input and feedback mechanisms
       - Score tracking
       - Visual aids and examples
       
 
-   **Important**: After creating the worksheet component, verify and proceed after confirmation:
+   **Important**: After creating the quiz component, verify and proceed after confirmation:
       - All interactive features work as expected
       - Score tracking is accurate
       - Feedback mechanisms are clear
       - Visual aids are appropriate
       - Content matches learning objectives
-   Only proceed to other components after confirming worksheet functionality.
+   Only proceed to other components after confirming quiz functionality.
 
    b. Answer Key ([Prefix]AnswerKey.tsx)
       - Mobile first design approach, No horizontal margins/padding on root containers
@@ -213,7 +212,7 @@ Wait for the following information
 
    c. Tips ([Prefix]Tips.tsx)
       - Mobile first design approach, No horizontal margins/padding on root containers
-      - Specific strategies for this worksheet
+      - Specific strategies for this quiz
       - Problem-solving guidance
       - Quick reference aids
 
@@ -232,26 +231,26 @@ Wait for the following information
 
 1. Title Guidelines:
    - Maximum 6 words
-   - Must clearly indicate the content range (e.g., "Match Numbers 1-5 with Fruits")
+   - Must clearly indicate the quiz content (e.g., "Match Numbers 1-5 with Fruits")
    - Focus on the actual learning content
    - DO NOT include grade level or difficulty
    - Avoid generic excitement words (e.g., "fun", "exciting")
    - Examples:
      ```
-     ❌ WRONG - "Fun PreK Number Matching Game"
+     ❌ WRONG - "Fun PreK Number Matching Quiz"
      ❌ WRONG - "Beginner Fruit Counting Activity"
      ✅ CORRECT - "Match Numbers 1-5 with Fruits"
      ✅ CORRECT - "Count and Add Numbers 1-10"
      ```
 
 2. Description Guidelines:
-   - Clear summary of content and learning objectives
+   - Clear summary of quiz content and learning objectives
    - Specify the exact number/content range being covered
-   - Focus on what the child will learn/practice
+   - Focus on what the student will learn/practice
    - DO NOT mention grade level or difficulty
    - Examples:
      ```
-     ❌ WRONG - "A fun PreK level game for learning numbers"
+     ❌ WRONG - "A fun PreK level quiz for learning numbers"
      ✅ CORRECT - "Match numbers 1-5 with their corresponding fruit quantities. Practice counting, number recognition, and one-to-one correspondence through interactive matching."
      ```
 
@@ -335,14 +334,11 @@ Wait for the following information
    - Default view fallback to worksheet
    - No manual HTML file creation needed (auto-generated during build)
 
-
-
 4. Build and Verify:
    ```powershell
    $env:WORKSHEET_ID="[grade]_[subject]_[topic]_[difficulty]"; npm run build
    ```
-   - Verify all HTML files load correctly
+   - Verify all quiz screens load correctly
    - Check all interactive features
    - Test responsive design
    - Validate thumbnail generation
-
