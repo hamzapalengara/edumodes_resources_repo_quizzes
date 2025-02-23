@@ -2,7 +2,7 @@
 description: Use these rules when creating quizz resources
 globs: 
 ---
-Let's create a new quiz
+Follow these rules while creating game resources:
 
 # Quiz Creation Request, Mobile first design approach, No horizontal margins/padding and no horizontal 
 scrolling should be there
