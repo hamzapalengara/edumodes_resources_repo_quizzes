@@ -1,16 +1,7 @@
 ---
-description: 
+description: Use these rules when creating quize resources
 globs: 
 ---
----
-description: 
-globs: 
----
-
-description: 
-globs: 
----
-
 Lets create a new worksheet
 
 # Worksheet Set Creation Request, Mobile first design approach, No horizontal margins/padding and no horizontal 
@@ -354,3 +345,4 @@ Wait for the following information
    - Check all interactive features
    - Test responsive design
    - Validate thumbnail generation
+
